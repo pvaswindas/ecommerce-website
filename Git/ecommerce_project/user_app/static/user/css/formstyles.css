@@ -1,0 +1,63 @@
+.form-box {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Style form labels */
+.form-box label {
+    color: white;
+    /* White text color */
+}
+
+/* Style form input fields */
+.form-box input[type="text"],
+.form-box input[type="password"],
+.form-box input[type="email"] {
+    width: 100%;
+    /* Set input width */
+    padding: 8px;
+    /* Adjust padding */
+    margin-bottom: 10px;
+    /* Adjust margin */
+    border-radius: 3px;
+    /* Add border radius */
+    border: 1px solid #ccc;
+    /* Add border */
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Input field background with 10% opacity white */
+    color: white;
+    /* Text color */
+}
+
+/* Style submit button */
+.form-box input[type="submit"] {
+    background-color: #4CAF50;
+    /* Green */
+    color: white;
+    /* White text */
+    padding: 10px 20px;
+    /* Padding */
+    border: none;
+    /* Remove border */
+    border-radius: 5px;
+    /* Add border radius */
+    cursor: pointer;
+    /* Add cursor pointer */
+}
+
+/* Style submit button on hover */
+.form-box input[type="submit"]:hover {
+    background-color: #45a049;
+    /* Darker green */
+}
+
+/* Style register label */
+#register-tab-2 {
+    color: #f8f9fa; /* Off-white text color */
+  }
+  
+  /* Hover effect for register label */
+#register-tab-2:hover {
+    opacity: 0.8; /* Reduce opacity on hover */
+  }
+  
+
