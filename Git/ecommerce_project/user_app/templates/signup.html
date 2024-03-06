@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include 'head.html' %}
+  </head>
+  <body>
+    <div class="page-wrapper">
+      {% include 'navbar.html' %}
+
+      {% include 'breadcrumbs.html' %}
+      <main class="main">
+        <div class="login-page bg-image pt-8 pb-8 pt-md-12 pb-md-12 pt-lg-17 pb-lg-17" id="register-form" style="background-image: url('{% static 'user/images/login_page/main_background1.png' %}')">
+          <div class="container">
+            <div class="form-box">
+              <div class="form-tab">
+                <ul class="nav nav-pills nav-fill" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link text-white" aria-selected="false">Sign In</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-selected="true">Register</a>
+                  </li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane fade show active" id="register-2" role="tabpanel" aria-labelledby="register-tab-2">
+                    <form action="{% url 'register_function' %}" method="post">
+                      {% csrf_token %}
+                      <div class="form-group">
+                        <label for="email">Your Email Address *</label>
+                        <input type="email" class="form-control" id="email" name="email" required />
+                      </div>
+                      <!-- End .form-group -->
+
+                      <div class="form-group">
+                        <label for="email">Password *</label>
+                        <input type="password" class="form-control" id="password" name="password" required />
+                      </div>
+                      <!-- End .form-group -->
+
+                      <div class="form-footer">
+                        <button type="submit" class="btn btn-outline-primary-2" id="sign_up_button" data-toggle="modal" data-target="register-form">
+                          <span>SIGN UP</span>
+                          <i class="icon-long-arrow-right"></i>
+                        </button>
+
+                        <div class="custom-control custom-checkbox">
+                          <input type="checkbox" class="custom-control-input" id="register-policy-2" required />
+                          <label class="custom-control-label" for="register-policy-2">I agree to the <a href="#">privacy policy</a> *</label>
+                        </div>
+                        <!-- End .custom-checkbox -->
+                      </div>
+                      <!-- End .form-footer -->
+                    </form>
+                    <div class="form-choice">
+                      <p class="text-center text-white">or sign in with</p>
+                      <div class="row text-center">
+                        {% if messages %}
+                          <p>
+                            {% for messages in messages %}
+                              {{ message }}
+                            {% endfor %}
+                          </p>
+                        {% endif %}
+                        <div class="col-sm-6">
+                          <a href="#" class="btn btn-login btn-g">
+                            <i class="icon-google"></i>
+                            Login With Google
+                          </a>
+                        </div>
+                        <!-- End .col-6 -->
+                        <div class="col-sm-6">
+                          <a href="#" class="btn btn-login btn-f">
+                            <i class="icon-facebook-f"></i>
+                            Login With Facebook
+                          </a>
+                        </div>
+                        <!-- End .col-6 -->
+                      </div>
+                      <!-- End .row -->
+                    </div>
+                    <!-- End .form-choice -->
+                  </div>
+                  <!-- .End .tab-pane -->
+                </div>
+                <!-- End .tab-content -->
+              </div>
+              <!-- End .form-tab -->
+            </div>
+            <!-- End .form-box -->
+          </div>
+          <!-- End .container -->
+        </div>
+        <!-- End .login-page section-bg -->
+      </main>
+      <!-- End .main -->
+    </div>
+    <!-- End .page-wrapper -->
+    {% include 'footer.html' %}
+    <!-- Plugins JS File -->
+  </body>
+</html>

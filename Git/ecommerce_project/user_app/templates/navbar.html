@@ -39,7 +39,11 @@
                 <a href="contact.html">Contact Us</a>
               </li>
               <li>
-                <a href="{% url 'sign_in' %}"><i class="icon-user"></i>Login</a>
+                {% if user.is_authenticated %}
+                  <a href=""><i class="icon-user"></i> {{ user.user.name }}</a>
+                {% else %}
+                  <a href="{% url 'sign_in_function' %}"><i class="icon-user"></i> Login</a>
+                {% endif %}
               </li>
             </ul>
           </li>
