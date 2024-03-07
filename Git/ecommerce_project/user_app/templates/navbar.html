@@ -30,19 +30,41 @@
             <a href="#">Links</a>
             <ul>
               <li>
-                <a href="wishlist.html"><i class="icon-heart-o"></i>My Wishlist <span>(3)</span></a>
+                <a href=""><i class="icon-heart-o"></i>My Wishlist <span>(3)</span></a>
               </li>
               <li>
-                <a href="about.html">About Us</a>
+                <a href="">About Us</a>
               </li>
               <li>
-                <a href="contact.html">Contact Us</a>
+                <a href="">Contact Us</a>
               </li>
               <li>
                 {% if user.is_authenticated %}
-                  <a href=""><i class="icon-user"></i> {{ user.user.name }}</a>
+                  {% if user.customer %}
+                    <div class="header-dropdown">
+                      <a href=""><i class="icon-user"></i> {{ user.customer.user.first_name }}</a>
+                      <div class="header-menu">
+                        <ul>
+                          <li>
+                            <a class=" text-dark fw-medium" href="#">Account</a>
+                          </li>
+                          <li>
+                            <form action="{% url 'logout' %}" method="post">
+                              {% csrf_token %}
+                              <button class="border-0 bg-white text-dark fw-medium" type="submit">LOGOUT</button>
+                            </form>
+                          </li>
+                        </ul>
+                      </div>
+                      <!-- End .header-menu -->
+                    </div>
+                    <!-- End .header-dropdown -->
+                  {% else %}
+                    <a href=""><i class="icon-user"></i> {{ user.username }}</a>
+                  {% endif %}
                 {% else %}
-                  <a href="{% url 'sign_in_function' %}"><i class="icon-user"></i> Login</a>
+                  <!-- Link to the sign-in page if the user is not authenticated -->
+                  <a href="{% url 'sign_in_page' %}"><i class="icon-user"></i>Login</a>
                 {% endif %}
               </li>
             </ul>
@@ -64,7 +86,7 @@
           <i class="icon-bars"></i>
         </button>
 
-        <a href="index.html" class="logo"><img src="{% static 'user/assets/images/demos/demo-10/logo.png' %}" alt="Molla Logo" width="105" height="25" /></a>
+        <a href="{% url 'index_page' %}" class="logo"><img src="{% static 'user/assets/images/demos/demo-10/logo.png' %}" alt="Molla Logo" width="105" height="25" /></a>
       </div>
       <!-- End .header-left -->
 
@@ -72,22 +94,22 @@
         <nav class="main-nav">
           <ul class="menu sf-arrows">
             <li class="megamenu-container active">
-              <a href="index.html" class="sf-with-ul">Home</a>
+              <a href="{% url 'index_page' %}" class="sf-with-ul">Home</a>
             </li>
             <li>
-              <a href="category.html" class="sf-with-ul">New</a>
+              <a href="" class="sf-with-ul">New</a>
             </li>
             <li>
-              <a href="product.html" class="sf-with-ul">Women</a>
+              <a href="" class="sf-with-ul">Women</a>
             </li>
             <li>
               <a href="#" class="sf-with-ul">Men</a>
             </li>
             <li>
-              <a href="blog.html" class="sf-with-ul">Kids</a>
+              <a href="" class="sf-with-ul">Kids</a>
             </li>
             <li>
-              <a href="elements-list.html" class="sf-with-ul">Elements</a>
+              <a href="" class="sf-with-ul">Elements</a>
             </li>
           </ul>
           <!-- End .menu -->
@@ -116,7 +138,7 @@
             <div class="dropdown-cart-products">
               <div class="product">
                 <div class="product-cart-details">
-                  <h4 class="product-title"><a href="product.html">Beige knitted elastic runner shoes</a></h4>
+                  <h4 class="product-title"><a href="">Beige knitted elastic runner shoes</a></h4>
 
                   <span class="cart-product-info">
                     <span class="cart-product-qty">1</span>
@@ -126,7 +148,7 @@
                 <!-- End .product-cart-details -->
 
                 <figure class="product-image-container">
-                  <a href="product.html" class="product-image"><img src="{% static 'user/assets/images/products/cart/product-1.jpg' %}" alt="product" /></a>
+                  <a href="" class="product-image"><img src="{% static 'user/assets/images/products/cart/product-1.jpg' %}" alt="product" /></a>
                 </figure>
                 <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
               </div>
@@ -134,7 +156,7 @@
 
               <div class="product">
                 <div class="product-cart-details">
-                  <h4 class="product-title"><a href="product.html">Blue utility pinafore denim dress</a></h4>
+                  <h4 class="product-title"><a href="">Blue utility pinafore denim dress</a></h4>
 
                   <span class="cart-product-info">
                     <span class="cart-product-qty">1</span>
@@ -144,7 +166,7 @@
                 <!-- End .product-cart-details -->
 
                 <figure class="product-image-container">
-                  <a href="product.html" class="product-image"><img src="{% static 'user/assets/images/products/cart/product-2.jpg' %}" alt="product" /></a>
+                  <a href="" class="product-image"><img src="{% static 'user/assets/images/products/cart/product-2.jpg' %}" alt="product" /></a>
                 </figure>
                 <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
               </div>
@@ -160,8 +182,8 @@
             <!-- End .dropdown-cart-total -->
 
             <div class="dropdown-cart-action">
-              <a href="cart.html" class="btn btn-primary">View Cart</a>
-              <a href="checkout.html" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
+              <a href="" class="btn btn-primary">View Cart</a>
+              <a href="" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
             </div>
             <!-- End .dropdown-cart-total -->
           </div>

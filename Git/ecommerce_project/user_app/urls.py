@@ -3,8 +3,10 @@ from user_app import views
 
 urlpatterns = [
     path('', views.index_page, name = 'index_page'),
+    path('sign-in/', views.sign_in, name='sign_in_page'),
+    path('sign-up/', views.sign_up, name='sign_up_page'),
+    path('user-logout/', views.logout, name='logout'),
     path('register/', views.register_function, name='register_function'),
-    path('sign-in/', views.sign_in_function, name='sign_in_function'),
-    path('test/signin/', views.test_signin, name='test_sign_in'),
-    path('test/signup/', views.test_signup, name='test_sign_up'),
+    path('sign-in/user', views.sign_in_function, name='sign_in_function'),
+    path('custom-google-login/', views.custom_google_login, name='custom_google_login'),
 ]
