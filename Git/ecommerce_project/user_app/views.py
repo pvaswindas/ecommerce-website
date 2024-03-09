@@ -45,7 +45,7 @@ def verify_otp(request):
     if request.user.is_authenticated:
         return redirect('index_page')
     else:
-        messages.success(request, 'OTP have sended to your email')
+        messages.success(request, 'OTP has been sent to your email')
         return render(request, 'verify_otp.html')
     
 
