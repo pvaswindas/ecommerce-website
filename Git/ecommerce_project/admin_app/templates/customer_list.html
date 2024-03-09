@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Details</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'admin_css/customer_list.css' %}" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <div class="search-bar">
+            <form action="{% url 'search_user' %}" method="get">
+              {% csrf_token %}
+              <input type="text" class="search-input form-control" placeholder="Search for users" name="query" aria-label="Search for users" aria-describedby="button-search" />
+              <button type="submit" class="search-button btn" type="button" id="button-search">Search</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-12 mt-4">
+          <ul class="user-list">
+            {% for user in user_list %}
+              {% if messages %}
+                <div class="container text-center text-white fs-4">
+                  {% for message in messages %}
+                    {{ message }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <li class="user-item">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <div class="user-avatar">
+                      <img src="https://picsum.photos/seed/{{ user.id }}/60/60" />
+                    </div>
+                  </div>
+                  <div class="col">
+                    <h5 class="user-name">
+                      {% if user.is_superuser %}
+                        {{ user.username }}
+                      {% else %}
+                        {{ user.first_name }}
+                      {% endif %}
+                    </h5>
+                    <p class="user-email">{{ user.email }}</p>
+                    <span class="user-role">
+                      {% if user.is_superuser %}
+                        <span class="rounded rounded-5 bg-success text-center px-3">Admin</span>
+                      {% else %}
+                        <span class="rounded rounded-4 bg-warning text-center px-2">Customer</span>
+                      {% endif %}
+                    </span>
+                  </div>
+                  {% if not user.is_superuser %}
+                    {% if user.is_active %}
+                      <form action="{% url 'block_user' user.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="col-auto">
+                          <button type="submit" class="block-button">Block</button>
+                        </div>
+                      </form>
+                    {% else %}
+                      <form action="{% url 'unblock_user' user.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="col-auto">
+                          <button type="submit" class="unblock-button">Unblock</button>
+                        </div>
+                      </form>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+  </body>
+</html>

@@ -18,11 +18,8 @@
               </li>
             </ul>
           </div>
-          <!-- End .header-menu -->
         </div>
-        <!-- End .header-dropdown -->
       </div>
-      <!-- End .header-left -->
 
       <div class="header-right">
         <ul class="top-menu">
@@ -40,43 +37,36 @@
               </li>
               <li>
                 {% if user.is_authenticated %}
-                  {% if user.customer %}
-                    <div class="header-dropdown">
+                  <div class="header-dropdown">
+                    {% if user.customer %}
                       <a href=""><i class="icon-user"></i> {{ user.customer.user.first_name }}</a>
-                      <div class="header-menu">
-                        <ul>
-                          <li>
-                            <a class=" text-dark fw-medium" href="#">Account</a>
-                          </li>
-                          <li>
-                            <form action="{% url 'logout' %}" method="post">
-                              {% csrf_token %}
-                              <button class="border-0 bg-white text-dark fw-medium" type="submit">LOGOUT</button>
-                            </form>
-                          </li>
-                        </ul>
-                      </div>
-                      <!-- End .header-menu -->
+                    {% else %}
+                      <a href=""><i class="icon-user"></i> {{ user.username }}</a>
+                    {% endif %}
+                    <div class="header-menu">
+                      <ul>
+                        <li>
+                          <a class="text-dark fw-medium" href="#">Account</a>
+                        </li>
+                        <li>
+                          <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button class="border-0 bg-white text-dark fw-medium" type="submit">LOGOUT</button>
+                          </form>
+                        </li>
+                      </ul>
                     </div>
-                    <!-- End .header-dropdown -->
-                  {% else %}
-                    <a href=""><i class="icon-user"></i> {{ user.username }}</a>
-                  {% endif %}
+                  </div>
                 {% else %}
-                  <!-- Link to the sign-in page if the user is not authenticated -->
                   <a href="{% url 'sign_in_page' %}"><i class="icon-user"></i>Login</a>
                 {% endif %}
               </li>
             </ul>
           </li>
         </ul>
-        <!-- End .top-menu -->
       </div>
-      <!-- End .header-right -->
     </div>
-    <!-- End .container -->
   </div>
-  <!-- End .header-top -->
 
   <div class="header-middle sticky-header">
     <div class="container">
