@@ -17,6 +17,9 @@ from django.core.mail import send_mail
 from django.views.decorators.cache import never_cache
 
 
+
+
+
 @never_cache
 def index_page(request):
     if request.user.is_authenticated:
@@ -223,6 +226,7 @@ def resend_otp(request):
 
 
 
+
 @never_cache
 def sign_in_function(request):
     if request.user.is_authenticated:
@@ -244,10 +248,12 @@ def sign_in_function(request):
         else:
             messages.error(request, 'Invalid email or password')
             return redirect('sign_in_page')
-            
+             
             
     else:
         return redirect('sign_in_page')
+
+
 
 
 @never_cache

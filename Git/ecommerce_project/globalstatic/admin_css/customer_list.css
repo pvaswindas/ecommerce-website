@@ -38,37 +38,13 @@ body {
     font-size: 1.2rem;
     font-weight: bold;
     color: #333;
-    margin-bottom: 0.5rem;
 }
 
 .user-email {
     font-size: 0.9rem;
     color: #666;
-    margin-bottom: 0.5rem;
 }
 
-.user-role {
-    font-size: 0.8rem;
-    color: black;
-    padding: 0.3rem 0.5rem;
-    border-radius: 10px;
-}
-
-.user-role-admin {
-    background-color: #dc3545;
-}
-
-.user-role-staff {
-    background-color: #007bff;
-}
-
-.user-role-active {
-    background-color: #28a745;
-}
-
-.user-role-inactive {
-    background-color: #6c757d;
-}
 
 .block-button {
     border-radius: 10px;
@@ -85,6 +61,25 @@ body {
 }
 
 .block-button:focus {
+    outline: none;
+}
+
+.unblock-button {
+    border-radius: 10px;
+    background-color: #1eb626;
+    border: none;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.unblock-button:hover {
+    background-color: #0a7518;
+}
+
+
+.unblock-button:focus {
     outline: none;
 }
 

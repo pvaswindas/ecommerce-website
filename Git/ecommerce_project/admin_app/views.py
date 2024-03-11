@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect
+
 from django.contrib.auth.models import User
 from user_app.models import Customer
+from categories.models import Category
+
 from django.contrib.auth import authenticate
 from django.contrib import auth
 from django.contrib import messages
+
 from django.contrib.auth.decorators import login_required 
 from django.views.decorators.cache import never_cache
 
@@ -46,6 +50,8 @@ def admin_customers(request):
         return redirect('admin_login')
         
         
+@login_required
+@never_cache       
 def block_user(request, user_id):
     if request.user.is_superuser:
         if request.method == 'POST':
@@ -57,7 +63,11 @@ def block_user(request, user_id):
             return redirect(admin_customers)
     else:
         return redirect(admin_login)
+    
 
+
+@login_required
+@never_cache
 def unblock_user(request, user_id):
     if request.user.is_superuser:
         if request.method == 'POST':
@@ -74,6 +84,7 @@ def unblock_user(request, user_id):
         
         
 @login_required
+@never_cache
 def search_user(request):
     if request.user.is_superuser:
         query = request.GET.get('query', '')
@@ -86,11 +97,63 @@ def search_user(request):
         return render(request,'pages/customers/customers.html' ,{'user_list' : user_list})
 
         
-        
+@login_required
+@never_cache     
 def admin_logout(request):
     if request.method == 'POST' :
         auth.logout(request)
         messages.info(request, 'Login again!')
         return redirect('admin_login')
     else:
-        return render(request, '404.html')
+        return redirect(admin_login)
+    
+    
+    
+@login_required
+@never_cache
+def admin_products(request):
+    if request.user.is_superuser:
+        return render(request, 'pages/products/products.html')
+    else:
+        return redirect(admin_login)
+    
+    
+@login_required
+@never_cache
+def admin_categories(request):
+    if request.user.is_superuser:
+        category_list = Category.objects.all().order_by('name').values()
+        return render(request, 'pages/category/category.html', {'category_list' : category_list})
+    else:
+        return redirect(admin_login)
+    
+    
+    
+@login_required
+@never_cache
+def add_category_page(request):
+    if request.user.is_superuser:
+        return render(request, 'pages/category/add_category_page.html')
+    else:
+        return redirect(admin_login)
+    
+    
+    
+@login_required
+@never_cache
+def add_categories(request):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            name = request.POST['category_name']
+            description = request.POST['category_description']
+            
+            if not Category.objects.filter(name = name).exists():
+                category = Category.objects.create(name = name, description = description)
+                category.save()
+                messages.success(request, 'New category was added!')
+                return redirect(admin_categories)
+            else:
+                messages.error(request, 'Category already exists, create new category')
+                return redirect(add_category_page)
+    else:
+        return redirect(admin_login)

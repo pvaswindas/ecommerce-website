@@ -1,0 +1,73 @@
+.google-btn,
+.facebook-btn {
+    font-size: 14px;
+    padding: 8px;
+    width: 48%;
+    border: 1px solid #ccc;
+}
+
+.google-btn {
+    margin-right: 5px;
+}
+
+.facebook-btn {
+    margin-left: 5px;
+}
+
+.google-btn:hover {
+    background-color: #f8f9fa !important;
+    color: red;
+}
+
+.facebook-btn:hover {
+    background-color: #f8f9fa !important;
+    color: #007bff;
+}
+
+.sign-in-button {
+    padding: 12px;
+}
+
+.register-btn {
+    font-size: 14px;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    width: 49%;
+}
+
+.sign-in-btn:hover,
+.register-btn:hover {
+    color: rgb(40, 114, 220);
+}
+
+.form-control {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid white;
+    color: white;
+}
+
+.upper-separator-line {
+    margin-bottom: 20px;
+    border: none;
+    background: linear-gradient(to right, rgba(255, 255, 255),
+            /* White color */
+            rgba(255, 255, 255) 50%,
+            /* White color */
+            rgba(0, 0, 255) 50%,
+            /* Blue color */
+            rgba(0, 0, 255)
+            /* Blue color */
+        );
+    height: 4px;
+}
+
+.main-background {
+    background-size: cover;
+    /* Ensure the image covers the entire container */
+    background-repeat: no-repeat;
+    /* Prevent image repetition */
+    background-position: center;
+    /* Center the background image */
+}

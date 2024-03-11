@@ -1,0 +1,32 @@
+{% load static %}
+<div class="container py-5">
+  <div class="mb-4 d-flex justify-content-between align-items-center">
+    <h1 class="mb-0">Manage Categories</h1>
+    <a href="{% url 'add_category_page' %}"><button class="btn btn-dark">Add Category</button></a>
+  </div>
+
+  {% if messages %}
+    <div class="text-center py-2 mb-4">
+      {% for message in messages %}
+        <h4>{{ message }}</h4>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% for category in category_list %}
+    <ul class="category-list">
+      <li class="category-item">
+        <h3 class="category-title">{{ category.name }}</h3>
+        <p class="category-description">{{ category.description }}</p>
+        <div>
+          <a href=""><button class="btn btn-primary mx-1">Edit</button></a>
+          <a href=""><button class="btn btn-danger mx-1">Delete</button></a>
+          {% if category.is_listed == False %}
+            <a href=""><button class="btn btn-success mx-1">List</button></a>
+          {% else %}
+            <a href=""><button class="btn btn-secondary mx-1">Unlist</button></a>
+          {% endif %}
+        </div>
+      </li>
+    </ul>
+  {% endfor %}
+</div>

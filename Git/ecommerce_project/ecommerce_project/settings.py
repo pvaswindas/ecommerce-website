@@ -19,6 +19,9 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+SITE_ID = 1
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -33,6 +36,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'admin_app',
     'user_app',
+    'categories',
 ]
 
 MIDDLEWARE = [
@@ -83,8 +87,6 @@ DATABASES = {
 
 
 
-
-SITE_ID = 1
 
 
 
@@ -137,12 +139,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -151,6 +147,18 @@ EMAIL_HOST_USER = 'sneakerheadsweb@gmail.com'
 EMAIL_HOST_PASSWORD = 'mtxd ozla oluq nlnc'
 
 
+SOCIALACCOUNT_QUERY_EMAIL = True
+
+
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+
+
+
 LOGIN_REDIRECT_URL = 'index_page'
 
-SOCIALACCOUNT_QUERY_EMAIL = True
