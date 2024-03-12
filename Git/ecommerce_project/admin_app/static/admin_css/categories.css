@@ -31,3 +31,39 @@ body {
     color: #666;
 }
 
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+
+.plus-icon {
+    z-index: 100; /* Ensure the icon is on top of other elements */
+}
+
+
+@media (max-width: 768px) {
+    /* Styles for screens smaller than 768px */
+    .category-title {
+      font-size: 1.2rem;  /* Adjust font size for smaller screens */
+    }
+    .btn-group {  /* Create button groups for smaller screens */
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .btn {
+      margin: 5px;  /* Adjust button spacing */
+    }
+  }
+  
+  .plus-icon:hover {
+    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2);  /* Add shadow on hover */
+    background-color: #ffffff;  /* Add background color on hover (optional) */
+  }

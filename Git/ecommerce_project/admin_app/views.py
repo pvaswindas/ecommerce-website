@@ -118,11 +118,15 @@ def admin_products(request):
         return redirect(admin_login)
     
     
+    
+    
+    
+# CATEGORIES PAGES
 @login_required
 @never_cache
 def admin_categories(request):
     if request.user.is_superuser:
-        category_list = Category.objects.all().order_by('name').values()
+        category_list = Category.objects.filter(is_deleted = False).order_by('name').values()
         return render(request, 'pages/category/category.html', {'category_list' : category_list})
     else:
         return redirect(admin_login)
@@ -139,6 +143,8 @@ def add_category_page(request):
     
     
     
+    
+ 
 @login_required
 @never_cache
 def add_categories(request):
@@ -147,7 +153,7 @@ def add_categories(request):
             name = request.POST['category_name']
             description = request.POST['category_description']
             
-            if not Category.objects.filter(name = name).exists():
+            if not Category.objects.filter(name = name, is_deleted = False).exists():
                 category = Category.objects.create(name = name, description = description)
                 category.save()
                 messages.success(request, 'New category was added!')
@@ -155,5 +161,93 @@ def add_categories(request):
             else:
                 messages.error(request, 'Category already exists, create new category')
                 return redirect(add_category_page)
+    else:
+        return redirect(admin_login)
+    
+    
+    
+    
+@login_required
+@never_cache    
+def delete_category(request, cat_id):
+    if request.user.is_superuser:
+        if cat_id:
+            category_to_delete = Category.objects.get(id = cat_id)
+            category_to_delete.is_deleted = True
+            category_to_delete.save()
+            messages.success(request, 'Category has been deleted!')
+            return redirect(admin_categories)
+        else:
+            messages.error(request, 'id cannot be found!')
+            return redirect(admin_categories)
+    else:
+        return redirect(admin_login)
+    
+    
+    
+    
+@login_required
+@never_cache   
+def list_category(request, cat_id):
+    if request.user.is_superuser:
+        if cat_id:
+            category_to_list = Category.objects.get(id = cat_id)
+            category_to_list.is_listed = True
+            category_to_list.save()
+            messages.success(request, 'Category updated successfully!')
+            return redirect(admin_categories)
+        else:
+            messages.error(request, 'id cannot be found!')
+            return redirect(admin_categories)
+    else:
+        return redirect(admin_login)
+
+
+
+
+
+@login_required
+@never_cache
+def un_list_category(request, cat_id):
+    if request.user.is_superuser:
+        if cat_id:
+            category_to_list = Category.objects.get(id = cat_id)
+            category_to_list.is_listed = False
+            category_to_list.save()
+            messages.success(request, 'Category updated successfully!')
+            return redirect(admin_categories)
+        else:
+            messages.error(request, 'id cannot be found!')
+            return redirect(admin_categories)
+    else:
+        return redirect(admin_login)
+    
+    
+
+@login_required
+@never_cache
+def deleted_cat_view(request):
+    if request.user.is_superuser:
+        category_list = Category.objects.filter(is_deleted = True).order_by('name').values()
+        return render(request, 'pages/category/deleted_categories.html', {'category_list' : category_list})
+    else:
+        return redirect(admin_login)
+    
+    
+
+
+@login_required
+@never_cache
+def restore_categories(request, cat_id):
+    if request.user.is_superuser:
+        if cat_id:
+            category_to_restore = Category.objects.get(id = cat_id)
+            category_to_restore.is_deleted = False
+            category_to_restore.save()
+            messages.success(request, 'Category have been restored successfully!')
+            return redirect(deleted_cat_view)
+        else:
+            messages.error(request, ' id cannot be found!')
+            return redirect(deleted_cat_view)
     else:
         return redirect(admin_login)

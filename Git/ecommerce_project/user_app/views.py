@@ -10,7 +10,6 @@ from user_app.models import Customer
 from django.utils import timezone
 from datetime import datetime
 from django.db import transaction
-import logging
 import random
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -78,7 +77,7 @@ def register_function(request):
         password = request.POST['password']
         confirm_password = request.POST['confirm_password']
 
-        # Normalize and validate email
+
         email = normalize_newlines(email).strip()
         is_valid_email = True
         try:
@@ -92,7 +91,6 @@ def register_function(request):
             messages.error(request, 'Email already exits, try logging in')
             is_valid_email = False
 
-        # Password validation
         is_valid_password = True
         if len(password) < 8:
             messages.error(request, 'Password must be at least 8 characters long.')
@@ -156,14 +154,13 @@ def otp_verification_page(request):
         otp_created_at_str = request.session.get('otp_created_at')
         
         if otp and otp_created_at_str:
-            # Convert otp_created_at_str to a timezone-aware datetime object
+            
             otp_created_at = datetime.strptime(otp_created_at_str, '%Y-%m-%d %H:%M:%S')
             otp_created_at = timezone.make_aware(otp_created_at, timezone.get_current_timezone())
             
-            # Get the current time in the current timezone
             now = timezone.localtime(timezone.now())
             
-            if (now - otp_created_at).total_seconds() <= 300:
+            if (now - otp_created_at).total_seconds() <= 120:
                 if str(otp_entered) == str(otp):
                     user_data = request.session.get('user_data')
                     if user_data:
@@ -197,19 +194,15 @@ def resend_otp(request):
     if request.user.is_authenticated:
         return redirect('index_page')
     elif request.method == 'POST':
-        # Retrieve user data from session
         user_data = request.session.get('user_data')
         if user_data:
-            user = user_data  # Use 'email' key instead of 'user.email'
+            user = user_data
             email = user_data['email']
             
-            # Generate a new OTP
             otp = generate_otp(user)
             
-            # Send the new OTP email
             send_otp_email(email, otp)
             
-            # Update session with new OTP and timestamp
             request.session['otp'] = otp
             request.session['otp_created_at'] = timezone.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -218,9 +211,9 @@ def resend_otp(request):
             return redirect('otp_verification_page')
         else:
             messages.error(request, 'User data not found in session.')
-            return redirect('sign_up')  # Redirect to appropriate page
+            return redirect('sign_up')
     else:
-        return redirect('resend_otp_page')  # Redirect to appropriate page
+        return redirect('resend_otp_page')
 
 
 
