@@ -1,9 +1,49 @@
 {% extends 'admin_base.html' %}
 
-
-
+{% block custom_css %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'admin_css/product.css' %}" />
+{% endblock %}
 
 {% block title %}
-<title>SneakerHeads Products</title>
-{% endblock title %}
-    
+  <title>SneakerHeads Products</title>
+{% endblock %}
+
+{% block content %}
+  <div class="container main-container">
+    <h1>Product List</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Category</th>
+          <th>Brand</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in product_list %}
+          <tr>
+            <td>
+                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" style="max-width: 100px;" />
+            </td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.quantity }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.category_id.name }}</td>
+            <td>{{ product.brand_id.name }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if not product_list %}
+    <div class="container text-center justify-content-center align-items-center mt-5">
+      <h3>No products to show</h3>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -33,14 +33,39 @@ class Product(models.Model):
     description = models.TextField()
     quantity = models.BigIntegerField()
     price = models.BigIntegerField()
-    category_id = models.ForeignKey(Category, on_delete = models.CASCADE)
-    brand_id = models.ForeignKey(Brand, on_delete = models.CASCADE)
-    main_image = models.ImageField(upload_to = 'media/product_image/')
-    side_view_image = models.ImageField(upload_to = 'media/product_images/')
-    back_view_image = models.ImageField(upload_to = 'media/product_images/')
+    category = models.ForeignKey(Category, on_delete = models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete = models.CASCADE)
+    main_image = models.FileField(upload_to = 'product_images/')
+    side_view_image = models.FileField(upload_to = 'product_images/')
+    back_view_image = models.FileField(upload_to = 'product_images/')
     is_deleted = models.BooleanField(default = False)
     is_listed = models.BooleanField(default = False)
     
     
     def __str__(self):
         return self.name
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

@@ -12,9 +12,13 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 
 
+from django.shortcuts import get_object_or_404
 
 
-@never_cache
+
+
+
+# ADMIN LOGIN PAGE
 def admin_login_page(request):
     if request.user.is_authenticated and request.user.is_superuser:
             user_list = User.objects.all().order_by('username').values()
@@ -38,7 +42,7 @@ def admin_login_page(request):
 
 
 
-
+# ADMIN LOGOUT FUNCTION
 @login_required
 @never_cache     
 def admin_logout(request):
@@ -65,10 +69,12 @@ def page_not_found(request):
 
 
 
+# ---------------------------------------------------------------- ADMIN CUSTOMER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 
-# CUSTOMER
+
+# CUSTOMER SHOW FUNCTION
 @login_required
 @never_cache
 def admin_customers(request):
@@ -81,6 +87,9 @@ def admin_customers(request):
         
         
         
+ 
+ 
+# BLOCK CUSTOMER FUNCTION    
 @login_required
 @never_cache       
 def block_user(request, user_id):
@@ -97,6 +106,10 @@ def block_user(request, user_id):
     
 
 
+
+
+
+# UNBLOCK CUSTOMER FUNCTION
 @login_required
 @never_cache
 def unblock_user(request, user_id):
@@ -113,7 +126,9 @@ def unblock_user(request, user_id):
         
         
         
-        
+
+
+# SEARCH CUSTOMER FUNCTION    
 @login_required
 @never_cache
 def search_user(request):
@@ -129,11 +144,14 @@ def search_user(request):
     
     
     
+
+
+# ---------------------------------------------------------------- ADMIN CATEGORIES PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
     
     
     
     
-# CATEGORIES PAGES
+# CATEGORIES PAGES FUNCTION
 @login_required
 @never_cache
 def admin_categories(request):
@@ -145,6 +163,9 @@ def admin_categories(request):
     
     
     
+    
+    
+# ADD CATEGORY PAGE FUNCTION   
 @login_required
 @never_cache
 def add_category_page(request):
@@ -156,7 +177,8 @@ def add_category_page(request):
     
     
     
- 
+
+# ADD CATEGORY FUNCTION 
 @login_required
 @never_cache
 def add_categories(request):
@@ -176,9 +198,45 @@ def add_categories(request):
     else:
         return redirect('admin_login_page')
     
-    
-    
-    
+
+
+# EDIT BRAND PAGE FUNCTION 
+@login_required
+@never_cache
+def edit_category_page(request, cat_id):
+    if request.user.is_superuser:
+        category = Category.objects.get(pk = cat_id)
+        return render(request, 'pages/category/edit_category.html', {'category' : category,'countries' : countries})
+    else:
+        return redirect('admin_login_page') 
+
+
+# EDIT CATEGORIES FUNCTION   
+@login_required
+@never_cache
+def edit_category(request, cat_id):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            name = request.POST['category_name']
+            description = request.POST['category_description']
+            
+            category = Category.objects.get(id = cat_id)
+            
+            if not Category.objects.filter(name__icontains = name).exists():
+                category.name = name
+                category.description = description
+                category.save()
+                messages.success(request, 'Category updated successfully!')
+                return redirect(admin_categories)
+            else:
+                messages.error(request, 'Category already exits, add new category')
+                return redirect(edit_category_page)
+    else:
+        return redirect('admin_login_page') 
+
+
+
+# DELETE CATEGORY FUNCTION 
 @login_required
 @never_cache    
 def delete_category(request, cat_id):
@@ -196,8 +254,10 @@ def delete_category(request, cat_id):
         return redirect('admin_login_page')
     
     
-    
-    
+
+
+   
+# LIST CATEGORY FUNCTION 
 @login_required
 @never_cache   
 def list_category(request, cat_id):
@@ -217,7 +277,7 @@ def list_category(request, cat_id):
 
 
 
-
+# UNLIST CATEGORY FUNCTION
 @login_required
 @never_cache
 def un_list_category(request, cat_id):
@@ -235,7 +295,10 @@ def un_list_category(request, cat_id):
         return redirect('admin_login_page')
     
     
-
+    
+    
+    
+# DELETED CATEGORIES VIEW PAGE FUNCTION
 @login_required
 @never_cache
 def deleted_cat_view(request):
@@ -248,6 +311,7 @@ def deleted_cat_view(request):
     
 
 
+# RESTORE CATEGORIES FUNCTION
 @login_required
 @never_cache
 def restore_categories(request, cat_id):
@@ -265,64 +329,75 @@ def restore_categories(request, cat_id):
         return redirect('admin_login_page')
     
     
-    
+
+# ---------------------------------------------------------------- ADMIN PRODUCT PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+   
 
 
-# PRODUCT
+# PRODUCT PAGE FUNCTION
 @login_required
 @never_cache
 def list_product_page(request):
     if request.user.is_superuser:
-        product_list = Product.objects.filter(is_deleted = False).order_by('name').values()
+        product_list = Product.objects.filter(is_deleted=False).order_by('name').select_related('category', 'brand')
+        print(product_list)
         return render(request, 'pages/products/product.html', {'product_list' : product_list})
     else:
         return redirect('admin_login_page')
 
 
 
+# ADD PRODUCT PAGE FUNCTION
 @login_required
 @never_cache
 def admin_add_product(request):
     if request.user.is_superuser:
-        return render(request, 'pages/products/add_products.html')
+        brand_list = Brand.objects.all().order_by('name').values()
+        category_list = Category.objects.all().order_by('name').values()
+        return render(request, 'pages/products/add_products.html', {'brand_list' : brand_list, 'category_list' : category_list})
     else:
         return redirect('admin_login_page')
 
 
 
-
+# ADD PRODUCT FUNCTION
 @login_required
 @never_cache
 def add_products(request):
     if request.user.is_superuser:
-        if request.method == 'POST' :
-            name = request.POST['product_name']
-            quantity = request.POST['quantity']
-            description = request.POST['description']
-            price = request.POST['price']
-            category_id = request.POST['category']
-            brand_id = request.POST['brand']
-            main_image = request.POST['main_image']
-            side_view_image = request.POST['side_view_image']
-            back_view_image = request.POST['back_view-image']
+        if request.method == 'POST':
+            name = request.POST.get('product_name')
+            quantity = request.POST.get('quantity')
+            description = request.POST.get('description')
+            price = request.POST.get('price')
+            category_id = request.POST.get('category')
+            brand_id = request.POST.get('brand')
+            main_image = request.FILES.get('main_image')
+            side_view_image = request.FILES.get('side_view_image')
+            back_view_image = request.FILES.get('back_view_image')
+
+            category = Category.objects.get(pk = category_id)
+            brand = Brand.objects.get(pk = brand_id)
             
-            if Product.objects.filter(name__icontains = name).exists():
-                messages.error(request, 'Product already exits!')
+            if Product.objects.filter(name__icontains=name).exists():
+                messages.error(request, 'Product already exists!')
+                return redirect(admin_add_product)
             else:
-                Product.objects.create(
-                    name = name, 
-                    description = description, 
-                    quantity = quantity, 
-                    price = price, 
-                    category_id = category_id, 
-                    brand_id = brand_id,
-                    main_image = main_image,
-                    side_view_image = side_view_image,
-                    back_view_image = back_view_image,
-                    )
+                product = Product.objects.create(
+                    name=name,
+                    description=description,
+                    quantity=quantity,
+                    price=price,
+                    category=category,
+                    brand=brand,
+                    main_image=main_image,
+                    side_view_image=side_view_image,
+                    back_view_image=back_view_image,
+                )
+                product.save()
                 messages.success(request, 'New Product was created!')
                 return redirect(list_product_page)
-        
+
     else:
         return redirect('admin_login_page')
     
@@ -330,9 +405,9 @@ def add_products(request):
     
     
 
+# ---------------------------------------------------------------- ADMIN BRAND PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
-
-# BRAND
+# BRAND PAGE FUNCTION
 @login_required
 @never_cache
 def list_brand_page(request):
@@ -343,15 +418,50 @@ def list_brand_page(request):
         return redirect('admin_login_page')
 
 
+countries = [
+    "Select a country", "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", 
+    "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", 
+    "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", 
+    "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", 
+    "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", 
+    "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", 
+    "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)", 
+    "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic", 
+    "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini (fmr. 'Swaziland')", 
+    "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", 
+    "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Holy See", 
+    "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", 
+    "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", 
+    "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", 
+    "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", 
+    "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", 
+    "Mozambique", "Myanmar (formerly Burma)", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", 
+    "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia (formerly Macedonia)", "Norway", 
+    "Oman", "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", 
+    "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", 
+    "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", 
+    "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", 
+    "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", 
+    "Suriname", "Sweden", "Switzerland", "Syria", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", 
+    "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", 
+    "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", 
+    "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+    ]
+
+        
+        
+# ADD BRAND PAGE FUNCTION
 @login_required
 @never_cache
 def admin_add_brand(request):
     if request.user.is_superuser:
-        return render(request, 'pages/products/add_brand.html')
+        return render(request, 'pages/products/add_brand.html', {'countries' : countries})
     else:
         return redirect('admin_login_page')
 
 
+
+# ADD BRAND FUNCTION
 @login_required
 @never_cache
 def add_brand(request):
@@ -378,18 +488,53 @@ def add_brand(request):
     else:
         return redirect('admin_login_page')
     
+
+
+
+
+# EDIT BRAND PAGE FUNCTION 
+@login_required
+@never_cache
+def edit_brand_page(request, brand_id):
+    if request.user.is_superuser:
+        brand = get_object_or_404(Brand, id = brand_id)
+        return render(request, 'pages/products/edit_brand.html', {'brand' : brand,'countries' : countries})
+    else:
+        return redirect('admin_login_page')
     
- 
+    
+
+
+
+# EDIT BRAND FUNCTION   
 @login_required
 @never_cache
 def edit_brand(request, brand_id):
     if request.user.is_superuser:
-        brand_list = Brand.objects.filter(id = brand_id).values()
-        return render(request, 'pages/products/edit_brand.html', {'brand_list' : brand_list})
+        if request.method == 'POST':
+            name = request.POST['name']
+            country_of_origin = request.POST['country_of_origin']
+            manufacturer_details = request.POST['manufacturer_details']
+            
+            brand = Brand.objects.get(id = brand_id)
+            
+            if not Brand.objects.filter(name__icontains = name).exists():
+                brand.name = name
+                brand.country_of_origin = country_of_origin
+                brand.manufacturer_details = manufacturer_details
+                brand.save()
+                messages.success(request, 'Brand updated successfully!')
+                return redirect(list_brand_page)
+            else:
+                messages.error(request, 'Brand already exits, add new brand')
+                return redirect(admin_add_brand)
     else:
         return redirect('admin_login_page')
-    
+            
+            
 
+
+# DELETE BRAND FUNCTION
 @login_required
 @never_cache
 def delete_brand(request, brand_id):
@@ -408,7 +553,7 @@ def delete_brand(request, brand_id):
     
 
 
-
+#  RESTORE BRAND FUNCTION
 @login_required
 @never_cache
 def restore_brand(request, brand_id):
@@ -427,7 +572,7 @@ def restore_brand(request, brand_id):
     
     
 
-
+#  DELETED BRAND VIEW PAGE
 @login_required
 @never_cache
 def deleted_brand_view(request):
@@ -440,7 +585,7 @@ def deleted_brand_view(request):
     
 
     
-
+# LIST BRAND FUNCTION
 @login_required
 @never_cache
 def list_the_brand(request, brand_id):
@@ -460,7 +605,8 @@ def list_the_brand(request, brand_id):
     
     
     
-    
+
+# UNLIST BRAND FUNCTION   
 @login_required
 @never_cache
 def un_list_the_brand(request, brand_id):
@@ -476,3 +622,6 @@ def un_list_the_brand(request, brand_id):
             return redirect(list_brand_page)
     else:
         return redirect('admin_login_page')
+    
+
+

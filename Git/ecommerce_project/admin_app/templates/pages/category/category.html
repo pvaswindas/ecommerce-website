@@ -30,7 +30,7 @@
           <h3 class="category-title">{{ category.name }}</h3>
           <p class="category-description">{{ category.description }}</p>
           <div class="btn-group mt-auto">
-            <a href=""><button class="btn btn-primary mt-3" style="margin-right: 5px;">Edit</button></a>
+            <a href="{% url 'edit_category_page' category.id %}"><button class="btn btn-primary mt-3" style="margin-right: 5px;">Edit</button></a>
             <a href="{% url 'delete_category' category.id %}"><button class="btn btn-danger mt-3" style="margin-right: 5px;">Delete</button></a>
             {% if category.is_listed == False %}
               <a href="{% url 'list_category' category.id %}"><button class="btn btn-success mt-3" style="margin-right: 5px;">List</button></a>

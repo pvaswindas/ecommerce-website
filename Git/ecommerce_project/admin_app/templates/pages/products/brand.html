@@ -30,9 +30,9 @@
       <ul class="brand-list list-unstyled">
         <li class="brand-item d-flex flex-column">
           <h3 class="brand-title">{{ brand.name }}</h3>
-          <p class="brand-description">{{ brand.description }}</p>
+          <p class="brand-description">{{ brand.country_of_origin }}</p>
           <div class="btn-group mt-auto">
-            <a href="{% url 'edit_brand' brand.id %}"><button class="btn btn-primary mt-3" style="margin-right: 5px;">Edit</button></a>
+            <a href="{% url 'edit_brand_page' brand.id %}"><button class="btn btn-primary mt-3" style="margin-right: 5px;">Edit</button></a>
             <a href="{% url 'delete_brand' brand.id %}"><button class="btn btn-danger mt-3" style="margin-right: 5px;">Delete</button></a>
             {% if brand.is_listed == False %}
               <a href="{% url 'list_the_brand' brand.id %}"><button class="btn btn-success mt-3" style="margin-right: 5px;">List</button></a>

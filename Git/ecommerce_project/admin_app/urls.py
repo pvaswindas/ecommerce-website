@@ -1,5 +1,9 @@
 from django.urls import path
 from admin_app import views
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 
 urlpatterns = [
     path('sneakerheads/admin/login/', views.admin_login_page, name='admin_login_page'),
@@ -19,8 +23,9 @@ urlpatterns = [
     path('list-brand/<int:brand_id>/', views.list_the_brand, name='list_the_brand'),
     path('un-list-brand/<int:brand_id>/', views.un_list_the_brand, name='un_list_the_brand'),
     path('delete-brand/<int:brand_id>/', views.delete_brand, name='delete_brand'),
-    path('deleted-brand-view', views.deleted_brand_view, name='deleted_brand_view'),
+    path('deleted-brand-view/', views.deleted_brand_view, name='deleted_brand_view'),
     path('restore-brand/<int:brand_id>/', views.restore_brand, name='restore_brand'),
+    path('edit-brand-page/<int:brand_id>/', views.edit_brand_page, name='edit_brand_page'),
     path('edit-brand/<int:brand_id>/', views.edit_brand, name='edit_brand'),
     
     
@@ -30,6 +35,8 @@ urlpatterns = [
     path('sneakerheads/admin/categories/', views.admin_categories, name = 'admin_categories'),
     path('add-category/page', views.add_category_page, name = 'add_category_page'),
     path("add-categories/", views.add_categories ,name="add_categories"),
+    path('edit-category-page/<int:cat_id>/', views.edit_category_page, name='edit_category_page'),
+    path('edit-category/<int:cat_id>/', views.edit_category, name='edit_category'),
     path('delete-category/<int:cat_id>/', views.delete_category, name='delete_category'),
     path('list-category/<int:cat_id>/', views.list_category, name='list_category'),
     path('un-list-category/<int:cat_id>/', views.un_list_category, name='un_list_category'),
@@ -43,3 +50,8 @@ urlpatterns = [
     path('unblock-user/<int:user_id>/', views.unblock_user, name='unblock_user'),
     path('sneakerheads/admin/customer/search/', views.search_user, name='search_user'),
 ]
+
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
