@@ -21,20 +21,27 @@
           <th>Price</th>
           <th>Category</th>
           <th>Brand</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         {% for product in product_list %}
           <tr>
             <td>
+              {% if product.main_image %}
                 <img src="{{ product.main_image.url }}" alt="{{ product.name }}" style="max-width: 100px;" />
+              {% else %}
+                <span>No Image Available</span>
+              {% endif %}
             </td>
-            <td>{{ product.name }}</td>
             <td>{{ product.name }}</td>
             <td>{{ product.quantity }}</td>
             <td>{{ product.price }}</td>
-            <td>{{ product.category_id.name }}</td>
-            <td>{{ product.brand_id.name }}</td>
+            <td>{{ product.category.name }}</td>
+            <td>{{ product.brand.name }}</td>
+            <td>
+              <a href="{% url 'edit_product_page' product.id %}"><button class="btn btn-warning">Edit</button></a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>

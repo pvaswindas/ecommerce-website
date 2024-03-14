@@ -340,7 +340,6 @@ def restore_categories(request, cat_id):
 def list_product_page(request):
     if request.user.is_superuser:
         product_list = Product.objects.filter(is_deleted=False).order_by('name').select_related('category', 'brand')
-        print(product_list)
         return render(request, 'pages/products/product.html', {'product_list' : product_list})
     else:
         return redirect('admin_login_page')
@@ -403,7 +402,100 @@ def add_products(request):
     
     
     
-    
+
+# EDIT PRODUCT
+@login_required
+@never_cache
+def edit_product_page(request, pdt_id):
+    if request.user.is_superuser:
+        product = Product.objects.get(id=pdt_id)
+        category_list = Category.objects.all()  # Assuming you have this queryset
+        brand_list = Brand.objects.all()  # Assuming you have this queryset
+        context = {
+            'product': product,
+            'category_list': category_list,
+            'brand_list': brand_list,
+            'selected_category_id': product.category.id if product.category else None,
+            'selected_brand_id': product.brand.id if product.brand else None,
+        }
+        return render(request, 'pages/products/edit_product.html', context)
+    else:
+        return redirect(admin_login_page)
+
+
+
+@login_required
+@never_cache
+def edit_product(request, pdt_id):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            name = request.POST.get('product_name')
+            quantity = request.POST.get('quantity')
+            description = request.POST.get('description')
+            price = request.POST.get('price')
+            category_id = request.POST.get('category')
+            brand_id = request.POST.get('brand')
+            main_image = request.FILES.get('main_image')
+            side_view_image = request.FILES.get('side_view_image')
+            back_view_image = request.FILES.get('back_view_image')
+            
+            
+            product = Product.objects.get(pk = pdt_id)
+            category = Category.objects.get(pk = category_id)
+            
+            brand = Brand.objects.get(pk = brand_id)
+            
+            product.name = name
+            product.description = description
+            product.quantity = quantity
+            product.price = price
+            product.category = category
+            product.brand = brand
+            if main_image:
+                product.main_image = main_image
+            if side_view_image:
+                product.side_view_image = side_view_image
+            if back_view_image:
+                product.back_view_image = back_view_image
+            product.save()
+            messages.success(request, 'New Product was created!')
+            return redirect(list_product_page)
+    else:
+        return redirect(admin_login_page)
+            
+            
+            
+
+# For list_product function
+def list_product(request, pdt_id):
+    if request.user.is_superuser:
+        if pdt_id:
+            product_to_list = Product.objects.get(pk=pdt_id)
+            product_to_list.is_listed = True
+            product_to_list.save()
+            messages.success(request, 'Product updated successfully!')
+            return redirect(edit_product_page)  # Redirect to edit_product_page
+        else:
+            messages.error(request, 'id cannot be found.')
+            return redirect(edit_product_page)
+    else:
+        return redirect(admin_login_page)
+
+# For un_list_product function
+def un_list_product(request, pdt_id):
+    if request.user.is_superuser:
+        if pdt_id:
+            product_to_un_list = Product.objects.get(pk=pdt_id)
+            product_to_un_list.is_listed = False
+            product_to_un_list.save()
+            messages.success(request, 'Product updated successfully!')
+            return redirect(list_product_page)  # Redirect to list_product_page
+        else:
+            messages.error(request, 'id cannot be found.')
+            return redirect(edit_product_page)  # Consider redirecting to the same page
+    else:
+        return redirect(admin_login_page)
+
 
 # ---------------------------------------------------------------- ADMIN BRAND PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
@@ -497,11 +589,12 @@ def add_brand(request):
 @never_cache
 def edit_brand_page(request, brand_id):
     if request.user.is_superuser:
-        brand = get_object_or_404(Brand, id = brand_id)
-        return render(request, 'pages/products/edit_brand.html', {'brand' : brand,'countries' : countries})
+        brand = get_object_or_404(Brand, id=brand_id)
+        selected_country = brand.country_of_origin if brand.country_of_origin in countries else None
+        return render(request, 'pages/products/edit_brand.html', {'brand': brand, 'countries': countries, 'selected_country': selected_country})
     else:
         return redirect('admin_login_page')
-    
+
     
 
 

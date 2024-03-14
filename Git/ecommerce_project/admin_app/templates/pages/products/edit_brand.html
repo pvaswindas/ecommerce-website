@@ -22,7 +22,7 @@
         <label for="country_of_origin">Country of Origin</label>
         <select id="country_of_origin" name="country_of_origin" class="form-control" required>
           {% for country in countries %}
-            <option value="{{ country }}" {% if country == brand.country_of_origin %}selected{% endif %}>{{ country }}</option>
+            <option value="{{ country }}" {% if country == selected_country %}selected{% endif %}>{{ country }}</option>
           {% endfor %}
         </select>
       </div>

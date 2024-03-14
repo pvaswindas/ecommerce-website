@@ -14,8 +14,16 @@ urlpatterns = [
     
     
     path('sneakerheads/admin/products/', views.list_product_page, name='list_product_page'),
-    path('sneakerheads/admin/add-products/', views.admin_add_product, name = 'admin_add_product'),
+    path('sneakerheads/admin/add-products/', views.admin_add_product, name='admin_add_product'),
     path('add-product/page/', views.add_products, name='add_products'),
+    path('edit-product-page/<int:pdt_id>/', views.edit_product_page, name='edit_product_page'),
+    path('edit-product/<int:pdt_id>/', views.edit_product, name='edit_product'),
+    path('list-product/<int:pdt_id>/', views.list_product, name='list_product'),
+    path('un-list-product/<int:pdt_id>/', views.un_list_product, name='un_list_product'),
+    
+    
+    
+    
     
     path('sneakerheads/admin/brands/', views.list_brand_page, name='list_brand_page'),
     path('sneakerheads/admin/add-brand/', views.admin_add_brand, name='admin_add_brand'),
