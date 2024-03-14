@@ -33,6 +33,7 @@ def sign_in(request):
     else:
         return render(request, 'signin.html')
 
+
 @never_cache
 def sign_up(request):
     if request.user.is_authenticated:

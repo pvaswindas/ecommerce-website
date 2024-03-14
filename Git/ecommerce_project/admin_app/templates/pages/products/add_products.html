@@ -1,0 +1,106 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}
+  <title>SneakerHeads Products</title>
+{% endblock %}
+
+{% block custom_css %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'admin_css/add_products.css' %}" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+  <div class="container main-container py-4">
+    <form action="" method="post">
+      {% csrf_token %}
+      <h1>Add New Product</h1>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+      <div class="accordion">
+        <div class="accordion-item">
+          <h3 class="accordion-header py-4">Name & Description</h3>
+          <div class="accordion-content">
+            <label for="name">Product Name</label>
+            <input type="text" id="name" name="product_name" required />
+            <label for="description">Description</label>
+            <textarea id="description" required maxlength="250" name="description" onkeyup="countChars(this)"></textarea>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">Inventory & Pricing</h3>
+          <div class="accordion-content">
+            <label for="stock">Stock</label>
+            <input type="number" id="stock" name="quantity" min="0" required />
+            <label for="price">Price</label>
+            <input type="number" id="price" name="price" step="1" min="0" required />
+            <label for="category">Category</label>
+            <select id="category" name="category" required>
+              <option value="">Select Category</option>
+              <option value="electronics">Electronics</option>
+              <option value="clothing">Clothing</option>
+              <option value="books">Books</option>
+              <!-- Add more options as needed -->
+            </select>
+            <label for="brand">Brand</label>
+            <select id="brandSelect" name="brand" onchange="toggleBrandInput(this)">
+              <option value="">Select Brand</option>
+              <option value="nike">Nike</option>
+              <option value="adidas">Adidas</option>
+              <option value="apple">Apple</option>
+              <option value="other">Other</option>
+              <!-- Add more options as needed -->
+            </select>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h3 class="accordion-header py-4">Products Images</h3>
+          <div class="accordion-content">
+            <p>Upload images for different views:</p>
+            <div class="image-grid">
+              <div class="form-group">
+                <label for="main_image">Main Image:</label>
+                <input type="file" id="main_image" name="main_image" required onchange="previewImage(this, 'main_image_preview')" />
+                <div class="image-preview" id="main_image_preview"></div>
+              </div>
+              <div class="form-group">
+                <label for="side_view_image">Side View Image:</label>
+                <input type="file" id="side_view_image" name="side_view_image" required onchange="previewImage(this, 'side_view_image_preview')" />
+                <div class="image-preview" id="side_view_image_preview"></div>
+              </div>
+              <div class="form-group">
+                <label for="back_view_image">Back View Image:</label>
+                <input type="file" id="back_view_image" name="back_view_image" required onchange="previewImage(this, 'back_view_image_preview')" />
+                <div class="image-preview" id="back_view_image_preview"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="add-product">Add Product</button>
+    </form>
+  </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script>
+    function previewImage(input, previewId) {
+      var preview = document.getElementById(previewId);
+      var file = input.files[0];
+      var reader = new FileReader();
+  
+      reader.onloadend = function () {
+          preview.style.backgroundImage = "url('" + reader.result + "')";
+      };
+  
+      if (file) {
+          reader.readAsDataURL(file);
+      } else {
+          preview.style.backgroundImage = null;
+      }
+  }
+  
+  </script>
+{% endblock %}

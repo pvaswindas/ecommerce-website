@@ -5,8 +5,11 @@ urlpatterns = [
     path('sneakerheads/admin/login/', views.admin_login, name='admin_login'),
     path('sneakerheads/admin/logout/', views.admin_logout, name = 'admin_logout'),
     
-    
-    path('sneakerheads/admin/products/', views.admin_products, name = 'admin_products'),
+    path('sneakerheads/admin/products/', views.list_product, name='list_product'),
+    path('sneakerheads/admin/add-products/', views.admin_add_product, name = 'admin_add_product'),
+    path('sneakerheads/admin/brands/', views.list_brand, name='list_brand'),
+    path('sneakerheads/admin/add-brand/', views.admin_add_brand, name='admin_add_brand'),
+    path('add-brand/page', views.add_brand, name='add_brand'),
     
     
     path('sneakerheads/admin/categories/', views.admin_categories, name = 'admin_categories'),
@@ -23,4 +26,6 @@ urlpatterns = [
     path('block-user/<int:user_id>/', views.block_user, name='block_user'),
     path('unblock-user/<int:user_id>/', views.unblock_user, name='unblock_user'),
     path('sneakerheads/admin/customer/search/', views.search_user, name='search_user'),
+    
+    
 ]
