@@ -76,9 +76,9 @@
                 <div class="image-preview" id="side_view_image_preview"></div>
               </div>
               <div class="form-group">
-                <label for="back_view_image">Back View Image:</label>
-                <input type="file" id="back_view_image" name="back_view_image" accept="image/*" required onchange="previewImage(this, 'back_view_image_preview')" />
-                <div class="image-preview" id="back_view_image_preview"></div>
+                <label for="top_view_image">Top View Image:</label>
+                <input type="file" id="top_view_image" name="top_view_image" accept="image/*" required onchange="previewImage(this, 'top_view_image_preview')" />
+                <div class="image-preview" id="top_view_image_preview"></div>
               </div>
             </div>
           </div>
@@ -92,18 +92,18 @@
 {% block custom_scripts %}
   <script>
     function previewImage(input, previewId) {
-      var preview = document.getElementById(previewId)
-      var file = input.files[0]
-      var reader = new FileReader()
+      var preview = document.getElementById(previewId);
+      var file = input.files[0];
+      var reader = new FileReader();
     
       reader.onloadend = function () {
-        preview.style.backgroundImage = "url('" + reader.result + "')"
-      }
+        preview.style.backgroundImage = "url('" + reader.result + "')";
+      };
     
       if (file) {
-        reader.readAsDataURL(file)
+        reader.readAsDataURL(file);
       } else {
-        preview.style.backgroundImage = null
+        preview.style.backgroundImage = null;
       }
     }
   </script>

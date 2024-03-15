@@ -3,18 +3,18 @@
 <html lang="en">
 
 
-{% include "head.html" %}
+{% include "partials/head.html" %}
 
 <body>
     
-{% include "navbar.html" %}
+{% include "partials/navbar.html" %}
     <div class="page-wrapper">
         <main class="main">
             {% comment %} Slider Carousel {% endcomment %}
-            {% include "slider.html" %}
+            {% include "partials/slider.html" %}
 
             {% comment %} Banner {% endcomment %}
-            {% include "banner.html" %}
+            {% include "partials/banner.html" %}
 
             <div class="icon-boxes-container icon-boxes-separator bg-transparent">
                 <div class="container">
@@ -77,7 +77,7 @@
 
 
             {% comment %} NEW ARRIVALS CONTAINER {% endcomment %}
-            {% include "new-arrivals.html" %}
+            {% include "partials/new-arrivals.html" %}
 
             <div class="container">
                 <div class="row justify-content-center">
@@ -127,7 +127,7 @@
 
             <div class="mb-4"></div><!-- End .mb-4 -->
 
-            {% include "top-selling.html" %}
+            {% include "partials/top-selling.html" %}
 
             <div class="mb-5"></div><!-- End .mb5 -->
 
@@ -272,7 +272,7 @@
             </div><!-- End .blog-posts -->
         </main><!-- End .main -->
 
-        {% include "footer.html" %}
+        {% include "partials/footer.html" %}
 
     <!-- Mobile Menu -->
     <div class="mobile-menu-overlay"></div><!-- End .mobil-menu-overlay -->

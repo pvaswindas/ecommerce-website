@@ -373,7 +373,7 @@ def add_products(request):
             brand_id = request.POST.get('brand')
             main_image = request.FILES.get('main_image')
             side_view_image = request.FILES.get('side_view_image')
-            back_view_image = request.FILES.get('back_view_image')
+            top_view_image = request.FILES.get('top_view_image')
 
             category = Category.objects.get(pk = category_id)
             brand = Brand.objects.get(pk = brand_id)
@@ -391,7 +391,7 @@ def add_products(request):
                     brand=brand,
                     main_image=main_image,
                     side_view_image=side_view_image,
-                    back_view_image=back_view_image,
+                    top_view_image=top_view_image,
                 )
                 product.save()
                 messages.success(request, 'New Product was created!')
@@ -403,7 +403,7 @@ def add_products(request):
     
     
 
-# EDIT PRODUCT
+# EDIT PRODUCT VIEW PAGE FUNCTION
 @login_required
 @never_cache
 def edit_product_page(request, pdt_id):
@@ -424,6 +424,9 @@ def edit_product_page(request, pdt_id):
 
 
 
+
+
+# EDIT PRODUCT VIEW FUNCTION
 @login_required
 @never_cache
 def edit_product(request, pdt_id):
@@ -437,7 +440,8 @@ def edit_product(request, pdt_id):
             brand_id = request.POST.get('brand')
             main_image = request.FILES.get('main_image')
             side_view_image = request.FILES.get('side_view_image')
-            back_view_image = request.FILES.get('back_view_image')
+            top_view_image = request.FILES.get('top_view_image')
+            is_deleted = request.POST.get('delete_product') == 'on'
             
             
             product = Product.objects.get(pk = pdt_id)
@@ -455,46 +459,74 @@ def edit_product(request, pdt_id):
                 product.main_image = main_image
             if side_view_image:
                 product.side_view_image = side_view_image
-            if back_view_image:
-                product.back_view_image = back_view_image
+            if top_view_image:
+                product.top_view_image = top_view_image
+            product.is_deleted = is_deleted
             product.save()
             messages.success(request, 'New Product was created!')
             return redirect(list_product_page)
     else:
         return redirect(admin_login_page)
             
-            
-            
+
+
+
+# DELETED PRODUCTS VIEW PAGE FUNCTION   
+@login_required
+@never_cache
+def deleted_product_page(request):
+    if request.user.is_superuser:
+        product_list = Product.objects.filter(is_deleted=True).order_by('name').select_related('category', 'brand')
+        return render(request, 'pages/products/deleted_products.html', {'product_list' : product_list})
+    else:
+        return redirect('admin_login_page')
+    
+    
+    
+# RESTORE PRODUCT FUNCTION
+@login_required
+@never_cache
+def restore_product(request, pdt_id):
+    if request.user.is_superuser:
+        
+        product = Product.objects.get(pk = pdt_id)
+        product.is_deleted = False
+        product.save()
+        messages.success(request, 'Product have been restored')
+        return redirect(deleted_product_page)
+    else:
+        return redirect(admin_login_page)
+        
 
 # For list_product function
-def list_product(request, pdt_id):
-    if request.user.is_superuser:
-        if pdt_id:
-            product_to_list = Product.objects.get(pk=pdt_id)
-            product_to_list.is_listed = True
-            product_to_list.save()
-            messages.success(request, 'Product updated successfully!')
-            return redirect(edit_product_page)  # Redirect to edit_product_page
-        else:
-            messages.error(request, 'id cannot be found.')
-            return redirect(edit_product_page)
-    else:
-        return redirect(admin_login_page)
+# def list_product(request, pdt_id):
+#     if request.user.is_superuser:
+#         if pdt_id:
+#             product_to_list = Product.objects.get(pk=pdt_id)
+#             product_to_list.is_listed = True
+#             product_to_list.save()
+#             messages.success(request, 'Product updated successfully!')
+#             return redirect(edit_product_page)  # Redirect to edit_product_page
+#         else:
+#             messages.error(request, 'id cannot be found.')
+#             return redirect(edit_product_page)
+#     else:
+#         return redirect(admin_login_page)
 
-# For un_list_product function
-def un_list_product(request, pdt_id):
-    if request.user.is_superuser:
-        if pdt_id:
-            product_to_un_list = Product.objects.get(pk=pdt_id)
-            product_to_un_list.is_listed = False
-            product_to_un_list.save()
-            messages.success(request, 'Product updated successfully!')
-            return redirect(list_product_page)  # Redirect to list_product_page
-        else:
-            messages.error(request, 'id cannot be found.')
-            return redirect(edit_product_page)  # Consider redirecting to the same page
-    else:
-        return redirect(admin_login_page)
+# # For un_list_product function
+# def un_list_product(request, pdt_id):
+#     if request.user.is_superuser:
+#         if pdt_id:
+#             product_to_un_list = Product.objects.get(pk=pdt_id)
+#             product_to_un_list.is_listed = False
+#             product_to_un_list.save()
+#             messages.success(request, 'Product updated successfully!')
+#             return redirect(list_product_page)  # Redirect to list_product_page
+#         else:
+#             messages.error(request, 'id cannot be found.')
+#             return redirect(edit_product_page)  # Consider redirecting to the same page
+#     else:
+#         return redirect(admin_login_page)
 
 
 # ---------------------------------------------------------------- ADMIN BRAND PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
@@ -610,17 +642,12 @@ def edit_brand(request, brand_id):
             manufacturer_details = request.POST['manufacturer_details']
             
             brand = Brand.objects.get(id = brand_id)
-            
-            if not Brand.objects.filter(name__icontains = name).exists():
-                brand.name = name
-                brand.country_of_origin = country_of_origin
-                brand.manufacturer_details = manufacturer_details
-                brand.save()
-                messages.success(request, 'Brand updated successfully!')
-                return redirect(list_brand_page)
-            else:
-                messages.error(request, 'Brand already exits, add new brand')
-                return redirect(admin_add_brand)
+            brand.name = name
+            brand.country_of_origin = country_of_origin
+            brand.manufacturer_details = manufacturer_details
+            brand.save()
+            messages.success(request, 'Brand updated successfully!')
+            return redirect(list_brand_page)
     else:
         return redirect('admin_login_page')
             

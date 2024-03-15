@@ -12,4 +12,8 @@ urlpatterns = [
     path('otp-verification-page/', views.otp_verification_page, name='otp_verification_page'),
     path('register/', views.register_function, name='register_function'),
     path('sign-in/user', views.sign_in_function, name='sign_in_function'),
+    
+    
+    path('sneakerheads/shop-page/', views.shop_page_view, name='shop_page_view'),
+    path('sneakerheads/<str:product_name>/<int:pdt_id>/', views.product_single_view_page, name='product_single_view_page'),
 ]

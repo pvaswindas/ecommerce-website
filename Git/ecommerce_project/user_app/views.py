@@ -7,16 +7,22 @@ from django.utils.text import normalize_newlines
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from user_app.models import Customer
+from admin_app.models import *
 from django.utils import timezone
 from datetime import datetime
+from django.db.models import *
 from django.db import transaction
 import random
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
 
 
 
+
+
+# ---------------------------------------------------------------------------------- INDEX PAGE ----------------------------------------------------------------------------------
 
 
 @never_cache
@@ -262,3 +268,43 @@ def logout(request):
         return render(request, '404.html')
     
 
+
+
+
+# ---------------------------------------------------------------------------------- SHOP PAGE ----------------------------------------------------------------------------------
+
+
+@login_required
+@never_cache
+def shop_page_view(request):
+    if request.user.is_authenticated:
+        price_ranges = [
+            {"min": 1000, "max": 1500},
+            {"min": 1500, "max": 2500},
+            {"min": 2500, "max": 4000},
+            {"min": 2500, "max": 3500},
+            {"min": 3500, "max": 5000},
+            {"min": 5000, "max": None},
+            ]
+        product_list = Product.objects.all()
+        category_list = Category.objects.annotate(product_count= Count ('product'))
+        brand_list = Brand.objects.annotate(product_count = Count('product'))
+        return render(request, 'shop_page.html', {'product_list' : product_list, 'brand_list' : brand_list, 'category_list' : category_list, 'price_ranges' : price_ranges, })
+    else:
+        return redirect(index_page)
+    
+    
+
+
+# -------------------------------------------------------------------------------- PRODUCT SINGLE VIEW PAGE --------------------------------------------------------------------------------
+
+
+@login_required
+@never_cache
+def product_single_view_page(request, product_name, pdt_id):
+    if request.user.is_authenticated:
+        product = Product.objects.get(pk=pdt_id)
+        last_five_products = Product.objects.order_by('-id')[:5]
+        return render(request, 'product_view.html', {'product': product, 'last_five_products': last_five_products})
+    else:
+        return redirect(index_page)

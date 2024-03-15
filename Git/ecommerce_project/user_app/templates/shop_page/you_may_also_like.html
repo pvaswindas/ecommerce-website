@@ -1,0 +1,51 @@
+{% load static %}
+<h2 class="title text-center mb-4">You May Also Like</h2>
+<div class="owl-carousel owl-simple" data-toggle="owl" data-owl-options='{
+    "nav": false, 
+    "dots": true,
+    "margin": 20,
+    "loop": false,
+    "responsive": {
+        "0": {"items":1},
+        "480": {"items":2},
+        "768": {"items":3},
+        "992": {"items":4},
+        "1200": {"items":4, "nav": true, "dots": false}
+    }
+}'>
+  {% for product in last_five_products %}
+    <div class="product product-7 text-center">
+      <figure class="product-media">
+        <span class="product-label label-new">New</span>
+        <a href="product.html"><img src="{{ product.main_image.url }}" alt="Product image" class="product-image" /></a>
+
+        <div class="product-action-vertical">
+          <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+        </div>
+
+        <div class="product-action">
+          <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+        </div>
+      </figure>
+
+      <div class="product-body">
+        <div class="product-cat">
+          <a href="#"> {{product.category.name}} </a>
+        </div>
+        <h3 class="product-title">
+            <a href="{% url 'product_single_view_page' product.name product.id %}" style="word-wrap: break-word;">
+                {{ product.name }}
+            </a>
+        </h3>
+        
+        <div class="product-price">₹ {{ product.price }}.00</div>
+        <div class="ratings-container">
+          <div class="ratings">
+            <div class="ratings-val" style="width: 20%;"></div>
+          </div>
+          <span class="ratings-text">( 2 Reviews )</span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
