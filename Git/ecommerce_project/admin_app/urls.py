@@ -18,10 +18,12 @@ urlpatterns = [
     path('add-product/page/', views.add_products, name='add_products'),
     path('edit-product-page/<int:pdt_id>/', views.edit_product_page, name='edit_product_page'),
     path('edit-product/<int:pdt_id>/', views.edit_product, name='edit_product'),
+    path('delete-product/<int:pdt_id>/', views.delete_product, name='delete_product'),
     path('deleted-product-view/', views.deleted_product_page, name='deleted_product_page'),
     path('restore-product/<int:pdt_id>/', views.restore_product, name='restore_product'),
-    # path('list-product/<int:pdt_id>/', views.list_product, name='list_product'),
-    # path('un-list-product/<int:pdt_id>/', views.un_list_product, name='un_list_product'),
+    path('product-variants-add-page/', views.admin_add_variants, name='admin_add_variants'),
+    path('list-product/<int:pdt_id>/', views.list_product, name='list_product'),
+    path('un-list-product/<int:pdt_id>/', views.un_list_product, name='un_list_product'),
     
     
     

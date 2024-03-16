@@ -7,7 +7,7 @@ class Category(models.Model):
     name = models.CharField(max_length = 50)
     description = models.TextField()
     is_deleted = models.BooleanField(default = False)
-    is_listed = models.BooleanField(default = False)
+    is_listed = models.BooleanField(default = True)
     
     def __str__(self):
         return self.name
@@ -19,7 +19,7 @@ class Brand(models.Model):
      country_of_origin = models.CharField(max_length = 100)
      manufacturer_details = models.TextField()
      is_deleted = models.BooleanField(default = False)
-     is_listed = models.BooleanField(default = False)
+     is_listed = models.BooleanField(default = True)
      
      
      def __str__(self):
@@ -56,6 +56,8 @@ class ProductVariant(models.Model):
     side_view_image = models.FileField(upload_to='product_variant_images/')
     top_view_image = models.FileField(upload_to='product_variant_images/')
     price = models.BigIntegerField()
+    is_listed = models.BooleanField(default = True)
+    is_deleted = models.BooleanField(default = False)
 
     def __str__(self):
         return f"{self.product.name} - {self.color} - {self.size}"

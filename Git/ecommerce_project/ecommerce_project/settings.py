@@ -46,6 +46,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
+    'user_app.middleware.RedirectAuthenticatedMiddleware',
 ]
 
 ROOT_URLCONF = 'ecommerce_project.urls'
@@ -165,4 +166,6 @@ AUTHENTICATION_BACKENDS = (
 
 
 LOGIN_REDIRECT_URL = 'index_page'
+
+LOGOUT_REDIRECT_URL = 'index_page'
 

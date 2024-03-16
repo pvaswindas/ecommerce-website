@@ -17,7 +17,9 @@
     </div>
     {% if messages %}
       {% for message in messages %}
-        <div class="text-center">{{ message }}</div>
+        <div class="text-center container mb-5">
+          <h4>{{ message }}</h4>
+        </div>
       {% endfor %}
     {% endif %}
     <table>
@@ -29,6 +31,8 @@
           <th>Price</th>
           <th>Category</th>
           <th>Brand</th>
+          <th></th>
+          <th></th>
           <th></th>
         </tr>
       </thead>
@@ -42,13 +46,25 @@
                 <span>No Image Available</span>
               {% endif %}
             </td>
-            <td>{{ product.name }}</td>
+            <td style="max-width: 200px; word-wrap: break-word;">{{ product.name }}</td>
             <td>{{ product.quantity }}</td>
             <td>{{ product.price }}</td>
             <td>{{ product.category.name }}</td>
             <td>{{ product.brand.name }}</td>
             <td>
-              <a href="{% url 'edit_product_page' product.id %}"><button class="btn btn-warning">Edit</button></a>
+              <a href="{% url 'edit_product_page' product.id %}"><button class="btn btn-warning rounded rounded-1">Edit</button></a>
+            </td>
+            <td>
+              {% if product.is_listed == True %}
+                <a href="{% url 'un_list_product' product.id %}"><button class="btn btn-dark rounded rounded-1">Unlist</button></a>
+              {% else %}
+                <a href="{% url 'list_product' product.id %}"><button class="btn btn-success rounded rounded-1">List</button></a>
+              {% endif %}
+            </td>
+            <td>
+              {% if product.is_deleted == False %}
+                <a href="{% url 'delete_product' product.id %}"><button class="btn btn-danger rounded rounded-1">Delete</button></a>
+              {% endif %}
             </td>
           </tr>
         {% endfor %}

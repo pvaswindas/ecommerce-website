@@ -5,7 +5,12 @@
       <div class="col-6 col-md-4 col-lg-4 col-xl-3">
         <div class="product product-7 text-center">
           <figure class="product-media">
-            <span class="product-label label-new">New</span>
+            {% if not product.is_listed %}
+              <span class="product-label bg-danger text-white">Out Of Stock</span>
+            {% elif latest_products %}
+              <span class="product-label label-new">New</span>
+            {% endif %}
+
             <a href="{% url 'product_single_view_page' product.name product.id %}"><img src="{{ product.main_image.url }}" alt="Product image" class="product-image" /></a>
 
             <div class="product-action-vertical">
@@ -14,7 +19,11 @@
             <!-- End .product-action-vertical -->
 
             <div class="product-action">
-              <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+              {% if not product.is_listed %}
+                <a href="#" class="btn-product"><span>Notify Me</span></a>
+              {% else %}
+                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+              {% endif %}
             </div>
             <!-- End .product-action -->
           </figure>
@@ -22,11 +31,11 @@
 
           <div class="product-body">
             <div class="product-cat">
-              <a href="#"> {{product.category.name}} </a>
+              <a href="#">{{ product.category.name }}</a>
             </div>
             <!-- End .product-cat -->
-            <h3 class="product-title"><a href="{% url 'product_single_view_page' product.name product.id %}"> {{product.name}} </a></h3>
-            <div class="product-price">₹ {{product.price}}.00</div>
+            <h3 class="product-title"><a href="{% url 'product_single_view_page' product.name product.id %}">{{ product.name }}</a></h3>
+            <div class="product-price">₹ {{ product.price }}.00</div>
             <!-- End .product-price -->
             <div class="ratings-container">
               <div class="ratings">

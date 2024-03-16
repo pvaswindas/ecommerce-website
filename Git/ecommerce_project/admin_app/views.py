@@ -339,7 +339,7 @@ def restore_categories(request, cat_id):
 @never_cache
 def list_product_page(request):
     if request.user.is_superuser:
-        product_list = Product.objects.filter(is_deleted=False).order_by('name').select_related('category', 'brand')
+        product_list = Product.objects.filter(is_deleted=False).order_by('pk').select_related('category', 'brand')
         return render(request, 'pages/products/product.html', {'product_list' : product_list})
     else:
         return redirect('admin_login_page')
@@ -409,8 +409,8 @@ def add_products(request):
 def edit_product_page(request, pdt_id):
     if request.user.is_superuser:
         product = Product.objects.get(id=pdt_id)
-        category_list = Category.objects.all()  # Assuming you have this queryset
-        brand_list = Brand.objects.all()  # Assuming you have this queryset
+        category_list = Category.objects.all()
+        brand_list = Brand.objects.all()
         context = {
             'product': product,
             'category_list': category_list,
@@ -468,6 +468,38 @@ def edit_product(request, pdt_id):
     else:
         return redirect(admin_login_page)
             
+            
+            
+
+
+
+# DELETE PRODUCT FUNCTION
+@login_required
+@never_cache
+def delete_product(request, pdt_id):
+    if request.user.is_superuser:
+        if pdt_id:
+            product_to_delete = Product.objects.get(pk=pdt_id)
+            if product_to_delete.brand.is_deleted == False and product_to_delete.category.is_deleted == False:
+                product_to_delete.is_deleted = False
+                product_to_delete.save()
+                messages.success(request, 'Product have been deleted!')
+            else:
+                if product_to_delete.brand.is_deleted and product_to_delete.category.is_deleted:
+                    messages.error(request, 'Cannot restore product: Brand and Category is deleted.')
+                elif product_to_delete.brand.is_deleted:
+                    messages.error(request, 'Cannot restore product: Brand is deleted.')
+                else:
+                    messages.error(request, 'Cannot restore product: Category is deleted.')
+            return redirect(list_product_page)
+        else:
+            messages.error(request, 'ID cannot be found.')
+            return redirect(list_product_page)
+    else:
+        return redirect('admin_login_page')
+
+
+
 
 
 
@@ -482,6 +514,7 @@ def deleted_product_page(request):
         return redirect('admin_login_page')
     
     
+
     
 # RESTORE PRODUCT FUNCTION
 @login_required
@@ -498,35 +531,82 @@ def restore_product(request, pdt_id):
         return redirect(admin_login_page)
         
 
-# For list_product function
-# def list_product(request, pdt_id):
-#     if request.user.is_superuser:
-#         if pdt_id:
-#             product_to_list = Product.objects.get(pk=pdt_id)
-#             product_to_list.is_listed = True
-#             product_to_list.save()
-#             messages.success(request, 'Product updated successfully!')
-#             return redirect(edit_product_page)  # Redirect to edit_product_page
-#         else:
-#             messages.error(request, 'id cannot be found.')
-#             return redirect(edit_product_page)
-#     else:
-#         return redirect(admin_login_page)
 
-# # For un_list_product function
-# def un_list_product(request, pdt_id):
-#     if request.user.is_superuser:
-#         if pdt_id:
-#             product_to_un_list = Product.objects.get(pk=pdt_id)
-#             product_to_un_list.is_listed = False
-#             product_to_un_list.save()
-#             messages.success(request, 'Product updated successfully!')
-#             return redirect(list_product_page)  # Redirect to list_product_page
-#         else:
-#             messages.error(request, 'id cannot be found.')
-#             return redirect(edit_product_page)  # Consider redirecting to the same page
-#     else:
-#         return redirect(admin_login_page)
+
+
+# For list_product function
+@login_required
+@never_cache
+def list_product(request, pdt_id):
+    if request.user.is_superuser:
+        if pdt_id:
+            product_to_list = Product.objects.get(pk=pdt_id)
+            if product_to_list.brand.is_listed and product_to_list.category.is_listed:
+                product_to_list.is_listed = True
+                product_to_list.save()
+                messages.success(request, 'Product updated successfully!')
+            else:
+                if product_to_list.brand.is_listed == False and product_to_list.category.is_listed == False:
+                    messages.error(request, 'Cannot list product: Brand and Category is not listed.')
+                elif product_to_list.brand.is_listed == False:
+                    messages.error(request, 'Cannot list product: Brand is not listed.')
+                else:
+                    messages.error(request, 'Cannot list product: Category is not listed.')
+            return redirect(list_product_page)
+        else:
+            messages.error(request, 'ID cannot be found.')
+            return redirect(list_product_page)
+    else:
+        return redirect(admin_login_page)
+
+
+
+
+
+# For un_list_product function
+@login_required
+@never_cache
+def un_list_product(request, pdt_id):
+    if request.user.is_superuser:
+        if pdt_id:
+            product_to_un_list = Product.objects.get(pk=pdt_id)
+            product_to_un_list.is_listed = False
+            product_to_un_list.save()
+            messages.success(request, 'Product updated successfully!')
+            return redirect(list_product_page)
+        else:
+            messages.error(request, 'id cannot be found.')
+            return redirect(list_product_page)
+    else:
+        return redirect(admin_login_page)
+
+
+
+
+
+sizes = [4, 5, 6,7, 8, 9, 10, 11, 12]
+
+# ---------------------------------------------------------------- ADMIN PRODUCT VARIANTS PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+
+
+# ADD PRODUCT VARIANTS BUTTON
+@login_required
+@never_cache
+def admin_add_variants(request):
+    if request.user.is_superuser:
+        products = Product.objects.all().order_by('name')
+        return render(request, 'pages/products/add_product_variant.html', {'products': products, 'sizes': sizes})
+    else:
+        return redirect(admin_login_page)
+
+
+
+
+
+
+
+
+
 
 
 # ---------------------------------------------------------------- ADMIN BRAND PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
