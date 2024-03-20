@@ -1,0 +1,34 @@
+.main-container {
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.profile-info {
+    margin-top: 20px;
+}
+
+.profile-info-item {
+    margin-bottom: 20px;
+}
+
+.profile-info-item label {
+    font-weight: bold;
+    flex: 1;
+    margin-right: 10px;
+}
+
+.profile-info-item .edit-action {
+    color: #007bff;
+    cursor: pointer;
+}
+
+.edit-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    width: calc(100% - 100px); /* Adjusted width for responsiveness */
+}

@@ -11,6 +11,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.views.decorators.cache import never_cache
 
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 from django.shortcuts import get_object_or_404
 
@@ -366,14 +368,10 @@ def add_products(request):
     if request.user.is_superuser:
         if request.method == 'POST':
             name = request.POST.get('product_name')
-            quantity = request.POST.get('quantity')
             description = request.POST.get('description')
             price = request.POST.get('price')
             category_id = request.POST.get('category')
             brand_id = request.POST.get('brand')
-            main_image = request.FILES.get('main_image')
-            side_view_image = request.FILES.get('side_view_image')
-            top_view_image = request.FILES.get('top_view_image')
 
             category = Category.objects.get(pk = category_id)
             brand = Brand.objects.get(pk = brand_id)
@@ -385,17 +383,13 @@ def add_products(request):
                 product = Product.objects.create(
                     name=name,
                     description=description,
-                    quantity=quantity,
                     price=price,
                     category=category,
                     brand=brand,
-                    main_image=main_image,
-                    side_view_image=side_view_image,
-                    top_view_image=top_view_image,
                 )
                 product.save()
-                messages.success(request, 'New Product was created!')
-                return redirect(list_product_page)
+                messages.success(request, 'New Product was created, Add product image')
+                return redirect(admin_add_image_page)
 
     else:
         return redirect('admin_login_page')
@@ -502,7 +496,6 @@ def delete_product(request, pdt_id):
 
 
 
-
 # DELETED PRODUCTS VIEW PAGE FUNCTION   
 @login_required
 @never_cache
@@ -583,27 +576,71 @@ def un_list_product(request, pdt_id):
 
 
 
+# ---------------------------------------------------------------- ADMIN ADD PRODUCT IMAGE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
-sizes = [4, 5, 6,7, 8, 9, 10, 11, 12]
+
+@login_required
+@never_cache
+def admin_add_image_page(request):
+    if request.user.is_superuser:
+        product_list = Product.objects.all()
+        return render(request, 'pages/products/add_product_image.html', {'product_list' : product_list})
+    else:
+        return redirect(admin_login_page)
+
+
+
+@login_required
+@never_cache
+def add_product_image(request, pdt_id):
+    if request.user.is_superuser:
+        if pdt_id:
+            if request.method == 'POST':
+                color = request.POST.get('color')
+                main_image = request.POST.get('main_image')
+                side_image = request.POST.get('side_image')
+                top_image = request.POST.get('top_image')
+                back_image = request.POST.get('back_image')
+                
+                
+
 
 # ---------------------------------------------------------------- ADMIN PRODUCT VARIANTS PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
-# ADD PRODUCT VARIANTS BUTTON
+
+adult_sizes = [6, 7, 8, 9, 10, 11, 12]
+kids_sizes = ['8C', '9C', '10C', '11C', '12C', '13C']
+
 @login_required
 @never_cache
 def admin_add_variants(request):
     if request.user.is_superuser:
+        sizes = adult_sizes
         products = Product.objects.all().order_by('name')
-        return render(request, 'pages/products/add_product_variant.html', {'products': products, 'sizes': sizes})
+        product_color = ProductImage.objects.all().order_by('color')
+        return render(request, 'pages/products/add_product_variant.html', {'products': products, 'product_image' : product_color, 'sizes': sizes})
     else:
         return redirect(admin_login_page)
 
 
 
 
-
-
+@require_GET
+def get_sizes_view(request):
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        product_id = request.GET.get('product_id')
+        if product_id:
+            try:
+                product = Product.objects.get(pk=product_id)
+                if product.category.name.lower() == "kids":
+                    sizes = ['8C', '9C', '10C', '11C', '12C', '13C']
+                else:
+                    sizes = [6, 7, 8, 9, 10, 11, 12]
+                return JsonResponse({'sizes': sizes})
+            except Product.DoesNotExist:
+                pass
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 

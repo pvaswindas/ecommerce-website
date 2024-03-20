@@ -39,8 +39,6 @@
         <div class="accordion-item">
           <h3 class="accordion-header">Inventory & Pricing</h3>
           <div class="accordion-content">
-            <label for="quantity">Quantity</label>
-            <input type="number" id="quantity" name="quantity" min="0" required />
             <label for="price">Price</label>
             <input type="number" id="price" name="price" step="1" min="0" required />
             <label for="category">Category</label>
@@ -60,51 +58,9 @@
             </select>
           </div>
         </div>
-        <div class="accordion-item">
-          <h3 class="accordion-header py-4">Products Images</h3>
-          <div class="accordion-content">
-            <p>Upload images for different views:</p>
-            <div class="image-grid">
-              <div class="form-group">
-                <label for="main_image">Main Image:</label>
-                <input type="file" id="main_image" name="main_image" accept="image/*" required onchange="previewImage(this, 'main_image_preview')" />
-                <div class="image-preview" id="main_image_preview"></div>
-              </div>
-              <div class="form-group">
-                <label for="side_view_image">Side View Image:</label>
-                <input type="file" id="side_view_image" name="side_view_image" accept="image/*" required onchange="previewImage(this, 'side_view_image_preview')" />
-                <div class="image-preview" id="side_view_image_preview"></div>
-              </div>
-              <div class="form-group">
-                <label for="top_view_image">Top View Image:</label>
-                <input type="file" id="top_view_image" name="top_view_image" accept="image/*" required onchange="previewImage(this, 'top_view_image_preview')" />
-                <div class="image-preview" id="top_view_image_preview"></div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-      <button type="submit" class="add-product">Add Product</button>
+      <button type="submit" class="add-product w-100">Add Product</button>
     </form>
   </div>
 {% endblock %}
 
-{% block custom_scripts %}
-  <script>
-    function previewImage(input, previewId) {
-      var preview = document.getElementById(previewId);
-      var file = input.files[0];
-      var reader = new FileReader();
-    
-      reader.onloadend = function () {
-        preview.style.backgroundImage = "url('" + reader.result + "')";
-      };
-    
-      if (file) {
-        reader.readAsDataURL(file);
-      } else {
-        preview.style.backgroundImage = null;
-      }
-    }
-  </script>
-{% endblock %}

@@ -13,7 +13,7 @@ from datetime import datetime
 from django.db.models import *
 from django.db import transaction
 import random
-from django.contrib.auth.tokens import default_token_generator
+from django.urls import reverse
 from django.core.mail import send_mail
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
@@ -302,3 +302,29 @@ def product_single_view_page(request, product_name, pdt_id):
         product = Product.objects.get(pk=pdt_id)
         last_five_products = Product.objects.order_by('-id')[:5]
         return render(request, 'product_view.html', {'product': product, 'last_five_products': last_five_products})
+
+
+
+
+
+
+# -------------------------------------------------------------------------------- USER ACCOUNT DETAILS VIEW PAGE --------------------------------------------------------------------------------
+
+
+
+
+
+@login_required
+@never_cache
+def user_dashboard(request, user_id):
+    print(user_id)
+    if request.user.is_authenticated:
+        if user_id:
+            user = User.objects.get(pk = user_id)
+            return render(request, 'dashboard.html', {'user' : user ,})
+        else:
+            messages.error(request, 'Not able to get user details at this moment')
+            return redirect(index_page)
+    else:
+        return render(index_page)
+    

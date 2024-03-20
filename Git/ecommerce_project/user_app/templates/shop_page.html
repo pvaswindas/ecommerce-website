@@ -1,92 +1,64 @@
+{% extends 'main_base.html' %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-  <!-- molla/category-4cols.html 22 Nov 2019 10:02:52 GMT -->
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>SneakerHeads Shop Page</title>
-    <link rel="stylesheet" href="{% static 'user/assets/css/bootstrap.min.css' %}" />
-    <!-- Main CSS File -->
-    <link rel="stylesheet" href="{% static 'user/assets/css/style.css' %}" />
-    <link rel="stylesheet" href="{% static 'user/assets/css/plugins/owl-carousel/owl.carousel.css' %}" />
-    <link rel="stylesheet" href="{% static 'user/assets/css/plugins/magnific-popup/magnific-popup.css' %}" />
-    <link rel="stylesheet" href="{% static 'user/assets/css/plugins/nouislider/nouislider.css' %}" />
-  </head>
+{% block title %}
+  <title>SneakerHeads Shop Page</title>
+{% endblock %}
+{% block custom_css %}
+  <link rel="stylesheet" href="{% static 'user/assets/css/bootstrap.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'user/assets/css/style.css' %}" />
+  <link rel="stylesheet" href="{% static 'user/assets/css/plugins/owl-carousel/owl.carousel.css' %}" />
+  <link rel="stylesheet" href="{% static 'user/assets/css/plugins/magnific-popup/magnific-popup.css' %}" />
+  <link rel="stylesheet" href="{% static 'user/assets/css/plugins/nouislider/nouislider.css' %}" />
+{% endblock %}
 
-  <body>
-    <div class="page-wrapper">
-      <main class="main">
-        {% include "partials/navbar.html" %}
-        <nav aria-label="breadcrumb" class="breadcrumb-nav mb-2">
-          <div class="container">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item">
-                <a href="{% url 'index_page' %}">Home</a>
-              </li>
-              <li class="breadcrumb-item">
-                <a href="#">Shop</a>
-              </li>
-            </ol>
-          </div>
-        </nav>
+{% block breadcrumbs %}
 
-        <div class="page-content">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-9">
-                <div class="toolbox">
-                  {% comment %} <div class="toolbox-left">
-                    <div class="toolbox-info">
-                      Showing <span>9 of 56</span> Products
-                    </div>
-                  </div> {% endcomment %}
+{% endblock %}
 
-                  <div class="toolbox-right">
-                    <div class="toolbox-sort">
-                      <label for="sortby">Sort by:</label>
-                      <div class="select-custom">
-                        <select name="sortby" id="sortby" class="form-control">
-                          <option value="popularity" selected="selected">Most Popular</option>
-                          <option value="rating">Most Rated</option>
-                          <option value="date">Date</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {% include "shop_products.html" %}
-
-                {% include "shop_page/shop_page_navigation.html" %}
-              </div>
-              {% include "shop_page/left_filter_bar.html" %}
-              <!-- End .col-lg-3 -->
+{% block page_content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-9">
+        <div class="toolbox">
+          {% comment %} <div class="toolbox-left">
+            <div class="toolbox-info">
+              Showing <span>9 of 56</span> Products
             </div>
-            <!-- End .row -->
+          </div> {% endcomment %}
+
+          <div class="toolbox-right">
+            <div class="toolbox-sort">
+              <label for="sortby">Sort by:</label>
+              <div class="select-custom">
+                <select name="sortby" id="sortby" class="form-control">
+                  <option value="popularity" selected="selected">Most Popular</option>
+                  <option value="rating">Most Rated</option>
+                  <option value="date">Date</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <!-- End .container -->
         </div>
-        {% include "partials/footer.html" %}
-      </main>
-      <!-- End .main -->
+
+        {% include 'shop_products.html' %}
+
+        {% include 'shop_page/shop_page_navigation.html' %}
+      </div>
+      {% include 'shop_page/left_filter_bar.html' %}
     </div>
+  </div>
+{% endblock %}
 
-    <!-- Plugins JS File -->
-    <script src="{% static 'user/assets/js/jquery.min.js' %}"></script>
-    <script src="{% static 'user/assets/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="{% static 'user/assets/js/jquery.hoverIntent.min.js' %}"></script>
-    <script src="{% static 'user/assets/js/jquery.waypoints.min.js' %}"></script>
-    <script src="{% static 'user/assets/js/superfish.min.js' %}"></script>
-    <script src="{% static 'user/assets/js/owl.carousel.min.js' %}"></script>
-    <script src="{% static 'user/assets/js/wNumb.js' %}"></script>
-    <script src="{% static 'user/assets/js/bootstrap-input-spinner.js' %}"></script>
-    <script src="{% static 'user/assets/js/jquery.magnific-popup.min.js' %}"></script>
-    <script src="{% static 'user/assets/js/nouislider.min.js' %}"></script>
-    <!-- Main JS File -->
-    <script src="{% static 'user/assets/js/main.js' %}"></script>
-  </body>
-
-  <!-- molla/category-4cols.html 22 Nov 2019 10:02:55 GMT -->
-</html>
+{% block custom_js %}
+  <script src="{% static 'user/assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/jquery.hoverIntent.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/jquery.waypoints.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/superfish.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/owl.carousel.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/wNumb.js' %}"></script>
+  <script src="{% static 'user/assets/js/bootstrap-input-spinner.js' %}"></script>
+  <script src="{% static 'user/assets/js/jquery.magnific-popup.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/nouislider.min.js' %}"></script>
+{% endblock %}

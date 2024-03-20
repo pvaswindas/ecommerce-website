@@ -1,0 +1,118 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}
+  <title>SneakerHeads Product Image</title>
+{% endblock %}
+
+{% block custom_css %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'admin_css/add_product_image.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h1 class="heading">Add Product Images</h1>
+    <form action="#" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group select-wrapper">
+        <label for="product" class="label">Select Product:</label>
+        <select id="product" name="product" required>
+          <option value="" disabled selected>Select Product</option>
+          {% for product in product_list %}
+            <option value="{{ product.id }}">{{ product.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group select-wrapper">
+        <label for="color" class="label">Color:</label>
+        <input type="text" id="color" name="color" maxlength="50" required />
+      </div>
+
+      <div class="form-group">
+        <label for="main_image" class="label">Main Image:</label>
+        <input type="file" id="main_image" name="main_image" accept="image/*" required onchange="previewImage('main_image', 'main_preview')" />
+        <label for="main_image" class="upload-btn">Select Main Image</label>
+        <div id="main_preview" class="preview"></div>
+        <button type="button" class="remove-btn" style="display: none;" onclick="removeImage('main_image')">Remove</button>
+      </div>
+      <div class="form-group">
+        <label for="side_image" class="label">Side View Image:</label>
+        <input type="file" id="side_image" name="side_image" accept="image/*" onchange="previewImage('side_image', 'side_preview')" />
+        <label for="side_image" class="upload-btn">Select Side Image</label>
+        <div id="side_preview" class="preview"></div>
+        <button type="button" class="remove-btn" style="display: none;" onclick="removeImage('side_image')">Remove</button>
+      </div>
+      <div class="form-group">
+        <label for="top_image" class="label">Top View Image:</label>
+        <input type="file" id="top_image" name="top_image" accept="image/*" onchange="previewImage('top_image', 'top_preview')" />
+        <label for="top_image" class="upload-btn">Select Top Image</label>
+        <div id="top_preview" class="preview"></div>
+        <button type="button" class="remove-btn" style="display: none;" onclick="removeImage('top_image')">Remove</button>
+      </div>
+      <div class="form-group">
+        <label for="back_image" class="label">Back View Image:</label>
+        <input type="file" id="back_image" name="back_image" accept="image/*" onchange="previewImage('back_image', 'back_preview')" />
+        <label for="back_image" class="upload-btn">Select Back Image</label>
+        <div id="back_preview" class="preview"></div>
+        <button type="button" class="remove-btn" style="display: none;" onclick="removeImage('back_image')">Remove</button>
+      </div>
+      <button type="submit" class="submit-btn w-100">Upload Images</button>
+    </form>
+  </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script>
+    function previewImage(inputId, previewId) {
+      const input = document.getElementById(inputId)
+      const preview = document.getElementById(previewId)
+      const removeBtn = input.parentNode.querySelector('.remove-btn')
+    
+      while (preview.firstChild) {
+        preview.removeChild(preview.firstChild)
+      }
+    
+      const files = input.files
+      if (files.length === 0) {
+        removeBtn.style.display = 'none'
+        return
+      }
+    
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        const imageType = /image.*/
+    
+        if (!file.type.match(imageType)) {
+          continue
+        }
+    
+        const img = document.createElement('img')
+        img.classList.add('preview-image')
+        img.file = file
+    
+        const reader = new FileReader()
+        reader.onload = (function (aImg) {
+          return function (e) {
+            aImg.src = e.target.result
+          }
+        })(img)
+        reader.readAsDataURL(file)
+    
+        preview.appendChild(img)
+        removeBtn.style.display = 'inline-block'
+      }
+    }
+    
+    function removeImage(inputId) {
+      const input = document.getElementById(inputId)
+      input.value = ''
+      const preview = input.parentNode.querySelector('.preview')
+      while (preview.firstChild) {
+        preview.removeChild(preview.firstChild)
+      }
+      const removeBtn = input.parentNode.querySelector('.remove-btn')
+      removeBtn.style.display = 'none'
+    }
+  </script>
+{% endblock %}

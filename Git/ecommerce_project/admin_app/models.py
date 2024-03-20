@@ -31,13 +31,9 @@ class Brand(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length = 100)
     description = models.TextField()
-    quantity = models.BigIntegerField()
     price = models.BigIntegerField()
     category = models.ForeignKey(Category, on_delete = models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete = models.CASCADE)
-    main_image = models.FileField(upload_to = 'product_images/')
-    side_view_image = models.FileField(upload_to = 'product_images/')
-    top_view_image = models.FileField(upload_to = 'product_images/')
     is_deleted = models.BooleanField(default = False)
     is_listed = models.BooleanField(default = True)
     
@@ -46,42 +42,37 @@ class Product(models.Model):
         return self.name
     
     
+
     
+
+class ProductColorImage(models.Model):
+    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    color = models.CharField(max_length = 50)
+    
+    main_image =  models.FileField(upload_to= ' product_all_images/')
+    side_image = models.FileField(upload_to= ' product_all_images/')
+    top_image = models.FileField(upload_to= ' product_all_images/')
+    back_image = models.FileField(upload_to= ' product_all_images/')
+    
+    
+
     
 class ProductVariant(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
-    size = models.IntegerField()
-    color = models.CharField(max_length=50)
-    main_image = models.FileField(upload_to='product_variant_images/')
-    side_view_image = models.FileField(upload_to='product_variant_images/')
-    top_view_image = models.FileField(upload_to='product_variant_images/')
-    price = models.BigIntegerField()
+    size = models.CharField(max_length = 50)
+    quantity = models.BigIntegerField()
     is_listed = models.BooleanField(default = True)
     is_deleted = models.BooleanField(default = False)
-
+    
     def __str__(self):
-        return f"{self.product.name} - {self.color} - {self.size}"
+        return self.size
+
+ 
+    
+    
+    
 
     
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    # //hello

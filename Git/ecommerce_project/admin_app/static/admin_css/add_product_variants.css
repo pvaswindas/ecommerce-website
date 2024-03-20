@@ -1,6 +1,5 @@
 body {
     font-family: Arial, sans-serif;
-    padding: 20px;
 }
 
 h1 {
@@ -48,3 +47,44 @@ button[type="submit"] {
 button[type="submit"]:hover {
     background-color: #45a049;
 }
+
+
+/* Add styles for select dropdowns */
+.select-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .select-wrapper select {
+    width: calc(100% - 22px); /* Adjusted width to account for the dropdown arrow */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    -webkit-appearance: none; /* Remove default arrow on iOS Safari */
+    -moz-appearance: none; /* Remove default arrow on Firefox */
+    appearance: none; /* Remove default arrow */
+  }
+  
+  .select-wrapper::after {
+    content: '\25BC';
+    font-size: 20px;
+    color: #666;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  
+  /* Style for selected option */
+  .select-wrapper select option {
+    padding: 10px;
+  }
+  
+  /* Style for hover effect */
+  .select-wrapper:hover::after {
+    color: #333;
+  }
+  

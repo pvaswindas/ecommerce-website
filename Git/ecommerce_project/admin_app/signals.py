@@ -26,3 +26,5 @@ def update_product_variants_on_category_change(sender, instance, **kwargs):
 def update_product_variants_on_brand_change(sender, instance, **kwargs):
     ProductVariant.objects.filter(product__brand=instance).update(is_listed=instance.is_listed)
     ProductVariant.objects.filter(product__brand=instance).update(is_deleted=instance.is_deleted)
+    
+    

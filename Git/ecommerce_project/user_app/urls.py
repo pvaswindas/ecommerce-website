@@ -16,4 +16,9 @@ urlpatterns = [
     
     path('sneakerheads/shop-page/', views.shop_page_view, name='shop_page_view'),
     path('sneakerheads/<str:product_name>/<int:pdt_id>/', views.product_single_view_page, name='product_single_view_page'),
+    
+    
+    
+    
+    path('user-dashboard/<int:user_id>/', views.user_dashboard, name='user_dashboard'),
 ]

@@ -22,8 +22,10 @@ urlpatterns = [
     path('deleted-product-view/', views.deleted_product_page, name='deleted_product_page'),
     path('restore-product/<int:pdt_id>/', views.restore_product, name='restore_product'),
     path('product-variants-add-page/', views.admin_add_variants, name='admin_add_variants'),
+    path('product-image-add-page/', views.admin_add_image_page, name='admin_add_image_page'),
     path('list-product/<int:pdt_id>/', views.list_product, name='list_product'),
     path('un-list-product/<int:pdt_id>/', views.un_list_product, name='un_list_product'),
+    path('get-sizes/', views.get_sizes_view, name='get_sizes'),
     
     
     
