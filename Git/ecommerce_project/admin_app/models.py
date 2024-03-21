@@ -1,5 +1,5 @@
 from django.db import models
-
+from user_app.models import *
 
 
 
@@ -45,19 +45,25 @@ class Product(models.Model):
 
     
 
-class ProductColorImage(models.Model):
-    product = models.ForeignKey(Product, on_delete = models.CASCADE)
-    color = models.CharField(max_length = 50)
     
+class ProductColorImage(models.Model):
+    products = models.ForeignKey(Product, on_delete = models.CASCADE)
+    color = models.CharField(max_length = 50)
     main_image =  models.FileField(upload_to= ' product_all_images/')
     side_image = models.FileField(upload_to= ' product_all_images/')
     top_image = models.FileField(upload_to= ' product_all_images/')
     back_image = models.FileField(upload_to= ' product_all_images/')
+    is_deleted = models.BooleanField(default = False)
+    is_listed = models.BooleanField(default = True)
+    
+    def __str__(self):
+        return self.color
     
     
 
     
-class ProductVariant(models.Model):
+class ProductSize(models.Model):
+    product_color_image = models.ForeignKey(ProductColorImage, on_delete = models.CASCADE)
     size = models.CharField(max_length = 50)
     quantity = models.BigIntegerField()
     is_listed = models.BooleanField(default = True)
@@ -68,11 +74,86 @@ class ProductVariant(models.Model):
 
  
     
+class Coupon(models.Model):
+    name = models.CharField(max_length = 200)
+    value = models.BigIntegerField()
+    starting_date = models.DateField()
+    expiry_date = models.DateField()
+    is_listed = models.BooleanField(default = True)
+    
+    def __str__(self):
+        return self.name
+  
+
+
+class Payment(models.Model):
+    method_name = models.CharField(max_length = 100)
+    
+    def __str__(self):
+        return self.method_name
+
+
+    
+class Order(models.Model):
+    product = models.OneToOneField(Product, on_delete = models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
+    order_status = models.CharField(max_length = 100)
+    address = models.OneToOneField(Address, on_delete = models.CASCADE)
+    coupon = models.OneToOneField(Coupon, on_delete = models.CASCADE)
+    payment = models.OneToOneField(Payment, on_delete = models.CASCADE)
+    
+    
+    def __str__(self):
+        return self.order_status
+    
+
+
+
+class Banner(models.Model):
+    name = models.CharField(max_length = 200)
+    image_video = models.FileField(upload_to= 'banner_images/')
+    target_id = models.IntegerField()
+    target_name = models.CharField()
+    start_date = models.DateField()
+    expiry_date = models.DateField()
+    is_listed = models.BooleanField()
+    
+    def __str__(self):
+        return self.name
+    
     
     
 
+
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
+    rating = models.BigIntegerField()
+    review_text = models.TextField()
+    review_date = models.DateField()
+    verified_purchase = models.BooleanField(default = False)
+    
+    
+    def __str__(self):
+        return self.rating
     
     
     
+class Wishlist(models.Model):
+    customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
+    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    in_stock = models.BooleanField(default = True)
     
-    # //hello
+    def __str__(self):
+        return f"{self.customer}, {self.product}, {self.in_stock}"
+    
+    
+    
+class Cart(models.Model):
+    customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
+    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    in_stock = models.BooleanField(default = True)
+    
+    def __str__(self):
+        return f"{self.customer}, {self.product}, {self.in_stock}"

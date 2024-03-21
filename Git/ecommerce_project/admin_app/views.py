@@ -427,14 +427,10 @@ def edit_product(request, pdt_id):
     if request.user.is_superuser:
         if request.method == 'POST':
             name = request.POST.get('product_name')
-            quantity = request.POST.get('quantity')
             description = request.POST.get('description')
             price = request.POST.get('price')
             category_id = request.POST.get('category')
             brand_id = request.POST.get('brand')
-            main_image = request.FILES.get('main_image')
-            side_view_image = request.FILES.get('side_view_image')
-            top_view_image = request.FILES.get('top_view_image')
             is_deleted = request.POST.get('delete_product') == 'on'
             
             
@@ -445,16 +441,9 @@ def edit_product(request, pdt_id):
             
             product.name = name
             product.description = description
-            product.quantity = quantity
             product.price = price
             product.category = category
             product.brand = brand
-            if main_image:
-                product.main_image = main_image
-            if side_view_image:
-                product.side_view_image = side_view_image
-            if top_view_image:
-                product.top_view_image = top_view_image
             product.is_deleted = is_deleted
             product.save()
             messages.success(request, 'New Product was created!')
@@ -491,6 +480,7 @@ def delete_product(request, pdt_id):
             return redirect(list_product_page)
     else:
         return redirect('admin_login_page')
+
 
 
 
@@ -596,12 +586,7 @@ def add_product_image(request, pdt_id):
     if request.user.is_superuser:
         if pdt_id:
             if request.method == 'POST':
-                color = request.POST.get('color')
-                main_image = request.POST.get('main_image')
-                side_image = request.POST.get('side_image')
-                top_image = request.POST.get('top_image')
-                back_image = request.POST.get('back_image')
-                
+                pass
                 
 
 
@@ -618,7 +603,7 @@ def admin_add_variants(request):
     if request.user.is_superuser:
         sizes = adult_sizes
         products = Product.objects.all().order_by('name')
-        product_color = ProductImage.objects.all().order_by('color')
+        product_color = ProductColorImage.objects.all().order_by('color')
         return render(request, 'pages/products/add_product_variant.html', {'products': products, 'product_image' : product_color, 'sizes': sizes})
     else:
         return redirect(admin_login_page)
