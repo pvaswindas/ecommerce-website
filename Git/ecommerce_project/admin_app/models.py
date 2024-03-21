@@ -28,9 +28,10 @@ class Brand(models.Model):
     
     
     
-class Product(models.Model):
+class Products(models.Model):
     name = models.CharField(max_length = 100)
     description = models.TextField()
+    information = models.TextField()
     price = models.BigIntegerField()
     category = models.ForeignKey(Category, on_delete = models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete = models.CASCADE)
@@ -42,12 +43,9 @@ class Product(models.Model):
         return self.name
     
     
-
-    
-
     
 class ProductColorImage(models.Model):
-    products = models.ForeignKey(Product, on_delete = models.CASCADE)
+    products = models.ForeignKey(Products, on_delete = models.CASCADE)
     color = models.CharField(max_length = 50)
     main_image =  models.FileField(upload_to= ' product_all_images/')
     side_image = models.FileField(upload_to= ' product_all_images/')
@@ -95,7 +93,7 @@ class Payment(models.Model):
 
     
 class Order(models.Model):
-    product = models.OneToOneField(Product, on_delete = models.CASCADE)
+    products = models.OneToOneField(Products, on_delete = models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
     order_status = models.CharField(max_length = 100)
     address = models.OneToOneField(Address, on_delete = models.CASCADE)
@@ -127,7 +125,7 @@ class Banner(models.Model):
 
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    products = models.ForeignKey(Products, on_delete = models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
     rating = models.BigIntegerField()
     review_text = models.TextField()
@@ -142,7 +140,7 @@ class Review(models.Model):
     
 class Wishlist(models.Model):
     customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
-    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    products = models.ForeignKey(Products, on_delete = models.CASCADE)
     in_stock = models.BooleanField(default = True)
     
     def __str__(self):
@@ -152,8 +150,9 @@ class Wishlist(models.Model):
     
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
-    product = models.ForeignKey(Product, on_delete = models.CASCADE)
+    products = models.ForeignKey(Products, on_delete = models.CASCADE)
     in_stock = models.BooleanField(default = True)
     
     def __str__(self):
         return f"{self.customer}, {self.product}, {self.in_stock}"
+    

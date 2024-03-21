@@ -284,8 +284,8 @@ def shop_page_view(request):
             {"min": 3500, "max": 5000},
             {"min": 5000, "max": None},
             ]
-        product_list = Product.objects.all()
-        latest_products = Product.objects.all()[:10]
+        product_list = Products.objects.all()
+        latest_products = Products.objects.all()[:10]
         category_list = Category.objects.annotate(product_count= Count ('product'))
         brand_list = Brand.objects.annotate(product_count = Count('product'))
         return render(request, 'shop_page.html', {'product_list' : product_list, 'brand_list' : brand_list, 'category_list' : category_list, 'price_ranges' : price_ranges, 'latest_products' : latest_products,})
@@ -299,8 +299,8 @@ def shop_page_view(request):
 
 @never_cache
 def product_single_view_page(request, product_name, pdt_id):
-        product = Product.objects.get(pk=pdt_id)
-        last_five_products = Product.objects.order_by('-id')[:5]
+        product = Products.objects.get(pk=pdt_id)
+        last_five_products = Products.objects.order_by('-id')[:5]
         return render(request, 'product_view.html', {'product': product, 'last_five_products': last_five_products})
 
 

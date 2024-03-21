@@ -35,22 +35,22 @@
         </tr>
       </thead>
       <tbody>
-        {% for product in product_list %}
+        {% for product_color in product_colors %}
           <tr>
             <td>
-              {% if product.main_image %}
-                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" style="max-width: 100px;" />
+              {% if product_color.main_image %}
+                <img src="{{ product_color.main_image.url }}" alt="{{ product_color.products.name }}" style="max-width: 100px;" />
               {% else %}
                 <span>No Image Available</span>
               {% endif %}
             </td>
-            <td>{{ product.name }}</td>
-            <td>{{ product.quantity }}</td>
-            <td>{{ product.price }}</td>
-            <td>{{ product.category.name }}</td>
-            <td>{{ product.brand.name }}</td>
+            <td>{{ product_color.products.name }}</td>
+            <td>{{ product_color.productsize.quantity }}</td>
+            <td>{{ product_color.products.price }}</td>
+            <td>{{ product_color.products.category.name }}</td>
+            <td>{{ product_color.products.brand.name }}</td>
             <td>
-              <a href="{% url 'restore_product' product.id %}"><button class="btn btn-info">Restore</button></a>
+              <a href="{% url 'restore_product' product_color.products.id %}"><button class="btn btn-info">Restore</button></a>
             </td>
           </tr>
         {% endfor %}
@@ -58,7 +58,7 @@
     </table>
   </div>
 
-  {% if not product_list %}
+  {% if not product_colors %}
     <div class="container text-center justify-content-center align-items-center mt-5">
       <h3>No products to show</h3>
     </div>

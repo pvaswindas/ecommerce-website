@@ -6,29 +6,26 @@
 {% endblock %}
 
 {% block title %}
-  <title>SneakerHeads Add Product Variants</title>
+  <title>SneakerHeads Add Product Size</title>
 {% endblock %}
 
 {% block content %}
-  <h1>Add Product Variant</h1>
-  <form action="" method="post" enctype="multipart/form-data" id="variantForm">
+  <h1>Add Product Size</h1>
+  <form action="{% url 'add_size' %}" method="post" enctype="multipart/form-data" id="variantForm">
     {% csrf_token %}
     <label for="product">Product</label>
-    <select name="product" id="product">
+    <select name="product" id="productSelect">
       <option value="" disabled selected>Select Product</option>
       {% for product in products %}
         <option value="{{ product.id }}">{{ product.name }}</option>
       {% endfor %}
     </select>
-    <label for="product">Product Color</label>
-    <select name="product" id="product">
-      <option value="" disabled selected>Select Product</option>
-      {% for color in product_color %}
-        <option value="">{{ color.color }}</option>
-      {% endfor %}
+    <label for="color">Product Color</label>
+    <select name="color" id="colorSelect">
+      <option value="" disabled selected>Select Color</option>
     </select>
     <label for="size">Size</label>
-    <select name="size" id="size">
+    <select name="size" id="sizeSelect">
       <option value="" disabled selected>Select Size</option>
     </select>
     <label for="quantity">Quantity</label>
@@ -41,16 +38,40 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(document).ready(function () {
-      $('#product').change(function () {
+      $('#productSelect').change(function () {
         var productId = $(this).val()
         if (productId) {
           $.ajax({
-            url: '{% url "get_sizes" %}',
+            url: '{% url "get_colors" %}',
             data: { product_id: productId },
             dataType: 'json',
             success: function (data) {
-              var sizeSelect = $('#size')
-              sizeSelect.empty().append('<option value="">Select Size</option>')
+              var colorSelect = $('#colorSelect')
+              colorSelect.empty().append('<option value="" disabled selected>Select Color</option>')
+              $.each(data.colors, function (index, color) {
+                colorSelect.append('<option value="' + color.id + '">' + color.color + '</option>')
+              })
+            },
+            error: function (xhr, status, error) {
+              console.error('Error fetching colors:', error)
+            }
+          })
+        } else {
+          $('#colorSelect').empty().append('<option value="" disabled selected>Select Color</option>')
+        }
+      })
+    
+      $('#colorSelect').change(function () {
+        var colorId = $(this).val()
+        if (colorId) {
+          var productId = $('#productSelect').val()
+          $.ajax({
+            url: '{% url "get_sizes" %}',
+            data: { product_id: productId, color_id: colorId },
+            dataType: 'json',
+            success: function (data) {
+              var sizeSelect = $('#sizeSelect')
+              sizeSelect.empty().append('<option value="" disabled selected>Select Size</option>')
               $.each(data.sizes, function (index, size) {
                 sizeSelect.append('<option value="' + size + '">' + size + '</option>')
               })
@@ -60,13 +81,42 @@
             }
           })
         } else {
-          $('#size').empty().append('<option value="">Select Size</option>')
+          $('#sizeSelect').empty().append('<option value="" disabled selected>Select Size</option>')
         }
       })
     
       $('#addVariantBtn').click(function () {
         // Perform additional validation or submit form here
         $('#variantForm').submit()
+      })
+    })
+    
+    $(document).ready(function () {
+      $('#productSelect').change(function () {
+        var productId = $(this).val()
+        console.log('Product selected: ', productId) // Debug statement
+    
+        if (productId) {
+          $.ajax({
+            url: '{% url "get_colors" %}',
+            data: { product_id: productId },
+            dataType: 'json',
+            success: function (data) {
+              console.log('Colors data received: ', data) // Debug statement
+    
+              var colorSelect = $('#colorSelect')
+              colorSelect.empty().append('<option value="" disabled selected>Select Color</option>')
+              $.each(data.colors, function (index, color) {
+                colorSelect.append('<option value="' + color.id + '">' + color.color + '</option>')
+              })
+            },
+            error: function (xhr, status, error) {
+              console.error('Error fetching colors:', error)
+            }
+          })
+        } else {
+          $('#colorSelect').empty().append('<option value="" disabled selected>Select Color</option>')
+        }
       })
     })
   </script>

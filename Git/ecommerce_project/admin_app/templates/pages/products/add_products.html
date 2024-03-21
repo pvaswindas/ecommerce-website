@@ -33,9 +33,10 @@
             <input type="text" id="name" name="product_name" required />
             <label for="description">Description</label>
             <textarea id="description" required maxlength="1000" name="description" onkeyup="countChars(this)"></textarea>
+            <label for="description">More Information</label>
+            <textarea id="information" required maxlength="1500" name="information" onkeyup="countChars(this)"></textarea>
           </div>
         </div>
-
         <div class="accordion-item">
           <h3 class="accordion-header">Inventory & Pricing</h3>
           <div class="accordion-content">
@@ -63,4 +64,3 @@
     </form>
   </div>
 {% endblock %}
-

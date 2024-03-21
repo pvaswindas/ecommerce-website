@@ -341,10 +341,26 @@ def restore_categories(request, cat_id):
 @never_cache
 def list_product_page(request):
     if request.user.is_superuser:
-        product_list = Product.objects.filter(is_deleted=False).order_by('pk').select_related('category', 'brand')
-        return render(request, 'pages/products/product.html', {'product_list' : product_list})
+        product_list = []
+        products_with_colors = Products.objects.filter(is_deleted=False).order_by('pk').select_related('category', 'brand')
+        
+        for product in products_with_colors:
+            product_colors = ProductColorImage.objects.filter(products=product, is_deleted= False)
+            for color in product_colors:
+                product_sizes = ProductSize.objects.filter(product_color_image=color)
+                total_quantity = sum(size.quantity for size in product_sizes)
+                product_list.append({
+                    'product': product,
+                    'color': color.color,
+                    'main_image': color.main_image.url if color.main_image else None,
+                    'quantity': total_quantity
+                })
+                
+        return render(request, 'pages/products/product.html', {'product_list': product_list})
     else:
         return redirect('admin_login_page')
+
+
 
 
 
@@ -369,6 +385,7 @@ def add_products(request):
         if request.method == 'POST':
             name = request.POST.get('product_name')
             description = request.POST.get('description')
+            information = request.POST.get('information')
             price = request.POST.get('price')
             category_id = request.POST.get('category')
             brand_id = request.POST.get('brand')
@@ -376,13 +393,14 @@ def add_products(request):
             category = Category.objects.get(pk = category_id)
             brand = Brand.objects.get(pk = brand_id)
             
-            if Product.objects.filter(name__icontains=name).exists():
+            if Products.objects.filter(name__icontains=name).exists():
                 messages.error(request, 'Product already exists!')
                 return redirect(admin_add_product)
             else:
-                product = Product.objects.create(
+                product = Products.objects.create(
                     name=name,
                     description=description,
+                    information= information,
                     price=price,
                     category=category,
                     brand=brand,
@@ -402,7 +420,7 @@ def add_products(request):
 @never_cache
 def edit_product_page(request, pdt_id):
     if request.user.is_superuser:
-        product = Product.objects.get(id=pdt_id)
+        product = Products.objects.get(id=pdt_id)
         category_list = Category.objects.all()
         brand_list = Brand.objects.all()
         context = {
@@ -434,7 +452,7 @@ def edit_product(request, pdt_id):
             is_deleted = request.POST.get('delete_product') == 'on'
             
             
-            product = Product.objects.get(pk = pdt_id)
+            product = Products.objects.get(pk = pdt_id)
             category = Category.objects.get(pk = category_id)
             
             brand = Brand.objects.get(pk = brand_id)
@@ -462,24 +480,16 @@ def edit_product(request, pdt_id):
 def delete_product(request, pdt_id):
     if request.user.is_superuser:
         if pdt_id:
-            product_to_delete = Product.objects.get(pk=pdt_id)
-            if product_to_delete.brand.is_deleted == False and product_to_delete.category.is_deleted == False:
-                product_to_delete.is_deleted = False
-                product_to_delete.save()
-                messages.success(request, 'Product have been deleted!')
-            else:
-                if product_to_delete.brand.is_deleted and product_to_delete.category.is_deleted:
-                    messages.error(request, 'Cannot restore product: Brand and Category is deleted.')
-                elif product_to_delete.brand.is_deleted:
-                    messages.error(request, 'Cannot restore product: Brand is deleted.')
-                else:
-                    messages.error(request, 'Cannot restore product: Category is deleted.')
+            product_to_delete = ProductColorImage.objects.get(pk=pdt_id)
+            product_to_delete.is_deleted = True
+            product_to_delete.save()
+            messages.success(request, 'Product have been deleted!')
             return redirect(list_product_page)
         else:
-            messages.error(request, 'ID cannot be found.')
-            return redirect(list_product_page)
+            messages.error()
     else:
         return redirect('admin_login_page')
+
 
 
 
@@ -491,11 +501,11 @@ def delete_product(request, pdt_id):
 @never_cache
 def deleted_product_page(request):
     if request.user.is_superuser:
-        product_list = Product.objects.filter(is_deleted=True).order_by('name').select_related('category', 'brand')
-        return render(request, 'pages/products/deleted_products.html', {'product_list' : product_list})
+        deleted_product_colors = ProductColorImage.objects.filter(is_deleted=True).select_related('products__category', 'products__brand',)
+        return render(request, 'pages/products/deleted_products.html', {'product_colors': deleted_product_colors})
     else:
         return redirect('admin_login_page')
-    
+
     
 
     
@@ -504,14 +514,16 @@ def deleted_product_page(request):
 @never_cache
 def restore_product(request, pdt_id):
     if request.user.is_superuser:
-        
-        product = Product.objects.get(pk = pdt_id)
-        product.is_deleted = False
-        product.save()
-        messages.success(request, 'Product have been restored')
-        return redirect(deleted_product_page)
+        if pdt_id:
+            product_to_delete = ProductColorImage.objects.get(pk=pdt_id)
+            product_to_delete.is_deleted = False
+            product_to_delete.save()
+            messages.success(request, 'Product have been deleted!')
+            return redirect(list_product_page)
+        else:
+            messages.error()
     else:
-        return redirect(admin_login_page)
+        return redirect('admin_login_page')
         
 
 
@@ -523,7 +535,7 @@ def restore_product(request, pdt_id):
 def list_product(request, pdt_id):
     if request.user.is_superuser:
         if pdt_id:
-            product_to_list = Product.objects.get(pk=pdt_id)
+            product_to_list = Products.objects.get(pk=pdt_id)
             if product_to_list.brand.is_listed and product_to_list.category.is_listed:
                 product_to_list.is_listed = True
                 product_to_list.save()
@@ -552,7 +564,7 @@ def list_product(request, pdt_id):
 def un_list_product(request, pdt_id):
     if request.user.is_superuser:
         if pdt_id:
-            product_to_un_list = Product.objects.get(pk=pdt_id)
+            product_to_un_list = Products.objects.get(pk=pdt_id)
             product_to_un_list.is_listed = False
             product_to_un_list.save()
             messages.success(request, 'Product updated successfully!')
@@ -573,7 +585,7 @@ def un_list_product(request, pdt_id):
 @never_cache
 def admin_add_image_page(request):
     if request.user.is_superuser:
-        product_list = Product.objects.all()
+        product_list = Products.objects.all()
         return render(request, 'pages/products/add_product_image.html', {'product_list' : product_list})
     else:
         return redirect(admin_login_page)
@@ -582,13 +594,38 @@ def admin_add_image_page(request):
 
 @login_required
 @never_cache
-def add_product_image(request, pdt_id):
+def add_product_image(request):
     if request.user.is_superuser:
-        if pdt_id:
-            if request.method == 'POST':
-                pass
+        if request.method == 'POST':
+                products_id = request.POST.get('product')
+                color = request.POST.get('color')
+                main_image = request.FILES.get('main_image')
+                side_image = request.FILES.get('side_image')
+                top_image = request.FILES.get('top_image')
+                back_image = request.FILES.get('back_image')
                 
-
+                products = Products.objects.get(pk = products_id)
+                existing_color = ProductColorImage.objects.filter(products=products, color=color).exists()
+                if existing_color:
+                    messages.error(request, f"A product image with the color '{color}' already exists for this product.")
+                    return redirect('admin_add_image_page')
+                else:
+                    product_color_image = ProductColorImage.objects.create(
+                        color = color,
+                        main_image = main_image,
+                        side_image = side_image,
+                        top_image = top_image,
+                        back_image = back_image,
+                        products = products
+                        )
+                    product_color_image.save()
+                    messages.success(request, "Product Color and Image was added, now add product size")
+                    return redirect(admin_add_variants)
+        else:
+            return redirect(admin_add_image_page)
+    else:
+        return redirect('admin_login_page')               
+                
 
 # ---------------------------------------------------------------- ADMIN PRODUCT VARIANTS PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
@@ -602,35 +639,76 @@ kids_sizes = ['8C', '9C', '10C', '11C', '12C', '13C']
 def admin_add_variants(request):
     if request.user.is_superuser:
         sizes = adult_sizes
-        products = Product.objects.all().order_by('name')
+        products = Products.objects.all().order_by('name')
         product_color = ProductColorImage.objects.all().order_by('color')
-        return render(request, 'pages/products/add_product_variant.html', {'products': products, 'product_image' : product_color, 'sizes': sizes})
+        return render(request, 'pages/products/add_product_variant.html', {'products': products, 'product_color' : product_color, 'sizes': sizes})
     else:
         return redirect(admin_login_page)
 
 
 
+@login_required
+@never_cache
+def get_colors(request):
+    if request.user.is_superuser:
+        if request.method == 'GET' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            product_id = request.GET.get('product_id')
+            if product_id:
+                colors = ProductColorImage.objects.filter(products_id=product_id).order_by('color').values('id', 'color')
+                return JsonResponse({'colors': list(colors)})
+        return JsonResponse({}, status=400)
 
+
+
+
+@login_required
+@never_cache
 @require_GET
 def get_sizes_view(request):
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        product_id = request.GET.get('product_id')
-        if product_id:
-            try:
-                product = Product.objects.get(pk=product_id)
-                if product.category.name.lower() == "kids":
-                    sizes = ['8C', '9C', '10C', '11C', '12C', '13C']
-                else:
-                    sizes = [6, 7, 8, 9, 10, 11, 12]
-                return JsonResponse({'sizes': sizes})
-            except Product.DoesNotExist:
-                pass
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    if request.user.is_superuser:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            product_id = request.GET.get('product_id')
+            if product_id:
+                try:
+                    product = Products.objects.get(pk=product_id)
+                    if product.category.name.lower() == "kids":
+                        sizes = ['8C', '9C', '10C', '11C', '12C', '13C']
+                    else:
+                        sizes = [6, 7, 8, 9, 10, 11, 12]
+                        return JsonResponse({'sizes': sizes})
+                except Products.DoesNotExist:
+                    pass
+                return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 
 
-
+@login_required
+@never_cache
+def add_size(request):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            product_id = request.POST.get('product')
+            color_id = request.POST.get('color')
+            size = request.POST.get('size')
+            quantity = request.POST.get('quantity')
+            
+            product_color_image = ProductColorImage.objects.get(pk = color_id)
+            
+            product_size = ProductSize.objects.create(
+                product_color_image = product_color_image,
+                size = size,
+                quantity = quantity
+            )                
+            product_size.save()
+            messages.success(request, 'Added size to the product')
+            return redirect(list_product_page)
+        else:
+            return redirect(admin_add_variants)
+    else:
+        return redirect(admin_login_page)
+            
+            
 # ---------------------------------------------------------------- ADMIN BRAND PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 # BRAND PAGE FUNCTION

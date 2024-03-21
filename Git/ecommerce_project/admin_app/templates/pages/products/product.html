@@ -11,9 +11,9 @@
 
 {% block content %}
   <div class="container main-container">
-    <div class="mb-4 d-flex justify-content-between align-items-center">
+    <div class="mb-4 d-flex justify-content-between align-products-center">
       <h2>Manage Products</h2>
-      <a href="{% url 'deleted_product_page' %}"><span class="d-inline-flex justify-content-center align-items-center" style="width: 40px; height: 40px;"><i class="bi bi-trash" style="color: #c70a0a; font-size: 22px; animation: bounce 1s ease infinite;"></i></span></a>
+      <a href="{% url 'deleted_product_page' %}"><span class="d-inline-flex justify-content-center align-products-center" style="width: 40px; height: 40px;"><i class="bi bi-trash" style="color: #c70a0a; font-size: 22px; animation: bounce 1s ease infinite;"></i></span></a>
     </div>
     {% if messages %}
       {% for message in messages %}
@@ -41,29 +41,29 @@
           <tr>
             <td>
               {% if product.main_image %}
-                <img src="{{ product.main_image.url }}" alt="{{ product.name }}" style="max-width: 100px;" />
+                <img src="{{ product.main_image }}" alt="{{ product.product.name }}" style="max-width: 100px;" />
               {% else %}
                 <span>No Image Available</span>
               {% endif %}
             </td>
-            <td style="max-width: 200px; word-wrap: break-word;">{{ product.name }}</td>
+            <td style="max-width: 200px; word-wrap: break-word;">{{ product.product.name }}</td>
             <td>{{ product.quantity }}</td>
-            <td>{{ product.price }}</td>
-            <td>{{ product.category.name }}</td>
-            <td>{{ product.brand.name }}</td>
+            <td>{{ product.product.price }}</td>
+            <td>{{ product.product.category.name }}</td>
+            <td>{{ product.product.brand.name }}</td>
             <td>
-              <a href="{% url 'edit_product_page' product.id %}"><button class="btn btn-warning rounded rounded-1">Edit</button></a>
+              <a href="{% url 'edit_product_page' product.product.id %}"><button class="btn btn-warning rounded rounded-1">Edit</button></a>
             </td>
             <td>
               {% if product.is_listed == True %}
-                <a href="{% url 'un_list_product' product.id %}"><button class="btn btn-dark rounded rounded-1">Unlist</button></a>
+                <a href="{% url 'un_list_product' product.product.id %}"><button class="btn btn-dark rounded rounded-1">Unlist</button></a>
               {% else %}
-                <a href="{% url 'list_product' product.id %}"><button class="btn btn-success rounded rounded-1">List</button></a>
+                <a href="{% url 'list_product' product.product.id %}"><button class="btn btn-success rounded rounded-1">List</button></a>
               {% endif %}
             </td>
             <td>
-              {% if product.is_deleted == False %}
-                <a href="{% url 'delete_product' product.id %}"><button class="btn btn-danger rounded rounded-1">Delete</button></a>
+              {% if product.product.is_deleted == False %}
+                <a href="{% url 'delete_product' product.product.id %}"><button class="btn btn-danger rounded rounded-1">Delete</button></a>
               {% endif %}
             </td>
           </tr>
@@ -73,7 +73,7 @@
   </div>
 
   {% if not product_list %}
-    <div class="container text-center justify-content-center align-items-center mt-5">
+    <div class="container text-center justify-content-center align-products-center mt-5">
       <h3>No products to show</h3>
     </div>
   {% endif %}

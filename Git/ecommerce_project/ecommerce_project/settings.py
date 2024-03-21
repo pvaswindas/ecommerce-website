@@ -81,7 +81,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DATABASES = {
     'default': {
         'ENGINE' : 'django.db.backends.postgresql',
-        'NAME' : 'ecommerce',
+        'NAME' : 'db_ecommerce',
         'USER' : 'postgres',
         'PASSWORD' : 'error404',
         'HOST' : 'localhost',

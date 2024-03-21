@@ -33,30 +33,30 @@
             <input type="text" id="name" name="product_name" value="{{ product.name }}" required />
             <label for="description">Description</label>
             <textarea id="description" required maxlength="1000" name="description" onkeyup="countChars(this)">{{ product.description }}</textarea>
+            <label for="description">More Information</label>
+            <textarea id="information" required maxlength="1500" name="information" onkeyup="countChars(this)">{{ product.information }}</textarea>
           </div>
         </div>
 
         <div class="accordion-item">
           <h3 class="accordion-header">Inventory & Pricing</h3>
           <div class="accordion-content">
-            <label for="quantity">Quantity</label>
-            <input type="number" id="quantity" value="{{ product.quantity }}" name="quantity" min="0" required />
             <label for="price">Price</label>
             <input type="number" id="price" name="price" value="{{ product.price }}" step="1" min="0" required />
             <label for="category">Category</label>
             <select id="category" name="category" required>
-                <option value="">Select Category</option>
-                {% for category in category_list %}
+              <option value="">Select Category</option>
+              {% for category in category_list %}
                 <option value="{{ category.id }}" {% if category.id == selected_category_id %}selected{% endif %}>{{ category.name }}</option>
-                {% endfor %}
+              {% endfor %}
             </select>
 
             <label for="brand">Brand</label>
             <select id="brandSelect" name="brand" onchange="toggleBrandInput(this)">
-                <option value="">Select Brand</option>
-                {% for brand in brand_list %}
+              <option value="">Select Brand</option>
+              {% for brand in brand_list %}
                 <option value="{{ brand.id }}" {% if brand.id == selected_brand_id %}selected{% endif %}>{{ brand.name }}</option>
-                {% endfor %}
+              {% endfor %}
             </select>
           </div>
         </div>
@@ -89,13 +89,9 @@
             </div>
           </div>
         </div>
-        <div class="form-group mt-4 d-flex align-items-center">
-          <input type="checkbox" id="delete_product" name="delete_product">
-          <label for="delete_product" class="mb-0 px-2">Delete Product</label>
       </div>
-      </div>
-      <div class=" container row justify-content-end">
-          <button type="submit" class="btn btn-dark rounded rounded-1 end-0 me-md-2 mb-2 mx-2" onclick="return confirm('Are you sure you want to save changes?')">SAVE</button>
+      <div class="container row justify-content-end">
+        <button type="submit" class="btn btn-dark rounded rounded-1 end-0 me-md-2 mb-2 mx-2" onclick="return confirm('Are you sure you want to save changes?')">SAVE</button>
       </div>
     </form>
   </div>
@@ -104,17 +100,17 @@
 {% block custom_scripts %}
   <script>
     function previewImage(input, previewId) {
-      var preview = document.getElementById(previewId);
-      var file = input.files[0];
-      var reader = new FileReader();
+      var preview = document.getElementById(previewId)
+      var file = input.files[0]
+      var reader = new FileReader()
     
       reader.onloadend = function () {
-        var img = preview.getElementsByTagName('img')[0];
-        img.src = reader.result;
+        var img = preview.getElementsByTagName('img')[0]
+        img.src = reader.result
       }
     
       if (file) {
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file)
       }
     }
   </script>
