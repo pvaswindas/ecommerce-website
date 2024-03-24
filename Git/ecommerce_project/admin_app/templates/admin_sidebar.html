@@ -1,51 +1,77 @@
 <nav class="sidebar start-0 sidebar-offcanvas" id="sidebar">
   <ul class="nav position-fixed">
-    <li class="nav-item">
+    <li class="nav-item {% if is_active_dashboard %}active{% endif %}">
       <a class="nav-link" href="{% url 'admin_login_page' %}">
         <i class="icon-grid menu-icon"></i>
         <span class="menu-title">Dashboard</span>
       </a>
     </li>
-    <li class="nav-item">
+    <li class="nav-item {% if is_active_customer %}active{% endif %}">
       <a class="nav-link" href="{% url 'admin_customers' %}">
         <i class="bi bi-person-lines-fill"></i>
         <span class="menu-title px-3">Customers</span>
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+    <li class="nav-item {% if is_active_product %}active{% endif %}">
+      <a class="nav-link" data-toggle="collapse" href="#products" aria-expanded="false" aria-controls="products">
         <i class="bi bi-box-seam-fill"></i>
         <span class="menu-title px-3">Products</span>
         <i class="menu-arrow"></i>
       </a>
-      <div class="collapse" id="ui-basic">
+      <div class="collapse" id="products">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"> <a class="nav-link" href="{% url 'list_product_page' %}">Products</a></li>
-          <li class="nav-item"> <a class="nav-link" href="{% url 'list_brand_page' %}">Brands</a></li>
-          <li class="nav-item"> <a class="nav-link" href="{% url 'admin_add_product' %}">Add Products</a></li>
-          <li class="nav-item"> <a class="nav-link" href="{% url 'admin_add_image_page' %}">Add product Image</a></li>
-          <li class="nav-item"> <a class="nav-link" href="{% url 'admin_add_variants' %}">Add product variants</a></li>
-          <li class="nav-item"> <a class="nav-link" href="{% url 'admin_add_brand' %}">Add Brand</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'list_product_page' %}">Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_add_product' %}">Add Products</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_add_image_page' %}">Add product Image</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_add_variants' %}">Add product variants</a>
+          </li>
         </ul>
       </div>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="">
-        <i class="bi bi-receipt"></i>
-        <span class="menu-title px-3">Orders</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
-        <i class="bi bi-grid-fill"></i>
-        <span class="menu-title px-3">Categories</span>
+
+    <li class="nav-item {% if is_active_brand %}active{% endif %}">
+      <a class="nav-link" data-toggle="collapse" href="#brand" aria-expanded="false" aria-controls="brand">
+        <i class="bi bi-building"></i>
+        <span class="menu-title px-3">Brands</span>
         <i class="menu-arrow"></i>
       </a>
-      <div class="collapse" id="form-elements">
+      <div class="collapse" id="brand">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"> <a class="nav-link" href="{% url 'admin_categories' %}">List Categories</a></li>
-          <li class="nav-item"> <a class="nav-link" href="{% url 'add_category_page' %}">Add Categories</a></li>
-          <li class="nav-item"> <a class="nav-link" href="{% url 'deleted_cat_view' %}">Deleted Categories</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'list_brand_page' %}">List Brands</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin_add_brand' %}">Add Brands</a>
+          </li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="nav-item {% if is_active_category %}active{% endif %}">
+      <a class="nav-link" href="{% url 'admin_categories' %}">
+        <i class="bi bi-grid-fill"></i>
+        <span class="menu-title px-3">Category</span>
+      </a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="collapse" href="#orders" aria-expanded="false" aria-controls="orders">
+        <i class="bi bi-receipt"></i>
+        <span class="menu-title px-3">Orders</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="orders">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item">
+            <a class="nav-link" href="">List Orders</a>
+          </li>
         </ul>
       </div>
     </li>
@@ -70,6 +96,3 @@
     </li>
   </ul>
 </nav>
-
-
-

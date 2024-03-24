@@ -17,7 +17,7 @@
     <div class="product product-7 text-center">
       <figure class="product-media">
         <span class="product-label label-new">New</span>
-        <a href="product.html"><img src="{{ product.main_image.url }}" alt="Product image" class="product-image" /></a>
+        <a href="product.html"><img src="{{ product.productcolorimage_set.first.main_image.url }}" alt="Product image" class="product-image" /></a>
 
         <div class="product-action-vertical">
           <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>

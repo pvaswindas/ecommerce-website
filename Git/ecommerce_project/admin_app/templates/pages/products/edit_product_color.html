@@ -1,0 +1,144 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}
+  <title>SneakerHeads Product Color Edit Page</title>
+{% endblock %}
+
+{% block custom_css %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'admin_css/add_products.css' %}" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+  <div class="container main-container py-4">
+    <div class="accordion">
+      <div class="accordion-item">
+        <h3 class="accordion-head mt-4">Product Color & Images</h3>
+        <form action="{% url 'edit_product_color' product_color_image.id %}" method="post" ddenctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="accordion">
+            <div class="accordion-item">
+              <div class="progress-bar my-5">
+                <div class="progress"></div>
+              </div>
+              <div class="accordion-content">
+                <label for="color">Color</label>
+                <input type="text" id="color" name="color" value="{{ product_color_image.color }}" required />
+              </div>
+              <div class="accordion-content my-4">
+                <p>Upload images for different views:</p>
+                <div class="image-grid">
+                  <div class="form-group">
+                    <label for="main_image">Main Image:</label>
+                    <input type="file" id="main_image" name="main_image" accept="image/*" style="display: none;" data-preview="main_image_preview" data-file-name="main_file_name" />
+                    <label for="main_image" class="btn btn-primary">
+                      {% if product_color_image.main_image %}
+                        Change Image
+                      {% else %}
+                        Select Image
+                      {% endif %}
+                    </label>
+                    <span id="main_file_name" class="file-name">{{ product_color_image.main_image.name }}</span>
+                    <div class="image-preview" id="main_image_preview">
+                      <img src="{{ product_color_image.main_image.url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%;" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="side_image">Side Image:</label>
+                    <input type="file" id="side_image" name="side_image" accept="image/*" style="display: none;" data-preview="side_image_preview" data-file-name="side_file_name" />
+                    <label for="side_image" class="btn btn-primary">
+                      {% if product_color_image.side_image %}
+                        Change Image
+                      {% else %}
+                        Select Image
+                      {% endif %}
+                    </label>
+                    <span id="side_file_name" class="file-name">{{ product_color_image.side_image.name }}</span>
+                    <div class="image-preview" id="side_image_preview">
+                      <img src="{{ product_color_image.side_image.url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%;" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="top_image">Top Image:</label>
+                    <input type="file" id="top_image" name="top_image" accept="image/*" style="display: none;" data-preview="top_image_preview" data-file-name="top_file_name" />
+                    <label for="top_image" class="btn btn-primary">
+                      {% if product_color_image.top_image %}
+                        Change Image
+                      {% else %}
+                        Select Image
+                      {% endif %}
+                    </label>
+                    <span id="top_file_name" class="file-name">{{ product_color_image.top_image.name }}</span>
+                    <div class="image-preview" id="top_image_preview">
+                      <img src="{{ product_color_image.top_image.url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%;" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="back_image">Back Image:</label>
+                    <input type="file" id="back_image" name="back_image" accept="image/*" style="display: none;" data-preview="back_image_preview" data-file-name="back_file_name" />
+                    <label for="back_image" class="btn btn-primary">
+                      {% if product_color_image.back_image %}
+                        Change Image
+                      {% else %}
+                        Select Image
+                      {% endif %}
+                    </label>
+                    <span id="back_file_name" class="file-name">{{ product_color_image.back_image.name }}</span>
+                    <div class="image-preview" id="back_image_preview">
+                      <img src="{{ product_color_image.back_image.url }}" alt="{{ product.name }}" style="max-width: 100%; max-height: 100%;" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="container row">
+              <button type="submit" class="btn btn-dark rounded rounded-1 end-0 me-md-2 mb-2 mx-2 w-100">SAVE</button>
+            </div>
+          </div>
+        </form>
+        <div class="container row justify-content-between">
+          <a href="{% url 'edit_product_page' product_color_image.id %}" class="btn btn-primary rounded-circle d-flex justify-content-center align-items-center me-md-2 mb-2 mx-2" style="width: 60px; height: 60px;"><i class="fas fa-arrow-left"></i></a>
+          <a href="{% url 'edit_product_size_page' product_color_image.id %}" class="btn btn-primary rounded-circle d-flex justify-content-center align-items-center me-md-2 mb-2 mx-2" style="width: 60px; height: 60px;"><i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script>
+    // Function to update image preview and file name for a specific input
+    function updateImagePreview(input) {
+      const previewId = input.getAttribute('data-preview')
+      const fileNameSpanId = input.getAttribute('data-file-name')
+      const preview = document.getElementById(previewId)
+      const fileNameSpan = document.getElementById(fileNameSpanId)
+      const file = input.files[0]
+      const reader = new FileReader()
+    
+      reader.onload = function (e) {
+        const img = preview.querySelector('img')
+        img.src = e.target.result
+      }
+    
+      if (file) {
+        reader.readAsDataURL(file)
+        fileNameSpan.textContent = file.name // Update file name
+      } else {
+        // If no file is selected, clear the image preview and file name span
+        preview.querySelector('img').src = '' // Clear image preview
+        fileNameSpan.textContent = '' // Clear file name
+      }
+    }
+    
+    // Event listeners for file input changes
+    document.querySelectorAll('.form-group input[type="file"]').forEach(function (input) {
+      input.addEventListener('change', function () {
+        updateImagePreview(this)
+      })
+    })
+  </script>
+{% endblock %}

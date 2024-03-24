@@ -27,7 +27,7 @@
         <tr>
           <th>Image</th>
           <th>Name</th>
-          <th>Quantity</th>
+          <th>Total Quantity</th>
           <th>Price</th>
           <th>Category</th>
           <th>Brand</th>
@@ -37,33 +37,34 @@
         </tr>
       </thead>
       <tbody>
-        {% for product in product_list %}
+        {% for color in product_color %}
           <tr>
             <td>
-              {% if product.main_image %}
-                <img src="{{ product.main_image }}" alt="{{ product.product.name }}" style="max-width: 100px;" />
+              {% if color.main_image %}
+                <img src="{{ color.main_image.url }}" alt="{{ color.products.name }}" style="max-width: 100px;" />
               {% else %}
                 <span>No Image Available</span>
               {% endif %}
             </td>
-            <td style="max-width: 200px; word-wrap: break-word;">{{ product.product.name }}</td>
-            <td>{{ product.quantity }}</td>
-            <td>{{ product.product.price }}</td>
-            <td>{{ product.product.category.name }}</td>
-            <td>{{ product.product.brand.name }}</td>
+            <td style="max-width: 200px; word-wrap: break-word;">{{ color.products.name }}</td>
+            <td>{{ color.total_quantity }}</td>
+            <td>{{ color.products.price }}</td>
+            <td>{{ color.products.category.name }}</td>
+            <td>{{ color.products.brand.name }}</td>
             <td>
-              <a href="{% url 'edit_product_page' product.product.id %}"><button class="btn btn-warning rounded rounded-1">Edit</button></a>
+              <a href="{% url 'edit_product_page' color.id %}"><button class="btn btn-warning rounded rounded-1">Edit</button></a>
             </td>
+
             <td>
-              {% if product.is_listed == True %}
-                <a href="{% url 'un_list_product' product.product.id %}"><button class="btn btn-dark rounded rounded-1">Unlist</button></a>
+              {% if color.is_listed %}
+                <a href="{% url 'un_list_product' color.id %}"><button class="btn btn-dark rounded rounded-1">Unlist</button></a>
               {% else %}
-                <a href="{% url 'list_product' product.product.id %}"><button class="btn btn-success rounded rounded-1">List</button></a>
+                <a href="{% url 'list_product' color.id %}"><button class="btn btn-success rounded rounded-1">List</button></a>
               {% endif %}
             </td>
             <td>
-              {% if product.product.is_deleted == False %}
-                <a href="{% url 'delete_product' product.product.id %}"><button class="btn btn-danger rounded rounded-1">Delete</button></a>
+              {% if not color.is_deleted %}
+                <a href="{% url 'delete_product' color.id %}"><button class="btn btn-danger rounded rounded-1">Delete</button></a>
               {% endif %}
             </td>
           </tr>
@@ -72,7 +73,7 @@
     </table>
   </div>
 
-  {% if not product_list %}
+  {% if not product_color %}
     <div class="container text-center justify-content-center align-products-center mt-5">
       <h3>No products to show</h3>
     </div>

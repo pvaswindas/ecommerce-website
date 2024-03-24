@@ -13,6 +13,7 @@ from datetime import datetime
 from django.db.models import *
 from django.db import transaction
 import random
+from random import shuffle
 from django.urls import reverse
 from django.core.mail import send_mail
 from django.views.decorators.cache import never_cache
@@ -274,23 +275,32 @@ def logout(request):
 # ---------------------------------------------------------------------------------- SHOP PAGE ----------------------------------------------------------------------------------
 
 
+
+
 @never_cache
 def shop_page_view(request):
-        price_ranges = [
-            {"min": 1000, "max": 1500},
-            {"min": 1500, "max": 2500},
-            {"min": 2500, "max": 4000},
-            {"min": 2500, "max": 3500},
-            {"min": 3500, "max": 5000},
-            {"min": 5000, "max": None},
-            ]
-        product_list = Products.objects.all()
-        latest_products = Products.objects.all()[:10]
-        category_list = Category.objects.annotate(product_count= Count ('product'))
-        brand_list = Brand.objects.annotate(product_count = Count('product'))
-        return render(request, 'shop_page.html', {'product_list' : product_list, 'brand_list' : brand_list, 'category_list' : category_list, 'price_ranges' : price_ranges, 'latest_products' : latest_products,})
-
+    price_ranges = [
+        {"min": 1000, "max": 1500},
+        {"min": 1500, "max": 2500},
+        {"min": 2500, "max": 4000},
+        {"min": 2500, "max": 3500},
+        {"min": 3500, "max": 5000},
+        {"min": 5000, "max": None},
+    ]
+    product_color_list = list(ProductColorImage.objects.all())
+    shuffle(product_color_list)
+    latest_products = ProductColorImage.objects.all()[:10]
+    category_list = Category.objects.annotate(product_count=Count('products'))
+    brand_list = Brand.objects.annotate(product_count=Count('products'))
     
+    context = {
+        'product_color_list': product_color_list,
+        'brand_list': brand_list,
+        'category_list': category_list,
+        'price_ranges': price_ranges,
+        'latest_products': latest_products,
+    }
+    return render(request, 'shop_page.html', context)
     
 
 
@@ -299,13 +309,11 @@ def shop_page_view(request):
 
 @never_cache
 def product_single_view_page(request, product_name, pdt_id):
-        product = Products.objects.get(pk=pdt_id)
+        product_color = ProductColorImage.objects.get(pk=pdt_id)
         last_five_products = Products.objects.order_by('-id')[:5]
-        return render(request, 'product_view.html', {'product': product, 'last_five_products': last_five_products})
-
-
-
-
+        product_sizes = ProductSize.objects.filter(product_color_image = product_color)
+        context = {'product_color' : product_color, 'product_sizes': product_sizes, 'last_five_products': last_five_products}
+        return render(request, 'product_view.html', context)
 
 
 

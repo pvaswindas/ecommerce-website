@@ -45,22 +45,20 @@
               {% endif %}
             </td>
             <td>{{ product_color.products.name }}</td>
-            <td>{{ product_color.productsize.quantity }}</td>
+            <td>{{ product_color.total_quantity }}</td>
             <td>{{ product_color.products.price }}</td>
             <td>{{ product_color.products.category.name }}</td>
             <td>{{ product_color.products.brand.name }}</td>
             <td>
-              <a href="{% url 'restore_product' product_color.products.id %}"><button class="btn btn-info">Restore</button></a>
+              <a href="{% url 'restore_product' product_color.id %}"><button class="btn btn-info">Restore</button></a>
             </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="text-center">No products to show</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-
-  {% if not product_colors %}
-    <div class="container text-center justify-content-center align-items-center mt-5">
-      <h3>No products to show</h3>
-    </div>
-  {% endif %}
 {% endblock %}

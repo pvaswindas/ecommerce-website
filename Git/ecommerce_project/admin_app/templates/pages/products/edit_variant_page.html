@@ -1,0 +1,80 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}
+  <title>SneakerHeads Product Size Edit Page</title>
+{% endblock %}
+
+{% block custom_css %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'admin_css/add_products.css' %}" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+  <div class="container main-container py-4">
+    <div class="accordion">
+      <div class="accordion-item">
+        <div class="progress-bar my-5">
+          <div class="progress"></div>
+        </div>
+        <h3 class="accordion-header py-4">Product Sizes & Quantity</h3>
+
+        {% for size in product_sizes %}
+          <form id="sizeForm_{{ size.id }}" method="post" action="{% url 'edit_product_size' size.id %}">
+            {% csrf_token %}
+            <div class="container">
+              <div class="row">
+                <div class="col">
+                  <label for="product_size">Sizes</label>
+                  <select id="sizeSelect_{{ size.id }}" class="form-control" name="product_size">
+                    <!-- Options will be added dynamically using JavaScript -->
+                  </select>
+                </div>
+                <div class="col">
+                  <label for="product_quantity">Quantity</label>
+                  <input type="number" id="quantity_{{ size.id }}" class="form-control" name="product_quantity" value="{{ size.quantity }}" required />
+                </div>
+              </div>
+            </div>
+            <div class="container row">
+              <button type="submit" class="btn btn-dark rounded rounded-1 end-0 me-md-2 mb-2 mx-2 w-100 mt-3">SAVE</button>
+            </div>
+          </form>
+        {% endfor %}
+        <div class="container row justify-content-start">
+          <a href="{% url 'edit_product_color_page' product_color_image.id %}" class="btn btn-primary rounded-circle d-flex justify-content-center align-items-center me-md-2 mb-2 mx-2" style="width: 60px; height: 60px;"><i class="fas fa-arrow-left"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      {% for size in product_sizes %}
+        $.ajax({
+          url: '{% url "get_sizes" %}',
+          method: 'GET',
+          data: { product_id: '{{ product.id }}' },
+          success: function (data) {
+            var sizeSelect = $('#sizeSelect_{{ size.id }}');
+            sizeSelect.empty().append('<option value="" disabled>Select Size</option>');
+            data.sizes.forEach(function (sizeOption) {
+              var option = $('<option value="' + sizeOption + '">' + sizeOption + '</option>');
+              // Check if the size matches the one from the database
+              if ("{{ size.size }}" === sizeOption) {
+                option.attr('selected', 'selected');
+              }
+              sizeSelect.append(option);
+            });
+          },
+          error: function (xhr, status, error) {
+            console.error('Error fetching sizes:', error);
+          }
+        });
+      {% endfor %}
+    });
+  </script>
+{% endblock %}

@@ -9,26 +9,26 @@
         </div>
         <div class="profile-info-item">
           <label for="first-name">First Name</label>
-          <span id="first-name-value"> {{ customer.User.first_name }} </span>
+          <span id="first-name-value"> {{ user.first_name }} </span>
           <br />
-          <input type="text" name="first_name" id="first-name-input" class="edit-input" style="display: none;" />
+          <input type="text" name="first_name" value="{{ user.first_name }}" id="first-name-input" class="edit-input" style="display: none;" />
         </div>
         <div class="profile-info-item">
           <label for="first-name">Last Name</label>
           <span id="last-name-value"> {{ user.last_name }}  </span>
           <br />
-          <input type="text" name="last_name" id="last-name-input" class="edit-input" style="display: none;" />
+          <input type="text" name="last_name" value="{{ user.last_name }}" id="last-name-input" class="edit-input" style="display: none;" />
         </div>
         <div class="profile-info-item">
           <label for="email">Email Address</label>
           <span id="email-value"> {{ user.email }}  </span>
           <br />
-          <input type="text" name="email" id="email-input" class="edit-input" style="display: none;" />
+          <input type="text" name="email" value="{{ user.email}}" id="email-input" class="edit-input" style="display: none;" />
         </div>
         <div class="profile-info-item">
           <label for="phone">Phone Number</label>
           <span id="phone-value"> {{ user.customer.phone_number }} </span>
-          <input type="text" name="phone" id="phone-input" class="edit-input" style="display: none;" />
+          <input type="text" name="phone" value="{{ user.customer.phone_number }}" id="phone-input" class="edit-input" style="display: none;" />
         </div>
         <div class="profile-info-item">
           <label>Gender:</label>

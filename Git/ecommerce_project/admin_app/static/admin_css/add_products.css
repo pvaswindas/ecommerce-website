@@ -97,6 +97,15 @@ select {
     margin-bottom: 10px;
 }
 
+.file-name {
+    max-width: 200px; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+    display: inline-block;
+}
+
+
 textarea {
     height: 120px;
 }
