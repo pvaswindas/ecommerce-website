@@ -326,14 +326,50 @@ def product_single_view_page(request, product_name, pdt_id):
 @login_required
 @never_cache
 def user_dashboard(request, user_id):
-    print(user_id)
     if request.user.is_authenticated:
         if user_id:
             user = User.objects.get(pk = user_id)
-            return render(request, 'dashboard.html', {'user' : user ,})
+            customer = Customer.objects.get(user = user)
+            return render(request, 'dashboard.html', {'user' : user, 'customer' : customer})
         else:
             messages.error(request, 'Not able to get user details at this moment')
             return redirect(index_page)
     else:
         return render(index_page)
     
+    
+@login_required
+@never_cache
+def user_details_edit(request, user_id):
+    if request.user.is_authenticated:
+        if user_id:
+            user = User.objects.get(pk = user_id)
+            customer = Customer.objects.get(user = user)
+            
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            email = request.POST.get('email')
+            phone = request.POST.get('phone')
+            dob = request.POST.get('dob')
+            gender = request.POST.get('gender')
+            
+            user.first_name = first_name
+            user.last_name = last_name
+            user.username = email
+            user.email = email
+            customer.phone_number = phone
+            customer.dob = dob
+            customer.gender = gender
+            
+            user.save()
+            customer.save()
+            messages.success(request, 'Profile Updated')
+            return redirect(reverse('user_dashboard', kwargs={'user_id': user_id}))
+        else:
+            messages.error(request, 'Not able to change user details at this moment')
+            return redirect(index_page)
+    else:
+        return render(index_page)
+
+            
+        

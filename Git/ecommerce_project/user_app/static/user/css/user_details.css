@@ -1,34 +1,73 @@
 .main-container {
+    max-width: 950px;
     margin: 20px auto;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
 }
 
-.profile-info {
-    margin-top: 20px;
-}
 
+/* Profile info item styles */
 .profile-info-item {
+    display: flex;
+    align-items: center;
     margin-bottom: 20px;
 }
 
 .profile-info-item label {
     font-weight: bold;
-    flex: 1;
+    width: 150px;
     margin-right: 10px;
+    color: #797a7c;
 }
 
-.profile-info-item .edit-action {
-    color: #007bff;
+.profile-info-item {
+    color: #000000;
     cursor: pointer;
+    margin-left: auto;
+    /* Push the edit action to the right */
 }
 
+/* Input styles */
 .edit-input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
-    width: calc(100% - 100px); /* Adjusted width for responsiveness */
+    width: 60%;
+    /* Adjusted width for responsiveness */
+    font-size: 14px;
+    /* Set font size */
+    color: #333;
+    /* Text color */
+}
+
+.edit-action {
+    color: #0056b3;
+}
+
+/* Radio button styles */
+input[type="radio"] {
+    margin-right: 5px;
+    /* Add some spacing between radio buttons and labels */
+}
+
+/* Button styles */
+.save-button {
+    padding: 8px 16px;
+    background-color: #1b3961;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    /* Set font size */
+    transition: background-color 0.3s ease;
+    /* Smooth transition */
+}
+
+.save-button:hover {
+    background-color: #0056b3;
+    /* Darker shade on hover */
 }

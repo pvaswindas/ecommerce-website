@@ -4,7 +4,6 @@
       <label>Filters:</label>
       <a href="#" class="sidebar-filter-clear">Clean All</a>
     </div>
-    <!-- End .widget widget-clean -->
 
     <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">Category</a></h3><!-- End .widget-title -->
@@ -18,20 +17,13 @@
                   <input type="checkbox" class="custom-control-input" id="cat" />
                   <label class="custom-control-label" for="cat">{{ category.name }}</label>
                 </div>
-                <!-- End .custom-checkbox -->
                 <span class="item-count">{{ category.product_count }}</span>
               </div>
             {% endfor %}
-
-            <!-- End .filter-item -->
           </div>
-          <!-- End .filter-items -->
         </div>
-        <!-- End .widget-body -->
       </div>
-      <!-- End .collapse -->
     </div>
-    <!-- End .widget -->
 
     <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2">Size</a></h3><!-- End .widget-title -->
@@ -44,62 +36,46 @@
                 <input type="checkbox" class="custom-control-input" id="size-1" />
                 <label class="custom-control-label" for="size-1">XS</label>
               </div>
-              <!-- End .custom-checkbox -->
             </div>
-            <!-- End .filter-item -->
 
             <div class="filter-item">
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" id="size-2" />
                 <label class="custom-control-label" for="size-2">S</label>
               </div>
-              <!-- End .custom-checkbox -->
             </div>
-            <!-- End .filter-item -->
 
             <div class="filter-item">
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" checked id="size-3" />
                 <label class="custom-control-label" for="size-3">M</label>
               </div>
-              <!-- End .custom-checkbox -->
             </div>
-            <!-- End .filter-item -->
 
             <div class="filter-item">
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" checked id="size-4" />
                 <label class="custom-control-label" for="size-4">L</label>
               </div>
-              <!-- End .custom-checkbox -->
             </div>
-            <!-- End .filter-item -->
 
             <div class="filter-item">
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" id="size-5" />
                 <label class="custom-control-label" for="size-5">XL</label>
               </div>
-              <!-- End .custom-checkbox -->
             </div>
-            <!-- End .filter-item -->
 
             <div class="filter-item">
               <div class="custom-control custom-checkbox">
                 <input type="checkbox" class="custom-control-input" id="size-6" />
                 <label class="custom-control-label" for="size-6">XXL</label>
               </div>
-              <!-- End .custom-checkbox -->
             </div>
-            <!-- End .filter-item -->
           </div>
-          <!-- End .filter-items -->
         </div>
-        <!-- End .widget-body -->
       </div>
-      <!-- End .collapse -->
     </div>
-    <!-- End .widget -->
 
     <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-3" role="button" aria-expanded="true" aria-controls="widget-3">Colour</a></h3><!-- End .widget-title -->
@@ -116,13 +92,9 @@
             <a href="#" style="background: #f2719c;"><span class="sr-only">Color Name</span></a>
             <a href="#" style="background: #ebebeb;"><span class="sr-only">Color Name</span></a>
           </div>
-          <!-- End .filter-colors -->
         </div>
-        <!-- End .widget-body -->
       </div>
-      <!-- End .collapse -->
     </div>
-    <!-- End .widget -->
 
     <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-4" role="button" aria-expanded="true" aria-controls="widget-4">Brand</a></h3><!-- End .widget-title -->
@@ -139,15 +111,10 @@
                 <span class="item-count">{{ brand.product_count }}</span>
               </div>
             {% endfor %}
-            <!-- End .filter-item -->
           </div>
-          <!-- End .filter-items -->
         </div>
-        <!-- End .widget-body -->
       </div>
-      <!-- End .collapse -->
     </div>
-    <!-- End .widget -->
 
     <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">Price</a></h3><!-- End .widget-title -->
@@ -157,13 +124,7 @@
           <div class="price-ranges">
             {% for range in price_ranges %}
               <div class="custom-control custom-checkbox">
-                <input type="checkbox"
-                  class="custom-control-input"
-                  id="price-range-{{ forloop.counter }}"
-                  name="price-range"
-                  value="{{ range.min }}-{% if range.max %}
-                    {{ range.max }}
-                  {% endif %}" />
+                <input type="checkbox" class="custom-control-input" id="price-range-{{ forloop.counter }}" name="price-range" value="{{ range.min }}-{% if range.max %}{{ range.max }}{% endif %}" />
                 <label class="custom-control-label" for="price-range-{{ forloop.counter }}">
                   ₹ {{ range.min }} -{% if range.max %}
                     ₹ {{ range.max }}

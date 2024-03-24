@@ -22,7 +22,7 @@ class Customer(models.Model):
     dob = models.DateField(null=True)
     
     def __str__(self):
-        return self.user.email
+        return self.user.first_name
 
 
 class Address(models.Model):

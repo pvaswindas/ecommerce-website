@@ -5,12 +5,6 @@
   <link rel="stylesheet" href="{% static 'user/css/user_details.css' %}" />
 {% endblock %}
 
-{% block bc2 %}
-  <li class="breadcrumb-item">
-    <a href="#">Shop</a>
-  </li>
-{% endblock %}
-
 {% block bcactive %}
   <li class="breadcrumb-item active" aria-current="page">My Account</li>
 {% endblock %}
@@ -19,7 +13,7 @@
   <div class="page-header text-center" style="background-image: url('{% static 'user/assets/images/page-header-bg.jpg' %}')">
     <div class="container">
       {% block page_header_title %}
-        <h1 class="page-title">My Account<span>Shop</span></h1>
+        <h1 class="page-title">My Account</h1>
       {% endblock %}
     </div>
   </div>
@@ -169,6 +163,8 @@
       var saveButton = document.querySelector('.save-button')
       var inputElements = document.querySelectorAll('.edit-input')
       var valueElements = document.querySelectorAll('.profile-info-item span:not(.edit-action)')
+      var genderInput = document.getElementById('gender-input')
+      var dobInput = document.getElementById('dob-input')
     
       if (inputElements[0].style.display === 'none') {
         // Entering edit mode
@@ -176,12 +172,16 @@
         saveButton.style.display = 'inline-block'
         inputElements.forEach((input) => (input.style.display = 'inline-block'))
         valueElements.forEach((value) => (value.style.display = 'none'))
+        genderInput.style.display = 'block' // Show gender input
+        dobInput.style.display = 'block' // Show DOB input
       } else {
         // Canceling edit mode
         editAction.textContent = 'Edit'
         saveButton.style.display = 'none'
         inputElements.forEach((input) => (input.style.display = 'none'))
         valueElements.forEach((value) => (value.style.display = 'inline-block'))
+        genderInput.style.display = 'none' // Hide gender input
+        dobInput.style.display = 'none' // Hide DOB input
       }
     }
   </script>
