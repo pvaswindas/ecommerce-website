@@ -212,7 +212,7 @@ def add_categories(request):
                 return redirect(admin_categories)
             else:
                 messages.error(request, 'Category already exists, create new category')
-                return redirect(add_category_page)
+                return redirect(admin_add_category_page)
     else:
         return redirect('admin_login_page')
     
