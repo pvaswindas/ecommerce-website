@@ -11,8 +11,9 @@ from admin_app.models import *
 from django.utils import timezone
 from datetime import datetime
 from django.db.models import *
-from django.db import transaction
+from django.db.models import Q
 import random
+import re
 from random import shuffle
 from django.urls import reverse
 from django.core.mail import send_mail
@@ -330,7 +331,8 @@ def user_dashboard(request, user_id):
         if user_id:
             user = User.objects.get(pk = user_id)
             customer = Customer.objects.get(user = user)
-            return render(request, 'dashboard.html', {'user' : user, 'customer' : customer})
+            addresses = Address.objects.filter(customer = customer)
+            return render(request, 'dashboard.html', {'user' : user, 'customer' : customer, 'addresses' : addresses})
         else:
             messages.error(request, 'Not able to get user details at this moment')
             return redirect(index_page)
@@ -353,17 +355,45 @@ def user_details_edit(request, user_id):
             dob = request.POST.get('dob')
             gender = request.POST.get('gender')
             
-            user.first_name = first_name
-            user.last_name = last_name
-            user.username = email
-            user.email = email
-            customer.phone_number = phone
-            customer.dob = dob
-            customer.gender = gender
             
-            user.save()
-            customer.save()
-            messages.success(request, 'Profile Updated')
+            is_valid_phone = True
+            
+            email = normalize_newlines(email).strip()
+            is_valid_email = True
+            
+            try:
+                validate_email(email)
+            except ValidationError as e:
+                is_valid_email = False
+                print("email validate issue")
+                messages.error(request, f'Invalid email: {e}')
+                
+            current_user_email = request.user.email
+            if User.objects.filter(~Q(username=current_user_email), username=email).exists():
+                print('email exits')
+                is_valid_email = False
+                messages.error(request, 'Email already exists for another user')
+                
+            
+            if not re.match(r'^\d{10}$', phone):
+                is_valid_phone = False
+                print('phone number issue')
+                messages.error(request, 'Phone number must be 10 digits')
+                print('return')
+                
+            if is_valid_email and is_valid_phone:
+                print('Entered')
+                user.first_name = first_name
+                user.last_name = last_name
+                user.username = email
+                user.email = email
+                customer.phone_number = phone
+                customer.dob = dob
+                customer.gender = gender
+            
+                user.save()
+                customer.save()
+                messages.success(request, 'Profile Updated')
             return redirect(reverse('user_dashboard', kwargs={'user_id': user_id}))
         else:
             messages.error(request, 'Not able to change user details at this moment')

@@ -24,6 +24,7 @@
     <div class="dashboard">
       <div class="container">
         <div class="row">
+          {% comment %}SIDEBAR{% endcomment %}
           <aside class="col-md-4 col-lg-3">
             <ul class="nav nav-dashboard flex-column mb-3 mb-md-0" role="tablist">
               <li class="nav-item">
@@ -36,7 +37,7 @@
                 <a class="nav-link" id="tab-downloads-link" data-toggle="tab" href="#tab-downloads" role="tab" aria-controls="tab-downloads" aria-selected="false">Downloads</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Adresses</a>
+                <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Manage Adresses</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account" role="tab" aria-controls="tab-account" aria-selected="false">Account Details</a>
@@ -46,69 +47,33 @@
               </li>
             </ul>
           </aside>
-          <!-- End .col-lg-3 -->
 
           <div class="col-md-8 col-lg-9">
             <div class="tab-content">
+              {% comment %}DASHBOARD{% endcomment %}
               <div class="tab-pane fade show active" id="tab-dashboard" role="tabpanel" aria-labelledby="tab-dashboard-link">
                 {% include 'dashboard/user_details.html' %}
               </div>
+
+              {% comment %}ORDER DETAILS{% endcomment %}
               <div class="tab-pane fade" id="tab-orders" role="tabpanel" aria-labelledby="tab-orders-link">
                 <p>No order has been made yet.</p>
                 <a href="category.html" class="btn btn-outline-primary-2"><span>GO SHOP</span><i class="icon-long-arrow-right"></i></a>
               </div>
-              <!-- .End .tab-pane -->
 
+              {% comment %} {% endcomment %}
               <div class="tab-pane fade" id="tab-downloads" role="tabpanel" aria-labelledby="tab-downloads-link">
                 <p>No downloads available yet.</p>
                 <a href="category.html" class="btn btn-outline-primary-2"><span>GO SHOP</span><i class="icon-long-arrow-right"></i></a>
               </div>
-              <!-- .End .tab-pane -->
 
+              {% comment %}MANAGE ADDRESS{% endcomment %}
               <div class="tab-pane fade" id="tab-address" role="tabpanel" aria-labelledby="tab-address-link">
                 <p>The following addresses will be used on the checkout page by default.</p>
-
-                <div class="row">
-                  <div class="col-lg-6">
-                    <div class="card card-dashboard">
-                      <div class="card-body">
-                        <h3 class="card-title">Billing Address</h3><!-- End .card-title -->
-
-                        <p>
-                          User Name<br />
-                          User Company<br />
-                          John str<br />
-                          New York, NY 10001<br />
-                          1-234-987-6543<br />
-                          yourmail@mail.com<br />
-                          <a href="#">Edit <i class="icon-edit"></i></a>
-                        </p>
-                      </div>
-                      <!-- End .card-body -->
-                    </div>
-                    <!-- End .card-dashboard -->
-                  </div>
-                  <!-- End .col-lg-6 -->
-
-                  <div class="col-lg-6">
-                    <div class="card card-dashboard">
-                      <div class="card-body">
-                        <h3 class="card-title">Shipping Address</h3><!-- End .card-title -->
-
-                        <p>
-                          You have not set up this type of address yet.<br />
-                          <a href="#">Edit <i class="icon-edit"></i></a>
-                        </p>
-                      </div>
-                      <!-- End .card-body -->
-                    </div>
-                    <!-- End .card-dashboard -->
-                  </div>
-                  <!-- End .col-lg-6 -->
-                </div>
-                <!-- End .row -->
+                {% include 'dashboard/manage_addresses.html' %}
               </div>
 
+              {% comment %}PASSWORD CHANGE{% endcomment %}
               <div class="tab-pane fade" id="tab-account" role="tabpanel" aria-labelledby="tab-account-link">
                 <form action="#">
                   <div class="row">
@@ -116,15 +81,12 @@
                       <label>First Name *</label>
                       <input type="text" class="form-control" required />
                     </div>
-                    <!-- End .col-sm-6 -->
 
                     <div class="col-sm-6">
                       <label>Last Name *</label>
                       <input type="text" class="form-control" required />
                     </div>
-                    <!-- End .col-sm-6 -->
                   </div>
-                  <!-- End .row -->
 
                   <label>Display Name *</label>
                   <input type="text" class="form-control" required />
@@ -167,22 +129,50 @@
       var dobInput = document.getElementById('dob-input')
     
       if (inputElements[0].style.display === 'none') {
-        // Entering edit mode
-        editAction.textContent = 'Cancel'
+        editAction.innerHTML = 'Cancel <i class="bi bi-x-lg"></i>'
         saveButton.style.display = 'inline-block'
         inputElements.forEach((input) => (input.style.display = 'inline-block'))
         valueElements.forEach((value) => (value.style.display = 'none'))
-        genderInput.style.display = 'block' // Show gender input
-        dobInput.style.display = 'block' // Show DOB input
+        genderInput.style.display = 'block'
+        dobInput.style.display = 'block'
       } else {
-        // Canceling edit mode
-        editAction.textContent = 'Edit'
+        editAction.innerHTML = 'Edit <i class="icon-edit"></i>'
         saveButton.style.display = 'none'
         inputElements.forEach((input) => (input.style.display = 'none'))
         valueElements.forEach((value) => (value.style.display = 'inline-block'))
-        genderInput.style.display = 'none' // Hide gender input
-        dobInput.style.display = 'none' // Hide DOB input
+        genderInput.style.display = 'none'
+        dobInput.style.display = 'none'
       }
+    }
+  </script>
+
+  <script>
+    function toggleEdit(addressType) {
+      var editAction = document.querySelector('.' + addressType + '-address .edit-action')
+      var cancelButton = document.querySelector('.' + addressType + '-address .cancel-action')
+      var saveButton = document.querySelector('#' + addressType + '-address-form .save-button')
+      var form = document.getElementById(addressType + '-address-form')
+      var addressInfo = document.querySelector('.' + addressType + '-address .address-info')
+    
+      editAction.style.display = 'none'
+      cancelButton.style.display = 'inline-block'
+      saveButton.style.display = 'inline-block'
+      form.style.display = 'block'
+      addressInfo.style.display = 'none'
+    }
+    
+    function cancelEdit(addressType) {
+      var editAction = document.querySelector('.' + addressType + '-address .edit-action')
+      var cancelButton = document.querySelector('.' + addressType + '-address .cancel-action')
+      var saveButton = document.querySelector('#' + addressType + '-address-form .save-button')
+      var form = document.getElementById(addressType + '-address-form')
+      var addressInfo = document.querySelector('.' + addressType + '-address .address-info')
+    
+      editAction.style.display = 'inline-block'
+      cancelButton.style.display = 'none'
+      saveButton.style.display = 'none'
+      form.style.display = 'none'
+      addressInfo.style.display = 'block'
     }
   </script>
 {% endblock %}

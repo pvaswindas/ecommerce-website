@@ -1,5 +1,12 @@
 <div class="container main-container">
   <h1 class="my-5">Profile Information</h1>
+  {% if messages %}
+    <div class="container messages-container text-black">
+      {% for message in messages %}
+        <h6>{{ message }}</h6>
+      {% endfor %}
+    </div>
+  {% endif %}
   <div class="profile-info">
     <form action="{% url 'user_details_edit' user.id %}" method="post" id="customer-profile-form">
       {% csrf_token %}
@@ -51,7 +58,7 @@
           <button type="submit" form="customer-profile-form" class="save-button btn btn-primary" style="display: none;">Save</button>
         </div>
         <div class="profile-info-item">
-          <span class="edit-action" onclick="toggleEdit()">Edit</span>
+          <span class="edit-action" onclick="toggleEdit()">Edit <i class="icon-edit"></i></span>
         </div>
       </div>
     </form>

@@ -27,6 +27,14 @@ class Customer(models.Model):
 
 class Address(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    name = models.CharField(max_length = 100, default = "")
+    phone_number = models.CharField(
+        max_length=10,
+        default = "",
+        validators=[
+            RegexValidator(regex=r'^\d{10}$', message='Phone number must have 10 digits.')
+        ]
+    )
     country = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     city = models.CharField(max_length=50)

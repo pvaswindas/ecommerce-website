@@ -7,8 +7,13 @@
     padding: 20px;
 }
 
+.messages-container{
+    text-align: center;
+    max-width: 950px;
+    margin: 20px auto;
+    padding: 20px;
+}
 
-/* Profile info item styles */
 .profile-info-item {
     display: flex;
     align-items: center;

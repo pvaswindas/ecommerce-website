@@ -12,6 +12,7 @@
       <meta name="keywords" content="Shoes" />
       <meta name="description" content="Shoe selling website" />
       <meta name="author" content="SneakerHeads" />
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
       {% block custom_css %}
         <link rel="stylesheet" href="{% static 'user/assets/css/bootstrap.min.css' %}" />
@@ -61,7 +62,7 @@
                                 <div class="header-menu">
                                   <ul>
                                     <li>
-                                      <a class="text-dark fw-medium" href="{% url 'user_dashboard' user.id  %}">Account</a>
+                                      <a class="text-dark fw-medium" href="{% url 'user_dashboard' user.id %}">Account</a>
                                     </li>
                                     <li>
                                       <form action="{% url 'logout' %}" method="post">
@@ -258,7 +259,6 @@
         <script src="{% static 'user/assets/js/jquery.magnific-popup.min.js' %}"></script>
       {% endblock %}
 
-      
       {% block main_js %}
         <script src="{% static 'user/assets/js/main.js' %}"></script>
       {% endblock %}
