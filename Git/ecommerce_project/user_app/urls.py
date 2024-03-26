@@ -22,5 +22,6 @@ urlpatterns = [
     path('sneakerheads/user/dashboard/<int:user_id>/', views.user_dashboard, name='user_dashboard'),
     path('sneakerheads/user/details-update/<int:user_id>/', views.user_details_edit, name='user_details_edit'),
     
-
+    path('sneakerheads/user/manage-address/update/<int:address_id>/', views.update_address, name='update_address'),
+    path('sneakerheads/user/manage-address/add-address/<int:customer_id>/', views.add_new_address, name='add_new_address'),
 ]

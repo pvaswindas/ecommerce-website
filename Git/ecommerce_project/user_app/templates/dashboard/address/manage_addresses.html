@@ -1,3 +1,44 @@
+<div class="col-lg-12 px-0">
+  <div class="card card-dashboard">
+    <div class="card-body">
+      <h3 class="card-title">Shipping Address</h3>
+
+      <div class="shipping-address-info">
+        <p>
+          You have not set up this type of address yet.<br />
+          <a href="#" id="shipping-edit-link" class="edit-action" onclick="toggleEdit('shipping', 'shipping-edit-link')">Edit <i class="icon-edit"></i></a>
+        </p>
+        <form action="{% url 'add_new_address' customer.id %}" method="post" id="shipping-address-form" style="display: none;">
+          {% csrf_token %}
+          <label for="name">Name</label><br />
+          <input type="text" name="name"/><br>
+
+          <label for="phone_number">Phone Number</label><br />
+          <input type="text" name="phone_number"/><br>
+
+          <label for="country">Country</label><br />
+          <input type="text" name="country"/><br>
+
+          <label for="state">State</label>
+          <input type="text" name="state"/><br />
+
+          <label for="city">City</label><br />
+          <input type="text" name="city"/><br>
+
+          <label for="street_address">Street Address</label><br />
+          <input type="text" name="street_address"/><br>
+
+          <label for="pincode">Pincode</label><br />
+          <input type="text" name="pincode"/><br>
+
+          <br><button type="submit" form="shipping-address-form" class="save-button btn btn-primary my-3">Save</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="row">
   {% for address in addresses %}
     <div class="col-lg-6">
@@ -17,7 +58,7 @@
           </div>
 
           <div class="address-edit-form" id="address-edit-form-{{ address.id }}" style="display: none;">
-            <form action="" method="post">
+            <form action="{% url 'update_address' address.id %}" method="post">
               {% csrf_token %}
               <label for="name">Name</label>
               <input type="text" name="name" value="{{ address.name }}" /><br />
@@ -25,19 +66,19 @@
               <label for="phone_number">Phone Number</label>
               <input type="text" name="phone_number" value="{{ address.phone_number }}" /><br />
 
-              <label for="street_address">Name</label>
+              <label for="street_address">Address (Area and Street)</label>
               <input type="text" name="street_address" value="{{ address.street_address }}" /><br />
 
-              <label for="city">Name</label>
+              <label for="city">City/District/Town</label>
               <input type="text" name="city" value="{{ address.city }}" /><br />
 
-              <label for="state">Name</label>
+              <label for="state">State</label>
               <input type="text" name="state" value="{{ address.state }}" /><br />
 
-              <label for="country">Name</label>
+              <label for="country">Country</label>
               <input type="text" name="country" value="{{ address.country }}" /><br />
 
-              <label for="pin_code">Name</label>
+              <label for="pin_code">Pincode</label>
               <input type="text" name="pin_code" value="{{ address.pin_code }}" /><br />
 
               <div>
@@ -51,3 +92,4 @@
     </div>
   {% endfor %}
 </div>
+

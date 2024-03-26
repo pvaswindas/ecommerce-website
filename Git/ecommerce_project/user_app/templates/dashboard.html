@@ -164,4 +164,17 @@
       addressEditForm.style.display = 'none'
     }
   </script>
+
+  <script>
+    function toggleEdit(type, linkId) {
+      var form = document.getElementById(type + '-address-form');
+      if (form.style.display === 'none') {
+        form.style.display = 'block';
+        document.getElementById(linkId).innerHTML = 'Cancel <i class="bi bi-x-lg"></i>';
+      } else {
+        form.style.display = 'none';
+        document.getElementById(linkId).innerHTML = 'Edit <i class="icon-edit"></i>';
+      }
+    }
+  </script>
 {% endblock %}

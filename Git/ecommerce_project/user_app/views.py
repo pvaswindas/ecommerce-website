@@ -365,24 +365,19 @@ def user_details_edit(request, user_id):
                 validate_email(email)
             except ValidationError as e:
                 is_valid_email = False
-                print("email validate issue")
                 messages.error(request, f'Invalid email: {e}')
                 
             current_user_email = request.user.email
             if User.objects.filter(~Q(username=current_user_email), username=email).exists():
-                print('email exits')
                 is_valid_email = False
                 messages.error(request, 'Email already exists for another user')
                 
             
             if not re.match(r'^\d{10}$', phone):
                 is_valid_phone = False
-                print('phone number issue')
                 messages.error(request, 'Phone number must be 10 digits')
-                print('return')
                 
             if is_valid_email and is_valid_phone:
-                print('Entered')
                 user.first_name = first_name
                 user.last_name = last_name
                 user.username = email
@@ -409,3 +404,97 @@ def user_details_edit(request, user_id):
 
 
 
+@login_required
+@never_cache
+def update_address(request, address_id):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            phone_number = request.POST.get('phone_number')
+            street_address = request.POST.get('street_address')
+            city = request.POST.get('city')
+            state = request.POST.get('state')
+            country = request.POST.get('country')
+            pin_code = request.POST.get('pin_code')
+                
+            is_valid_phone_no = True
+                
+            if not re.match(r'^\d{10}$', phone_number):
+                is_valid_phone_no = False
+                messages.error(request, 'Phone number must be 10 digits')
+                
+            address = Address.objects.get(pk = address_id)
+                
+            if is_valid_phone_no:
+                address.name = name
+                address.phone_number = phone_number
+                address.street_address = street_address
+                address.city = city
+                address.state = state
+                address.country = country
+                address.pin_code = pin_code
+                
+                address.save()
+                messages.success(request, 'Address Updated')
+                user_id = address.customer.user.id
+                return redirect('user_dashboard', user_id = user_id)
+    else:
+        return redirect(index_page)
+
+
+
+@login_required
+@never_cache
+def add_new_address(request, customer_id):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            customer = Customer.objects.get(pk = customer_id)
+            name = request.POST.get('name')
+            phone_number = request.POST.get('phone_number')
+            street_address = request.POST.get('street_address')
+            city = request.POST.get('city')
+            state = request.POST.get('state')
+            country = request.POST.get('country')
+            pin_code = request.POST.get('pincode')
+                
+            is_valid_phone_no = True
+                
+            if not re.match(r'^\d{10}$', phone_number):
+                is_valid_phone_no = False
+                messages.error(request, 'Phone number must be 10 digits')
+                    
+                
+            if is_valid_phone_no:
+                address = Address.objects.create(
+                    customer = customer,
+                    name = name,
+                    phone_number = phone_number,
+                    country = country,
+                    state = state,
+                    city = city,
+                    street_address = street_address,
+                    pin_code = pin_code
+                )
+                address.save()
+                messages.success(request, 'New shipping address created')
+                user_id = customer.user.id
+                return redirect('user_dashboard', user_id = user_id)
+    else:
+        return redirect(index_page)
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                

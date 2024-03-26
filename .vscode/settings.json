@@ -3,7 +3,9 @@
         "allauth",
         "ecommerce",
         "globalstatic",
+        "Pincode",
         "productsize",
-        "socialaccount"
+        "socialaccount",
+        "updation"
     ]
 }
