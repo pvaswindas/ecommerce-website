@@ -3,6 +3,7 @@
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'user/css/user_details.css' %}" />
+  <link rel="stylesheet" href="{% static 'user/css/edit_address.css' %}" />
 {% endblock %}
 
 {% block bcactive %}
@@ -70,7 +71,7 @@
               {% comment %}MANAGE ADDRESS{% endcomment %}
               <div class="tab-pane fade" id="tab-address" role="tabpanel" aria-labelledby="tab-address-link">
                 <p>The following addresses will be used on the checkout page by default.</p>
-                {% include 'dashboard/manage_addresses.html' %}
+                {% include 'dashboard/address/manage_addresses.html' %}
               </div>
 
               {% comment %}PASSWORD CHANGE{% endcomment %}
@@ -147,32 +148,20 @@
   </script>
 
   <script>
-    function toggleEdit(addressType) {
-      var editAction = document.querySelector('.' + addressType + '-address .edit-action')
-      var cancelButton = document.querySelector('.' + addressType + '-address .cancel-action')
-      var saveButton = document.querySelector('#' + addressType + '-address-form .save-button')
-      var form = document.getElementById(addressType + '-address-form')
-      var addressInfo = document.querySelector('.' + addressType + '-address .address-info')
+    function editAddress(addressId) {
+      var addressInfo = document.getElementById('address-info-' + addressId)
+      var addressEditForm = document.getElementById('address-edit-form-' + addressId)
     
-      editAction.style.display = 'none'
-      cancelButton.style.display = 'inline-block'
-      saveButton.style.display = 'inline-block'
-      form.style.display = 'block'
       addressInfo.style.display = 'none'
+      addressEditForm.style.display = 'block'
     }
     
-    function cancelEdit(addressType) {
-      var editAction = document.querySelector('.' + addressType + '-address .edit-action')
-      var cancelButton = document.querySelector('.' + addressType + '-address .cancel-action')
-      var saveButton = document.querySelector('#' + addressType + '-address-form .save-button')
-      var form = document.getElementById(addressType + '-address-form')
-      var addressInfo = document.querySelector('.' + addressType + '-address .address-info')
+    function cancelEdit(addressId) {
+      var addressInfo = document.getElementById('address-info-' + addressId)
+      var addressEditForm = document.getElementById('address-edit-form-' + addressId)
     
-      editAction.style.display = 'inline-block'
-      cancelButton.style.display = 'none'
-      saveButton.style.display = 'none'
-      form.style.display = 'none'
       addressInfo.style.display = 'block'
+      addressEditForm.style.display = 'none'
     }
   </script>
 {% endblock %}

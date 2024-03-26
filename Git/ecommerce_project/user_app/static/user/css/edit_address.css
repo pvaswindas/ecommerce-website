@@ -1,0 +1,38 @@
+.address-info {
+    margin-bottom: 20px;
+}
+
+.address-info p {
+    margin-bottom: 10px;
+}
+
+.address-info .edit-action {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.address-edit-form {
+    display: none;
+}
+
+.address-edit-form form {
+    margin-top: 20px;
+}
+
+.address-edit-form form input {
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.address-edit-form form .save-button {
+    margin-right: 10px;
+}
+
+.address-edit-form form .cancel-action {
+    color: red;
+    text-decoration: underline;
+    cursor: pointer;
+}

@@ -42,5 +42,5 @@ class Address(models.Model):
     pin_code = models.CharField(max_length=50)
     
     def __str__(self):
-        return f"{self.country}, {self.state}, {self.city}, {self.street_address}, {self.pin_code}"
+        return f"{self.name}, {self.country}, {self.state}, {self.city}, {self.street_address}, {self.pin_code}"
 

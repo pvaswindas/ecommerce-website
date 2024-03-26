@@ -1,0 +1,53 @@
+<div class="row">
+  {% for address in addresses %}
+    <div class="col-lg-6">
+      <div class="card card-dashboard">
+        <div class="card-body">
+          <h3 class="card-title">Billing Address</h3>
+
+          <div class="address-info" id="address-info-{{ address.id }}">
+            <p>
+              <span class="name">{{ address.name }}</span><br />
+              <span class="phone_number">{{ address.phone_number }}</span><br />
+              <span class="street">{{ address.street_address }}</span><br />
+              <span class="city_state_country">{{ address.city }}, {{ address.state }}, {{ address.country }}</span><br />
+              <span class="pincode">{{ address.pin_code }}</span><br />
+              <a href="#" class="edit-action" onclick="editAddress({{ address.id }})">Edit <i class="icon-edit"></i></a>
+            </p>
+          </div>
+
+          <div class="address-edit-form" id="address-edit-form-{{ address.id }}" style="display: none;">
+            <form action="" method="post">
+              {% csrf_token %}
+              <label for="name">Name</label>
+              <input type="text" name="name" value="{{ address.name }}" /><br />
+
+              <label for="phone_number">Phone Number</label>
+              <input type="text" name="phone_number" value="{{ address.phone_number }}" /><br />
+
+              <label for="street_address">Name</label>
+              <input type="text" name="street_address" value="{{ address.street_address }}" /><br />
+
+              <label for="city">Name</label>
+              <input type="text" name="city" value="{{ address.city }}" /><br />
+
+              <label for="state">Name</label>
+              <input type="text" name="state" value="{{ address.state }}" /><br />
+
+              <label for="country">Name</label>
+              <input type="text" name="country" value="{{ address.country }}" /><br />
+
+              <label for="pin_code">Name</label>
+              <input type="text" name="pin_code" value="{{ address.pin_code }}" /><br />
+
+              <div>
+                <button type="submit" class="save-button btn btn-primary my-3">Save</button> <br />
+                <a href="#" class="cancel-action my-3" onclick="cancelEdit({{ address.id }})">Cancel <i class="bi bi-x-lg"></i></a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

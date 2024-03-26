@@ -21,4 +21,6 @@ urlpatterns = [
     
     path('sneakerheads/user/dashboard/<int:user_id>/', views.user_dashboard, name='user_dashboard'),
     path('sneakerheads/user/details-update/<int:user_id>/', views.user_details_edit, name='user_details_edit'),
+    
+
 ]
