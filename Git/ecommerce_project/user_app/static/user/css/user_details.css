@@ -1,5 +1,5 @@
 .main-container {
-    max-width: 950px;
+    max-width: 75%;
     margin: 20px auto;
     background-color: #f9f9f9;
     border-radius: 10px;
@@ -9,7 +9,7 @@
 
 .messages-container{
     text-align: center;
-    max-width: 950px;
+    max-width: 75%;
     margin: 20px auto;
     padding: 20px;
 }

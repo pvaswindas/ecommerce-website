@@ -41,10 +41,13 @@
                 <a class="nav-link" id="tab-address-link" data-toggle="tab" href="#tab-address" role="tab" aria-controls="tab-address" aria-selected="false">Manage Adresses</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account" role="tab" aria-controls="tab-account" aria-selected="false">Account Details</a>
+                <a class="nav-link" id="tab-account-link" data-toggle="tab" href="#tab-account" role="tab" aria-controls="tab-account" aria-selected="false">Change Password</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Sign Out</a>
+                <form action="{% url 'logout' %}" method="post">
+                  {% csrf_token %}
+                  <button class="border-0 bg-white text-dark fw-light my-2" type="submit"> <i class="bi bi-box-arrow-left me-2"></i>Logout</button>
+                </form>
               </li>
             </ul>
           </aside>
@@ -76,34 +79,16 @@
 
               {% comment %}PASSWORD CHANGE{% endcomment %}
               <div class="tab-pane fade" id="tab-account" role="tabpanel" aria-labelledby="tab-account-link">
-                <form action="#">
-                  <div class="row">
-                    <div class="col-sm-6">
-                      <label>First Name *</label>
-                      <input type="text" class="form-control" required />
-                    </div>
+                <form action="{% url 'user_change_password' user.id %}" method="post">
+                  {% csrf_token %}
+                  <label>Current password *</label>
+                  <input type="password" name="current_password" class="form-control" />
 
-                    <div class="col-sm-6">
-                      <label>Last Name *</label>
-                      <input type="text" class="form-control" required />
-                    </div>
-                  </div>
+                  <label>New password *</label>
+                  <input type="password" name="new_password" class="form-control" />
 
-                  <label>Display Name *</label>
-                  <input type="text" class="form-control" required />
-                  <small class="form-text">This will be how your name will be displayed in the account section and in reviews</small>
-
-                  <label>Email address *</label>
-                  <input type="email" class="form-control" required />
-
-                  <label>Current password (leave blank to leave unchanged)</label>
-                  <input type="password" class="form-control" />
-
-                  <label>New password (leave blank to leave unchanged)</label>
-                  <input type="password" class="form-control" />
-
-                  <label>Confirm new password</label>
-                  <input type="password" class="form-control mb-2" />
+                  <label>Confirm new password *</label>
+                  <input type="password" name="confirm_password" class="form-control mb-2" />
 
                   <button type="submit" class="btn btn-outline-primary-2">
                     <span>SAVE CHANGES</span>
@@ -120,61 +105,5 @@
 {% endblock %}
 
 {% block custom_scripts %}
-  <script>
-    function toggleEdit() {
-      var editAction = document.querySelector('.edit-action')
-      var saveButton = document.querySelector('.save-button')
-      var inputElements = document.querySelectorAll('.edit-input')
-      var valueElements = document.querySelectorAll('.profile-info-item span:not(.edit-action)')
-      var genderInput = document.getElementById('gender-input')
-      var dobInput = document.getElementById('dob-input')
-    
-      if (inputElements[0].style.display === 'none') {
-        editAction.innerHTML = 'Cancel <i class="bi bi-x-lg"></i>'
-        saveButton.style.display = 'inline-block'
-        inputElements.forEach((input) => (input.style.display = 'inline-block'))
-        valueElements.forEach((value) => (value.style.display = 'none'))
-        genderInput.style.display = 'block'
-        dobInput.style.display = 'block'
-      } else {
-        editAction.innerHTML = 'Edit <i class="icon-edit"></i>'
-        saveButton.style.display = 'none'
-        inputElements.forEach((input) => (input.style.display = 'none'))
-        valueElements.forEach((value) => (value.style.display = 'inline-block'))
-        genderInput.style.display = 'none'
-        dobInput.style.display = 'none'
-      }
-    }
-  </script>
-
-  <script>
-    function editAddress(addressId) {
-      var addressInfo = document.getElementById('address-info-' + addressId)
-      var addressEditForm = document.getElementById('address-edit-form-' + addressId)
-    
-      addressInfo.style.display = 'none'
-      addressEditForm.style.display = 'block'
-    }
-    
-    function cancelEdit(addressId) {
-      var addressInfo = document.getElementById('address-info-' + addressId)
-      var addressEditForm = document.getElementById('address-edit-form-' + addressId)
-    
-      addressInfo.style.display = 'block'
-      addressEditForm.style.display = 'none'
-    }
-  </script>
-
-  <script>
-    function toggleEdit(type, linkId) {
-      var form = document.getElementById(type + '-address-form');
-      if (form.style.display === 'none') {
-        form.style.display = 'block';
-        document.getElementById(linkId).innerHTML = 'Cancel <i class="bi bi-x-lg"></i>';
-      } else {
-        form.style.display = 'none';
-        document.getElementById(linkId).innerHTML = 'Edit <i class="icon-edit"></i>';
-      }
-    }
-  </script>
+  <script src="{% static 'user/js/dashboard.js' %}"></script>
 {% endblock %}

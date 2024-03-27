@@ -14,6 +14,7 @@ from django.db.models import *
 from django.db.models import Q
 import random
 import re
+from django.contrib.auth.hashers import check_password
 from random import shuffle
 from django.urls import reverse
 from django.core.mail import send_mail
@@ -486,12 +487,51 @@ def add_new_address(request, customer_id):
                 
                 
                 
+@login_required
+@never_cache
+def user_change_password(request, user_id):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            current_password  = request.POST.get('current_password')
+            new_password = request.POST.get('new_password')
+            confirm_password = request.POST.get('confirm_password')
+            print(current_password)
+            
+            user = User.objects.get(pk = user_id)
+            print(user.password)
+            is_valid_current_password = True
+            if not check_password(current_password, user.password):
+                messages.error(request, '''Current password don't match''')
+                is_valid_current_password = False
                 
+            is_valid_new_password = True
+            if len(new_password) < 8:
+                messages.error(request, 'Password must be at least 8 characters long.')
+                is_valid_new_password = False
+            elif ' ' in new_password:
+                messages.error(request, 'Password cannot contain spaces.')
+                is_valid_new_password = False    
                 
+            is_valid_confirm_password = True
+            if new_password != confirm_password:
+                messages.error(request, 'Passwords not match.')
+                is_valid_confirm_password = False    
                 
+            if is_valid_current_password and is_valid_confirm_password and is_valid_new_password:
+                user.set_password(new_password)
+                user.save()
                 
+                user = authenticate(username=user.username, password=new_password)
+                if user is not None:
+                    auth.login(request, user)
+                    
+                messages.success(request, 'Password Updated')
+                return redirect('user_dashboard', user_id = user_id)
                 
-                
+            else:
+                return redirect('user_dashboard', user_id = user_id)
+    else:
+        return redirect(index_page) 
                 
                 
                 

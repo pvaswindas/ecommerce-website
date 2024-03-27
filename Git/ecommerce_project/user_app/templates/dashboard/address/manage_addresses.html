@@ -5,31 +5,31 @@
 
       <div class="shipping-address-info">
         <p>
-          You have not set up this type of address yet.<br />
-          <a href="#" id="shipping-edit-link" class="edit-action" onclick="toggleEdit('shipping', 'shipping-edit-link')">Edit <i class="icon-edit"></i></a>
+          ADD A NEW ADDRESS<br />
+          <a href="#" id="shipping-edit-link" class="edit-action" onclick="toggleEdit('shipping', 'shipping-edit-link')">Add <i class="bi bi-plus-square-dotted"></i></a>
         </p>
         <form action="{% url 'add_new_address' customer.id %}" method="post" id="shipping-address-form" style="display: none;">
           {% csrf_token %}
           <label for="name">Name</label><br />
-          <input type="text" name="name"/><br>
+          <input type="text" required name="name"/><br>
 
           <label for="phone_number">Phone Number</label><br />
-          <input type="text" name="phone_number"/><br>
+          <input type="text" required name="phone_number"/><br>
 
           <label for="country">Country</label><br />
           <input type="text" name="country"/><br>
 
           <label for="state">State</label>
-          <input type="text" name="state"/><br />
+          <input type="text" required name="state"/><br />
 
           <label for="city">City</label><br />
-          <input type="text" name="city"/><br>
+          <input type="text" required name="city"/><br>
 
           <label for="street_address">Street Address</label><br />
-          <input type="text" name="street_address"/><br>
+          <input type="text" required name="street_address"/><br>
 
           <label for="pincode">Pincode</label><br />
-          <input type="text" name="pincode"/><br>
+          <input type="text" required name="pincode"/><br>
 
           <br><button type="submit" form="shipping-address-form" class="save-button btn btn-primary my-3">Save</button>
         </form>
@@ -61,25 +61,25 @@
             <form action="{% url 'update_address' address.id %}" method="post">
               {% csrf_token %}
               <label for="name">Name</label>
-              <input type="text" name="name" value="{{ address.name }}" /><br />
+              <input type="text" required name="name" value="{{ address.name }}" /><br />
 
               <label for="phone_number">Phone Number</label>
-              <input type="text" name="phone_number" value="{{ address.phone_number }}" /><br />
+              <input type="text" required name="phone_number" value="{{ address.phone_number }}" /><br />
 
               <label for="street_address">Address (Area and Street)</label>
-              <input type="text" name="street_address" value="{{ address.street_address }}" /><br />
+              <input type="text" required name="street_address" value="{{ address.street_address }}" /><br />
 
               <label for="city">City/District/Town</label>
-              <input type="text" name="city" value="{{ address.city }}" /><br />
+              <input type="text" required name="city" value="{{ address.city }}" /><br />
 
               <label for="state">State</label>
-              <input type="text" name="state" value="{{ address.state }}" /><br />
+              <input type="text" required name="state" value="{{ address.state }}" /><br />
 
               <label for="country">Country</label>
-              <input type="text" name="country" value="{{ address.country }}" /><br />
+              <input type="text" required name="country" value="{{ address.country }}" /><br />
 
               <label for="pin_code">Pincode</label>
-              <input type="text" name="pin_code" value="{{ address.pin_code }}" /><br />
+              <input type="text" required name="pin_code" value="{{ address.pin_code }}" /><br />
 
               <div>
                 <button type="submit" class="save-button btn btn-primary my-3">Save</button> <br />
