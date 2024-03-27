@@ -13,11 +13,11 @@
         "1200": {"items":4, "nav": true, "dots": false}
     }
 }'>
-  {% for product in last_five_products %}
+  {% for color in last_five_products %}
     <div class="product product-7 text-center">
       <figure class="product-media">
         <span class="product-label label-new">New</span>
-        <a href="product.html"><img src="{{ product.productcolorimage_set.first.main_image.url }}" alt="Product image" class="product-image" /></a>
+        <a href="{% url 'product_single_view_page' color.products.name color.id %}"><img src="{{ color.main_image.url }}" alt="Product image" class="product-image" /></a>
 
         <div class="product-action-vertical">
           <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
@@ -30,15 +30,15 @@
 
       <div class="product-body">
         <div class="product-cat">
-          <a href="#"> {{product.category.name}} </a>
+          <a href="#"> {{color.products.category.name}} </a>
         </div>
         <h3 class="product-title">
-            <a href="{% url 'product_single_view_page' product.name product.id %}" style="word-wrap: break-word;">
-                {{ product.name }}
+            <a href="{% url 'product_single_view_page' color.products.name color.id %}" style="word-wrap: break-word;">
+                {{ color.products.name }}
             </a>
         </h3>
         
-        <div class="product-price">₹ {{ product.price }}.00</div>
+        <div class="product-price">₹ {{ color.price }}.00</div>
         <div class="ratings-container">
           <div class="ratings">
             <div class="ratings-val" style="width: 20%;"></div>

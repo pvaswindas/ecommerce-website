@@ -26,6 +26,11 @@
                 <label for="color">Color</label>
                 <input type="text" id="color" name="color" value="{{ product_color_image.color }}" required />
               </div>
+              <div class="accordation-content">
+                <label for="price">Price</label>
+                <input type="number" id="price" name="price" value="{{ product_color_image.price }}" step="1" min="0" required />
+              </div>
+
               <div class="accordion-content my-4">
                 <p>Upload images for different views:</p>
                 <div class="image-grid">

@@ -352,7 +352,7 @@ def restore_categories(request, cat_id):
    
 
 
-# PRODUCT PAGE FUNCTION
+# PRODUCTS VIEW PAGE FUNCTION
 @login_required
 @never_cache
 def list_product_page(request):
@@ -387,7 +387,7 @@ def add_products(request):
             name = request.POST.get('product_name')
             description = request.POST.get('description')
             information = request.POST.get('information')
-            price = request.POST.get('price')
+            type = request.POST.get('type')
             category_id = request.POST.get('category')
             brand_id = request.POST.get('brand')
 
@@ -402,7 +402,7 @@ def add_products(request):
                     name=name,
                     description=description,
                     information= information,
-                    price=price,
+                    type=type,
                     category=category,
                     brand=brand,
                 )
@@ -458,7 +458,7 @@ def edit_product_update(request, p_id):
         if request.method == 'POST':
             name = request.POST.get('product_name')
             description = request.POST.get('description')
-            price = request.POST.get('price')
+            information = request.POST.get('information')
             category_id = request.POST.get('category')
             brand_id = request.POST.get('brand')
             
@@ -469,7 +469,7 @@ def edit_product_update(request, p_id):
             
             product.name = name
             product.description = description
-            product.price = price
+            product.information = information
             product.category = category
             product.brand = brand
             
@@ -521,7 +521,7 @@ def restore_product(request, pdt_id):
 # ---------------------------------------------------------------- ADMIN EDIT PRODUCT COLOR & IMAGE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
-
+# EDIT PRODUCT COLOR PAGE VIEW FUNCTION
 @login_required
 @never_cache
 def edit_product_color_page(request, p_id):
@@ -550,6 +550,7 @@ def edit_product_color_page(request, p_id):
 
 
 
+# EDIT PRODUCT COLOR FUNCTION
 @login_required
 @never_cache
 def edit_product_color(request, p_id):
@@ -557,12 +558,14 @@ def edit_product_color(request, p_id):
         product_color_image = ProductColorImage.objects.get(pk=p_id)
         if request.method == 'POST':
             color = request.POST.get('color')
+            price = request.POST.get('price')
             main_image = request.FILES.get('main_image')
             side_image = request.FILES.get('side_image')
             top_image = request.FILES.get('top_image')
             back_image = request.FILES.get('back_image')
             
             product_color_image.color = color
+            product_color_image.price = price
             
             if main_image:
                 product_color_image.main_image = main_image
@@ -650,6 +653,7 @@ def delete_product(request, pdt_id):
 # ---------------------------------------------------------------- ADMIN EDIT PRODUCT SIZE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
+# EDIT PRODUCT SIZE PAGE VIEW FUNCTION
 @login_required
 @never_cache
 def edit_product_size_page(request, p_id):
@@ -677,6 +681,7 @@ def edit_product_size_page(request, p_id):
         
 
 
+# EDIT PRODUCT SIZE FUNCTION
 @login_required
 @never_cache
 def edit_product_size(request, p_id):
@@ -708,6 +713,7 @@ def edit_product_size(request, p_id):
 # ---------------------------------------------------------------- ADMIN ADD PRODUCT IMAGE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
+# ADD PRODUCT IMAGE PAGE VIEW FUNCTION
 @login_required
 @never_cache
 def admin_add_image_page(request):
@@ -719,6 +725,7 @@ def admin_add_image_page(request):
 
 
 
+# ADD PRODUCT IMAGE FUNCTION
 @login_required
 @never_cache
 def add_product_image(request):
@@ -726,6 +733,7 @@ def add_product_image(request):
         if request.method == 'POST':
                 products_id = request.POST.get('product')
                 color = request.POST.get('color')
+                price = request.POST.get('price')
                 main_image = request.FILES.get('main_image')
                 side_image = request.FILES.get('side_image')
                 top_image = request.FILES.get('top_image')
@@ -739,6 +747,7 @@ def add_product_image(request):
                 else:
                     product_color_image = ProductColorImage.objects.create(
                         color = color,
+                        price = price,
                         main_image = main_image,
                         side_image = side_image,
                         top_image = top_image,
@@ -761,6 +770,7 @@ def add_product_image(request):
 adult_sizes = [6, 7, 8, 9, 10, 11, 12]
 kids_sizes = ['8C', '9C', '10C', '11C', '12C', '13C']
 
+# PRODUCT SIZE ADD PAGE VIEW PAGE FUNCTION
 @login_required
 @never_cache
 def admin_add_variants(request):
@@ -773,7 +783,7 @@ def admin_add_variants(request):
         return redirect(admin_login_page)
 
 
-
+# GET COLOR FUNCTION
 @login_required
 @never_cache
 def get_colors(request):
@@ -788,6 +798,7 @@ def get_colors(request):
 
 
 
+# GET SIZES FUNCTION
 @login_required
 @never_cache
 @require_GET
@@ -809,7 +820,7 @@ def get_sizes_view(request):
 
 
 
-
+# ADD PRODUCT SIZE FUNCTION
 @login_required
 @never_cache
 def add_size(request):

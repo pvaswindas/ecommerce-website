@@ -1,5 +1,5 @@
 .main-container {
-    max-width: 75%;
+    max-width: 950px;
     margin: 20px auto;
     background-color: #f9f9f9;
     border-radius: 10px;
@@ -7,9 +7,9 @@
     padding: 20px;
 }
 
-.messages-container{
+.messages-container {
     text-align: center;
-    max-width: 75%;
+    max-width: 950px;
     margin: 20px auto;
     padding: 20px;
 }
@@ -52,11 +52,11 @@
     color: #0056b3;
 }
 
-/* Radio button styles */
-input[type="radio"] {
-    margin-right: 5px;
-    /* Add some spacing between radio buttons and labels */
+input {
+    max-width: 700px;
 }
+
+
 
 /* Button styles */
 .save-button {

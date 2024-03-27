@@ -27,4 +27,6 @@ urlpatterns = [
     
     
     path('sneakerheads/user/change-password/<int:user_id>/', views.user_change_password, name='user_change_password'),
+    
+    path('sneakerheads/user/cart/<int:customer_id>/', views.cart_view_page, name='cart_view_page'),
 ]

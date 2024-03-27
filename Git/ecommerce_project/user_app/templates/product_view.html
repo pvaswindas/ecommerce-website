@@ -47,7 +47,7 @@
                 </div>
                 <a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a>
               </div>
-              <div class="product-price">₹ {{ product_color.products.price }}.00</div>
+              <div class="product-price">₹ {{ product_color.price }}.00</div>
               <div class="product-content">
                 <p>{{ product_color.products.description }}</p>
               </div>
@@ -73,6 +73,11 @@
                 <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
                 <div class="details-action-wrapper">
                   <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                </div>
+              </div>
+              <div class="product-details-action">
+                <a href="#" class="btn-product btn-add"><span>Buy now</span></a>
+                <div class="details-action-wrapper">
                 </div>
               </div>
               <div class="product-details-footer">
@@ -133,7 +138,7 @@
     </div>
   </div>
 
-  <div class="sticky-bar">
+  {% comment %} <div class="sticky-bar">
     <div class="container">
       <div class="row">
         <div class="col-6">
@@ -144,7 +149,7 @@
         </div>
 
         <div class="col-6 justify-content-end">
-          <div class="product-price">₹ {{ product_color.products.price }}.00</div>
+          <div class="product-price">₹ {{ product_color.price }}.00</div>
           <div class="product-details-quantity">
             <input type="number" id="sticky-cart-qty" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" required />
           </div>
@@ -156,7 +161,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> {% endcomment %}
 {% endblock %}
 
 {% block custom_scripts %}

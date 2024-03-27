@@ -32,7 +32,7 @@ class Products(models.Model):
     name = models.CharField(max_length = 100)
     description = models.TextField()
     information = models.TextField()
-    price = models.BigIntegerField()
+    type = models.CharField(max_length = 50)
     category = models.ForeignKey(Category, on_delete = models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete = models.CASCADE)
     is_deleted = models.BooleanField(default = False)
@@ -47,6 +47,7 @@ class Products(models.Model):
 class ProductColorImage(models.Model):
     products = models.ForeignKey(Products, on_delete = models.CASCADE)
     color = models.CharField(max_length = 50)
+    price = models.PositiveBigIntegerField()
     main_image =  models.FileField(upload_to= ' product_all_images/')
     side_image = models.FileField(upload_to= ' product_all_images/')
     top_image = models.FileField(upload_to= ' product_all_images/')
@@ -139,7 +140,7 @@ class Review(models.Model):
     
     
 class Wishlist(models.Model):
-    customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
+    customer = models.OneToOneField(Customer, on_delete = models.CASCADE)
     products = models.ForeignKey(Products, on_delete = models.CASCADE)
     in_stock = models.BooleanField(default = True)
     
@@ -149,10 +150,15 @@ class Wishlist(models.Model):
     
     
 class Cart(models.Model):
-    customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
-    products = models.ForeignKey(Products, on_delete = models.CASCADE)
-    in_stock = models.BooleanField(default = True)
+    customer = models.OneToOneField(Customer, on_delete = models.CASCADE)
     
     def __str__(self):
-        return f"{self.customer}, {self.product}, {self.in_stock}"
+        return f"{self.customer.user.first_name} {self.customer.user.last_name}"
     
+
+class CartProducts(models.Model):
+    cart = models.ForeignKey(Cart, on_delete = models.CASCADE)
+    product = models.ForeignKey(ProductColorImage, on_delete = models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.cart.customer.user.first_name} {self.cart.customer.user.last_name},  {self.product.color} {self.product.products.name}"

@@ -30,6 +30,25 @@
   color: #555;
 }
 
+/* Price input styles */
+#price {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Style for when the input is focused */
+#price:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+
 /* Color input styles */
 #color {
   display: inline-block;

@@ -33,7 +33,7 @@
             <input type="text" id="name" name="product_name" value="{{ product.name }}" required />
             <label for="description">Description</label>
             <textarea id="description" required maxlength="1000" name="description" onkeyup="countChars(this)">{{ product.description }}</textarea>
-            <label for="description">More Information</label>
+            <label for="information">More Information</label>
             <textarea id="information" required maxlength="1500" name="information" onkeyup="countChars(this)">{{ product.information }}</textarea>
           </div>
         </div>
@@ -41,8 +41,6 @@
         <div class="accordion-item">
           <h3 class="accordion-header">Inventory & Pricing</h3>
           <div class="accordion-content">
-            <label for="price">Price</label>
-            <input type="number" id="price" name="price" value="{{ product.price }}" step="1" min="0" required />
             <label for="category">Category</label>
             <select id="category" name="category" required>
               <option value="">Select Category</option>

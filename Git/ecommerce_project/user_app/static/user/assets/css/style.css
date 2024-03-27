@@ -12888,34 +12888,56 @@ button:focus {
     display: flex;
     align-items: center;
     flex-flow: row wrap;
-    margin-bottom: 3rem
+    margin-bottom: 3rem;
 }
 
-.product-details-action .btn-cart {
+.product-details-action .btn-cart, .btn-add {
     padding: 1rem 1.5rem;
     max-width: 198px;
-    color: #c96;
-    border: 0.1rem solid #c96
+    color: white;
+    border: 0.1rem solid  #445F84;
 }
 
-.product-details-action .btn-cart span {
+.product-details-action .btn-cart, .btn-add span {
     font-size: 1.4rem;
     color: inherit;
     text-transform: uppercase;
     box-shadow: none;
-    transition: box-shadow .35s ease, color 0s ease
+    transition: box-shadow .35s ease, color 0s ease;
 }
 
 .product-details-action .btn-cart:before {
-    margin-right: .4rem
+    margin-right: .4rem;
+}
+
+.product-details-action .btn-add:before {
+    margin-right: .4rem;
+}
+
+.product-details-action .btn-add:hover,
+.product-details-action .btn-add:focus {
+    color: white;
+    border-color:  #445F84;
+    background-color:  #445F84;
+}
+
+.product-details-action .btn-add:hover span,
+.product-details-action .btn-add:focus span{
+    color: white;
 }
 
 .product-details-action .btn-cart:hover,
 .product-details-action .btn-cart:focus {
-    color: #fff;
-    border-color: #c96;
-    background-color: #c96
+    color: white;
+    border-color:  #445F84;
+    background-color: #c96;
 }
+
+.product-details-action .btn-cart:hover span,
+.product-details-action .btn-cart:focus span {
+    color: white;
+}
+
 
 .details-action-wrapper {
     display: flex;

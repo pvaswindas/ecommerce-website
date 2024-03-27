@@ -164,23 +164,6 @@
                             </figure>
                             <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
                           </div>
-                          <!-- End .product -->
-
-                          <div class="product">
-                            <div class="product-cart-details">
-                              <h4 class="product-title"><a href="">Blue utility pinafore denim dress</a></h4>
-
-                              <span class="cart-product-info">
-                                <span class="cart-product-qty">1</span>
-                                x $76.00
-                              </span>
-                            </div>
-
-                            <figure class="product-image-container">
-                              <a href="" class="product-image"><img src="{% static 'user/assets/images/products/cart/product-2.jpg' %}" alt="product" /></a>
-                            </figure>
-                            <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
-                          </div>
                         </div>
 
                         <div class="dropdown-cart-total">
@@ -190,7 +173,7 @@
                         </div>
 
                         <div class="dropdown-cart-action">
-                          <a href="" class="btn btn-primary">View Cart</a>
+                          <a href="{% url 'cart_view_page' user.customer.id %}" class="btn btn-primary">View Cart</a>
                           <a href="" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
                         </div>
                       </div>

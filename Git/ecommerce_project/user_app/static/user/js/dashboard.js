@@ -1,28 +1,28 @@
-
-function toggleEdit() {
-    var editAction = document.querySelector('.edit-action')
-    var saveButton = document.querySelector('.save-button')
-    var inputElements = document.querySelectorAll('.edit-input')
-    var valueElements = document.querySelectorAll('.profile-info-item span:not(.edit-action)')
-    var genderInput = document.getElementById('gender-input')
-    var dobInput = document.getElementById('dob-input')
+function toggleEdit1() {
+    var editAction = document.querySelector('.edit-action');
+    var saveButton = document.querySelector('.save-button');
+    var inputElements = document.querySelectorAll('.edit-input');
+    var valueElements = document.querySelectorAll('.profile-info-item span:not(.edit-action)');
+    var genderInput = document.getElementById('gender-input');
+    var dobInput = document.getElementById('dob'); // Corrected ID
 
     if (inputElements[0].style.display === 'none') {
-        editAction.innerHTML = 'Cancel <i class="bi bi-x-lg"></i>'
-        saveButton.style.display = 'inline-block'
-        inputElements.forEach((input) => (input.style.display = 'inline-block'))
-        valueElements.forEach((value) => (value.style.display = 'none'))
-        genderInput.style.display = 'block'
-        dobInput.style.display = 'block'
+        editAction.innerHTML = 'Cancel <i class="bi bi-x-lg"></i>';
+        saveButton.style.display = 'inline-block';
+        inputElements.forEach((input) => (input.style.display = 'inline-block'));
+        valueElements.forEach((value) => (value.style.display = 'none'));
+        genderInput.style.display = 'block';
+        dobInput.style.display = 'block'; // Corrected display
     } else {
-        editAction.innerHTML = 'Edit <i class="icon-edit"></i>'
-        saveButton.style.display = 'none'
-        inputElements.forEach((input) => (input.style.display = 'none'))
-        valueElements.forEach((value) => (value.style.display = 'inline-block'))
-        genderInput.style.display = 'none'
-        dobInput.style.display = 'none'
+        editAction.innerHTML = 'Edit <i class="icon-edit"></i>';
+        saveButton.style.display = 'none';
+        inputElements.forEach((input) => (input.style.display = 'none'));
+        valueElements.forEach((value) => (value.style.display = 'inline-block'));
+        genderInput.style.display = 'none';
+        dobInput.style.display = 'none';
     }
 }
+
 function editAddress(addressId) {
     var addressInfo = document.getElementById('address-info-' + addressId)
     var addressEditForm = document.getElementById('address-edit-form-' + addressId)
@@ -38,7 +38,7 @@ function cancelEdit(addressId) {
     addressInfo.style.display = 'block'
     addressEditForm.style.display = 'none'
 }
-function toggleEdit(type, linkId) {
+function toggleEdit2(type, linkId) {
     var form = document.getElementById(type + '-address-form')
     if (form.style.display === 'none') {
         form.style.display = 'block'

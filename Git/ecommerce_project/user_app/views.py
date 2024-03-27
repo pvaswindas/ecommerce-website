@@ -289,7 +289,7 @@ def shop_page_view(request):
         {"min": 3500, "max": 5000},
         {"min": 5000, "max": None},
     ]
-    product_color_list = list(ProductColorImage.objects.all())
+    product_color_list = list(ProductColorImage.objects.filter(is_deleted = False))
     shuffle(product_color_list)
     latest_products = ProductColorImage.objects.all()[:10]
     category_list = Category.objects.annotate(product_count=Count('products'))
@@ -312,7 +312,7 @@ def shop_page_view(request):
 @never_cache
 def product_single_view_page(request, product_name, pdt_id):
         product_color = ProductColorImage.objects.get(pk=pdt_id)
-        last_five_products = Products.objects.order_by('-id')[:5]
+        last_five_products = ProductColorImage.objects.order_by('-id')[:5]
         product_sizes = ProductSize.objects.filter(product_color_image = product_color)
         context = {'product_color' : product_color, 'product_sizes': product_sizes, 'last_five_products': last_five_products}
         return render(request, 'product_view.html', context)
@@ -536,5 +536,12 @@ def user_change_password(request, user_id):
                 
                 
                 
+# -------------------------------------------------------------------------------- USER CART VIEW PAGE --------------------------------------------------------------------------------
                 
                 
+@login_required
+@never_cache
+def cart_view_page(request, customer_id):
+    if request.user.is_authenticated:
+        customer = Customer.objects.get(pk = customer_id)
+        return render(request, 'cart.html')
