@@ -12891,14 +12891,37 @@ button:focus {
     margin-bottom: 3rem;
 }
 
-.product-details-action .btn-cart, .btn-add {
+.product-details-action .btn-cart,
+.btn-add {
     padding: 1rem 1.5rem;
     max-width: 198px;
     color: white;
-    border: 0.1rem solid  #445F84;
+    border: 0.1rem solid #445F84;
 }
 
-.product-details-action .btn-cart, .btn-add span {
+.product-details-action .btn-cart,
+.btn-wishlist {
+    margin-top: 40px;
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.product-details-action .btn-cart,
+.btn-add {
+    padding: 1rem 1.5rem;
+    max-width: 198px;
+    color: #445F84;
+    /* Text color */
+    background-color: white;
+    /* Background color */
+    border: 0.1rem solid #445F84;
+}
+
+.product-details-action .btn-cart,
+.btn-add span {
     font-size: 1.4rem;
     color: inherit;
     text-transform: uppercase;
@@ -12917,19 +12940,19 @@ button:focus {
 .product-details-action .btn-add:hover,
 .product-details-action .btn-add:focus {
     color: white;
-    border-color:  #445F84;
-    background-color:  #445F84;
+    border-color: #445F84;
+    background-color: #445F84;
 }
 
 .product-details-action .btn-add:hover span,
-.product-details-action .btn-add:focus span{
+.product-details-action .btn-add:focus span {
     color: white;
 }
 
 .product-details-action .btn-cart:hover,
 .product-details-action .btn-cart:focus {
     color: white;
-    border-color:  #445F84;
+    border-color: #445F84;
     background-color: #c96;
 }
 

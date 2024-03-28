@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 
@@ -22,7 +24,14 @@ class Customer(models.Model):
     dob = models.DateField(null=True)
     
     def __str__(self):
-        return self.user.first_name
+        return f"{self.user.first_name} {self.user.last_name}"
+    
+    
+@receiver(post_save, sender=User)
+def create_customer(sender, instance, created, **kwargs):
+    if created:
+        Customer.objects.create(user=instance)
+
 
 
 class Address(models.Model):

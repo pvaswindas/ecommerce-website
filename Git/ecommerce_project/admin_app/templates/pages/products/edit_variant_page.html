@@ -18,7 +18,13 @@
           <div class="progress"></div>
         </div>
         <h3 class="accordion-header py-4">Product Sizes & Quantity</h3>
-
+        {% if messages %}
+          {% for message in messages %}
+            <div class="text-center container mb-5">
+              <h4>{{ message }}</h4>
+            </div>
+          {% endfor %}
+        {% endif %}
         {% for size in product_sizes %}
           <form id="sizeForm_{{ size.id }}" method="post" action="{% url 'edit_product_size' size.id %}">
             {% csrf_token %}

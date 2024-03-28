@@ -1,4 +1,5 @@
 from django.db import models
+from django.dispatch import receiver
 from user_app.models import *
 
 
@@ -41,6 +42,7 @@ class Products(models.Model):
     
     def __str__(self):
         return self.name
+    
     
     
     
@@ -155,10 +157,19 @@ class Cart(models.Model):
     def __str__(self):
         return f"{self.customer.user.first_name} {self.customer.user.last_name}"
     
+    
+    
+@receiver(post_save, sender=Customer)
+def create_cart(sender, instance, created, **kwargs):
+    if created:
+        Cart.objects.create(customer=instance)
+
+    
 
 class CartProducts(models.Model):
     cart = models.ForeignKey(Cart, on_delete = models.CASCADE)
-    product = models.ForeignKey(ProductColorImage, on_delete = models.CASCADE)
+    product = models.ForeignKey(ProductSize, on_delete = models.CASCADE)
+    quantity = models.PositiveBigIntegerField(default = 1)
     
     def __str__(self):
-        return f"{self.cart.customer.user.first_name} {self.cart.customer.user.last_name},  {self.product.color} {self.product.products.name}"
+        return f"{self.cart.customer.user.first_name} {self.cart.customer.user.last_name},  {self.product.product_color_image.color} {self.product.product_color_image.products.name}"

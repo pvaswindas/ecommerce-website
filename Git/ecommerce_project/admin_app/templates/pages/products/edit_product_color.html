@@ -15,6 +15,13 @@
     <div class="accordion">
       <div class="accordion-item">
         <h3 class="accordion-head mt-4">Product Color & Images</h3>
+        {% if messages %}
+          {% for message in messages %}
+            <div class="text-center container mb-5">
+              <h4>{{ message }}</h4>
+            </div>
+          {% endfor %}
+        {% endif %}
         <form action="{% url 'edit_product_color' product_color_image.id %}" method="post" ddenctype="multipart/form-data">
           {% csrf_token %}
           <div class="accordion">

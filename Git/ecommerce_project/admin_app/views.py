@@ -363,6 +363,14 @@ def list_product_page(request):
         return redirect('admin_login_page')
 
 
+@login_required
+@never_cache
+def get_quantity(request, size):
+    try:
+        quantity = ProductSize.objects.get(size=size).quantity
+        return JsonResponse({'quantity': quantity})
+    except ProductSize.DoesNotExist:
+        return JsonResponse({'quantity': 'Size not found'})
 
 
 # ADD PRODUCT PAGE FUNCTION
@@ -833,18 +841,24 @@ def add_size(request):
             
             product_color_image = ProductColorImage.objects.get(pk=color_id)
             
-            product_size = ProductSize.objects.create(
+            existing_size = ProductSize.objects.filter(product_color_image=product_color_image, size=size).exists()
+            
+            if existing_size:
+                messages.error(request, 'This size is already added')
+                return redirect('admin_add_variants')
+            else:
+                product_size = ProductSize.objects.create(
                 product_color_image=product_color_image,
                 size=size,
                 quantity=quantity
-            )                
-            product_size.save()
-            messages.success(request, 'Added size to the product')
-            return redirect(list_product_page)
+                )                
+                product_size.save()
+                messages.success(request, 'Added size to the product')
+                return redirect(list_product_page)
         else:
-            return redirect(admin_add_variants)
+            return redirect('admin_add_variants')
     else:
-        return redirect(admin_login_page)
+        return redirect('admin_login_page')
 
             
             

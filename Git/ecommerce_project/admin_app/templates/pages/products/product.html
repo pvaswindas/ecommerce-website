@@ -15,6 +15,19 @@
       <h2>Manage Products</h2>
       <a href="{% url 'deleted_product_page' %}"><span class="d-inline-flex justify-content-center align-products-center" style="width: 40px; height: 40px;"><i class="bi bi-trash" style="color: #c70a0a; font-size: 22px; animation: bounce 1s ease infinite;"></i></span></a>
     </div>
+    {% if product_color %}
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <div class="search-bar">
+            <form action="" method="get">
+              {% csrf_token %}
+              <input type="text" class="search-input form-control" placeholder="Search for products" name="query" aria-label="Search for users" aria-describedby="button-search" />
+              <button type="submit" class="search-button btn" type="button" id="button-search">Search</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endif %}
     {% if messages %}
       {% for message in messages %}
         <div class="text-center container mb-5">
@@ -27,13 +40,13 @@
         <tr>
           <th>Image</th>
           <th>Name</th>
-          <th>Total Quantity</th>
           <th>Type</th>
           <th>Price</th>
           <th>Category</th>
           <th>Brand</th>
-          <th></th>
-          <th></th>
+          <th>Size</th>
+          <th>Quantity</th>
+          <th>Total Quantity</th>
           <th></th>
         </tr>
       </thead>
@@ -43,32 +56,49 @@
             <td class="align-middle">
               {% if color.main_image %}
                 <img class="my-2" src="{{ color.main_image.url }}" alt="{{ color.products.name }}" style="max-width: 100px;" />
-                <br>
+                <br />
                 {% if color.is_listed %}
-                  <span class="badge bg-success"> Product in Stock</span>
+                  <span class="badge bg-success">Product in Stock</span>
                 {% else %}
-                  <span class="badge bg-danger">Out of Stock</span>
+                  <span class="badge bg-danger">Product Blocked</span>
                 {% endif %}
               {% else %}
                 <span>No Image Available</span>
               {% endif %}
-            </td>            
+            </td>
             <td class="align-middle" style="max-width: 200px; word-wrap: break-word;">{{ color.products.name }}</td>
-            <td class="align-middle">{{ color.total_quantity }}</td>
+
             <td class="align-middle">{{ color.products.type }}</td>
-            <td class="align-middle">{{ color.price }}</td>
+            <td class="align-middle">₹{{ color.price }}</td>
             <td class="align-middle">{{ color.products.category.name }}</td>
             <td class="align-middle">{{ color.products.brand.name }}</td>
             <td class="align-middle">
+              {% for size in color.productsize_set.all %}
+                <div>
+                  <span class="size">{{ size.size }}</span>
+                </div>
+                {% empty %}No Sizes Available
+              {% endfor %}
+            </td>
+            <td class="align-middle">
+              {% for size in color.productsize_set.all %}
+                <div>
+                  <span class="quantity">{{ size.quantity }}</span>
+                </div>
+                {% empty %}No Quantity Available
+              {% endfor %}
+            </td>
+            <td class="align-middle">{{ color.total_quantity }}</td>
+            <td class="align-middle">
               <div class="btn-group">
-                <a href="{% url 'edit_product_page' color.id %}" class="btn btn-outline-info rounded-start">Edit</a>
+                <a href="{% url 'edit_product_page' color.id %}" class="btn btn-outline-primary rounded-start">Edit</a>
                 {% if color.is_listed %}
-                  <a href="{% url 'un_list_product' color.id %}" class="btn btn-outline-info">Unlist</a>
+                  <a href="{% url 'un_list_product' color.id %}" class="btn btn-outline-primary">Unlist</a>
                 {% else %}
-                  <a href="{% url 'list_product' color.id %}" class="btn btn-outline-info">List</a>
+                  <a href="{% url 'list_product' color.id %}" class="btn btn-outline-primary">List</a>
                 {% endif %}
                 {% if not color.is_deleted %}
-                  <a href="{% url 'delete_product' color.id %}" class="btn btn-outline-info rounded-end">Delete</a>
+                  <a href="{% url 'delete_product' color.id %}" class="btn btn-outline-primary rounded-end">Delete</a>
                 {% endif %}
               </div>
             </td>

@@ -12,6 +12,7 @@ urlpatterns = [
     
     path('page_not_found/', views.page_not_found, name='page_not_found'),
     
+    path('sneakerheads/admin/get_quantity/<str:size>/', views.get_quantity, name='get_quantity'),
     
     path('sneakerheads/admin/product/', views.list_product_page, name='list_product_page'),
     path('sneakerheads/admin/product/add-products/', views.admin_add_product, name='admin_add_product'),

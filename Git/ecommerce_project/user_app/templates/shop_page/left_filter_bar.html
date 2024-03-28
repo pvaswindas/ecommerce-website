@@ -25,53 +25,40 @@
       </div>
     </div>
 
-    <div class="widget widget-collapsible">
+    {% comment %} <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-2" role="button" aria-expanded="true" aria-controls="widget-2">Size</a></h3><!-- End .widget-title -->
 
       <div class="collapse show" id="widget-2">
         <div class="widget-body">
           <div class="filter-items">
             <div class="filter-item">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="size-1" />
-                <label class="custom-control-label" for="size-1">XS</label>
-              </div>
+              {% for size in color.productsize_set.all %}
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="size-1" />
+                  <label class="custom-control-label" for="size-1">{{ size.size }}</label>
+                </div>
+              {% endfor %}
             </div>
+          </div>
+        </div>
+      </div>
+    </div> {% endcomment %}
 
-            <div class="filter-item">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="size-2" />
-                <label class="custom-control-label" for="size-2">S</label>
-              </div>
-            </div>
+    <div class="widget widget-collapsible">
+      <h3 class="widget-title"><a data-toggle="collapse" href="#widget-4" role="button" aria-expanded="true" aria-controls="widget-4">Brand</a></h3><!-- End .widget-title -->
 
-            <div class="filter-item">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" checked id="size-3" />
-                <label class="custom-control-label" for="size-3">M</label>
+      <div class="collapse show" id="widget-4">
+        <div class="widget-body">
+          <div class="filter-items">
+            {% for brand in brand_list %}
+              <div class="filter-item filter-items-count">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" id="brand" />
+                  <label class="custom-control-label" for="brand">{{ brand.name }}</label>
+                </div>
+                <span class="item-count">{{ brand.product_count }}</span>
               </div>
-            </div>
-
-            <div class="filter-item">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" checked id="size-4" />
-                <label class="custom-control-label" for="size-4">L</label>
-              </div>
-            </div>
-
-            <div class="filter-item">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="size-5" />
-                <label class="custom-control-label" for="size-5">XL</label>
-              </div>
-            </div>
-
-            <div class="filter-item">
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" id="size-6" />
-                <label class="custom-control-label" for="size-6">XXL</label>
-              </div>
-            </div>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -91,26 +78,6 @@
             <a href="#" style="background: #669933;"><span class="sr-only">Color Name</span></a>
             <a href="#" style="background: #f2719c;"><span class="sr-only">Color Name</span></a>
             <a href="#" style="background: #ebebeb;"><span class="sr-only">Color Name</span></a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="widget widget-collapsible">
-      <h3 class="widget-title"><a data-toggle="collapse" href="#widget-4" role="button" aria-expanded="true" aria-controls="widget-4">Brand</a></h3><!-- End .widget-title -->
-
-      <div class="collapse show" id="widget-4">
-        <div class="widget-body">
-          <div class="filter-items">
-            {% for brand in brand_list %}
-              <div class="filter-item filter-items-count">
-                <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="brand" />
-                  <label class="custom-control-label" for="brand">{{ brand.name }}</label>
-                </div>
-                <span class="item-count">{{ brand.product_count }}</span>
-              </div>
-            {% endfor %}
           </div>
         </div>
       </div>

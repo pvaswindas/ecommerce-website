@@ -13,6 +13,13 @@
   <h1>Add Product Size</h1>
   <form action="{% url 'add_size' %}" method="post" enctype="multipart/form-data" id="variantForm">
     {% csrf_token %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="text-center container mb-5">
+          <h4>{{ message }}</h4>
+        </div>
+      {% endfor %}
+    {% endif %}
     <label for="product">Product</label>
     <select name="product" id="productSelect">
       <option value="" disabled selected>Select Product</option>

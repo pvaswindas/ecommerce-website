@@ -12,6 +12,7 @@ from django.utils import timezone
 from datetime import datetime
 from django.db.models import *
 from django.db.models import Q
+from django.http import JsonResponse
 import random
 import re
 from django.contrib.auth.hashers import check_password
@@ -181,7 +182,6 @@ def otp_verification_page(request):
                             first_name = user_data['name']
                         )
                         user.save()
-                        customer = Customer.objects.create(user = user)
                         del request.session['user_data']
                         del request.session['otp']
                         del request.session['otp_created_at']
@@ -541,7 +541,54 @@ def user_change_password(request, user_id):
                 
 @login_required
 @never_cache
-def cart_view_page(request, customer_id):
+def cart_view_page(request, user_id):
     if request.user.is_authenticated:
-        customer = Customer.objects.get(pk = customer_id)
-        return render(request, 'cart.html')
+        user = User.objects.get(pk = user_id)
+        customer = Customer.objects.get(user = user)
+        cart = Cart.objects.get(customer = customer)
+        cart_items = CartProducts.objects.filter(cart = cart)   
+        return render(request, 'cart.html', {'cart_items' : cart_items})
+    
+    
+@login_required
+@never_cache
+def add_to_cart(request, product_id):
+    if request.user.is_authenticated:
+        print('entered inside the function')
+        if request.method == 'POST':
+            print('entered inside post')
+            user_id = request.user.id
+            user = User.objects.get(pk = user_id)
+            customer = Customer.objects.get(user = user)
+            size = request.POST.get('size')
+            quantity = request.POST.get('qty')
+            print(size)
+            
+            product_size = ProductSize.objects.filter(product_color_image__id = product_id).get(pk = size)
+            
+            cart = Cart.objects.get(customer =  customer)
+            
+            cart_product = CartProducts.objects.create(
+                cart = cart,
+                product = product_size,
+                quantity = quantity,
+            )
+            cart_product.save()
+            return redirect('cart_view_page', user_id = user_id)
+    else:
+        return redirect(sign_in)
+        
+        
+
+def update_total_price(request):
+    if request.method == 'POST' and request.is_ajax():
+        product_id = request.POST.get('product_id')
+        quantity = int(request.POST.get('quantity'))
+        
+        product = ProductSize.objects.get(pk=product_id)
+        total_price = product.product_color_image.price * quantity
+        print(total_price)
+        
+        return JsonResponse({'total_price': total_price})
+    else:
+        return JsonResponse({'error': 'Invalid request'})

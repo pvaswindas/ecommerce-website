@@ -51,35 +51,48 @@
               <div class="product-content">
                 <p>{{ product_color.products.description }}</p>
               </div>
-              <div class="details-filter-row details-row-size">
-                <label for="size">Size:</label>
-                <div class="select-custom">
-                  <select name="size" id="size" class="form-control">
-                    <option value="#" selected="selected">Select a size</option>
-                    {% for size in product_sizes %}
-                      <option value="{{ size }}">{{ size }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-                <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a>
+              <div class="product-content">
+                <p>Color : {{ product_color.color }}</p>
               </div>
-              <div class="details-filter-row details-row-size">
-                <label for="qty">Qty:</label>
-                <div class="product-details-quantity">
-                  <input type="number" id="qty" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" required />
+              <form action="{% url 'add_to_cart' product_color.id %}" method="post">
+                {% csrf_token %}
+                <div class="details-filter-row details-row-size">
+                  <label {% if not product_color.is_listed %} class="disabled" {% endif %} for="size">Size:</label>
+                  <div class="select-custom {% if not product_color.is_listed %}disabled{% endif %}">
+                      <select name="size" id="size" class="form-control" {% if not product_color.is_listed %}disabled{% endif %} required>
+                          <option value="" disabled selected>Select a size</option>
+                          {% for product_size in product_sizes %}
+                              <option value="{{ product_size.id }}">{{ product_size.size }}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+                  <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a>
+                </div>              
+
+                <div class="details-filter-row details-row-size {% if not product_color.is_listed %}{% endif %}">
+                  <label for="qty">Qty:</label>
+                  <div class="product-details-quantity">
+                    <input type="number" id="qty" class="form-control" name="qty" value="1" min="1" max="10" step="1" data-decimals="0" required />
+                  </div>
                 </div>
-              </div>
-              <div class="product-details-action">
-                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                <div class="details-action-wrapper">
-                  <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+
+                <div class="product-details-action">
+                  {% if product_color.is_listed %}
+                    <button type="submit" class="btn-product btn-cart"><span>Add to cart</span></button>
+                  {% else %}
+                    <button type="button" class="btn-product btn-add" style="margin-top: 40px;"><span>Out of stock</span></button>
+                  {% endif %}
+                  <div class="details-action-wrapper">
+                    <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                  </div>
                 </div>
-              </div>
-              <div class="product-details-action">
-                <a href="#" class="btn-product btn-add"><span>Buy now</span></a>
-                <div class="details-action-wrapper">
+              </form>
+
+              {% if product_color.is_listed %}
+                <div class="product-details-action">
+                  <a href="#" class="btn-product btn-add"><span>Buy now</span></a>
                 </div>
-              </div>
+              {% endif %}
               <div class="product-details-footer">
                 <div class="product-cat">
                   <span>Category:</span>

@@ -28,5 +28,7 @@ urlpatterns = [
     
     path('sneakerheads/user/change-password/<int:user_id>/', views.user_change_password, name='user_change_password'),
     
-    path('sneakerheads/user/cart/<int:customer_id>/', views.cart_view_page, name='cart_view_page'),
+    path('sneakerheads/user/cart/<int:user_id>/', views.cart_view_page, name='cart_view_page'),
+    
+    path('sneakerheads/user/add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
 ]

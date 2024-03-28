@@ -143,40 +143,42 @@
                     <div class="dropdown cart-dropdown">
                       <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                         <i class="icon-shopping-cart"></i>
-                        <span class="cart-count">2</span>
+                        {% comment %} <span class="cart-count">2</span> {% endcomment %}
                       </a>
 
-                      <div class="dropdown-menu dropdown-menu-right">
-                        <div class="dropdown-cart-products">
-                          <div class="product">
-                            <div class="product-cart-details">
-                              <h4 class="product-title"><a href="">Beige knitted elastic runner shoes</a></h4>
+                      {% if user.is_authenticated %}
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <div class="dropdown-cart-products">
+                            <div class="product">
+                              <div class="product-cart-details">
+                                <h4 class="product-title"><a href="">Beige knitted elastic runner shoes</a></h4>
 
-                              <span class="cart-product-info">
-                                <span class="cart-product-qty">1</span>
-                                x $84.00
-                              </span>
+                                <span class="cart-product-info">
+                                  <span class="cart-product-qty">1</span>
+                                  x $84.00
+                                </span>
+                              </div>
+                              <!-- End .product-cart-details -->
+
+                              <figure class="product-image-container">
+                                <a href="" class="product-image"><img src="{% static 'user/assets/images/products/cart/product-1.jpg' %}" alt="product" /></a>
+                              </figure>
+                              <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
                             </div>
-                            <!-- End .product-cart-details -->
+                          </div>
 
-                            <figure class="product-image-container">
-                              <a href="" class="product-image"><img src="{% static 'user/assets/images/products/cart/product-1.jpg' %}" alt="product" /></a>
-                            </figure>
-                            <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
+                          <div class="dropdown-cart-total">
+                            <span>Total</span>
+
+                            <span class="cart-total-price">$160.00</span>
+                          </div>
+
+                          <div class="dropdown-cart-action">
+                            <a href="{% url 'cart_view_page' user.id %}" class="btn btn-primary">View Cart</a>
+                            <a href="" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
                           </div>
                         </div>
-
-                        <div class="dropdown-cart-total">
-                          <span>Total</span>
-
-                          <span class="cart-total-price">$160.00</span>
-                        </div>
-
-                        <div class="dropdown-cart-action">
-                          <a href="{% url 'cart_view_page' user.customer.id %}" class="btn btn-primary">View Cart</a>
-                          <a href="" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
-                        </div>
-                      </div>
+                      {% endif %}
                     </div>
                   </div>
                 </div>
@@ -221,11 +223,11 @@
             </main>
           {% endblock %}
           {% include 'partials/footer.html' %}
-
-          {% block mobile_content %}
-            {% include 'partials/mobile_content.html' %}
-          {% endblock %}
         </div>
+      {% endblock %}
+
+      {% block mobile_content %}
+        {% include 'partials/mobile_content.html' %}
       {% endblock %}
 
       {% block scripts %}
