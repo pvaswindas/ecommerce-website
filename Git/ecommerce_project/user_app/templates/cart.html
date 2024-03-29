@@ -32,108 +32,113 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-9">
-            <table class="table table-cart table-mobile">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Size</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Total</th>
-                  <th></th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {% for item in cart_items %}
+            {% if cart_items %}
+              <table class="table table-cart table-mobile">
+                <thead>
                   <tr>
-                    <td class="product-col">
-                      <div class="product">
-                        <figure class="product-media">
-                          <a href="#"><img src="{{ item.product.product_color_image.main_image.url }}" alt="Product image" /></a>
-                        </figure>
-
-                        <h3 class="product-title two-lines"><a href="#">{{ item.product.product_color_image.products.name }}</a></h3>
-                      </div>
-                    </td>
-                    <td class="total-col">{{ item.product.size }}</td>
-                    <td class="price-col">₹{{ item.product.product_color_image.price }}</td>
-                    <td class="quantity-col">
-                      <div class="cart-product-quantity">
-                        <input type="number" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" onchange="updateTotalPrice({{ item.product.id }})" required />
-                      </div>
-                    </td>
-                    <td class="total-col" id="total-price-{{ item.product.id }}">₹</td>
-                    <td class="remove-col">
-                      <button class="btn-remove"><i class="icon-close"></i></button>
-                    </td>
+                    <th>Product</th>
+                    <th>Size</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th></th>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-
-            <div class="cart-bottom">
-              <div class="cart-discount">
-                <form action="#">
-                  <div class="input-group">
-                    <input type="text" class="form-control" required placeholder="coupon code" />
-                    <div class="input-group-append">
-                      <button class="btn btn-outline-primary-2" type="submit"><i class="icon-long-arrow-right"></i></button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-              <a href="#" class="btn btn-outline-dark-2"><span>REMOVE ITEMS IN CART</span><i class="icon-refresh"></i></a>
-            </div>
-          </div>
-          <aside class="col-lg-3">
-            <div class="summary summary-cart">
-              <h3 class="summary-title">Cart Total</h3>
-
-              <table class="table table-summary">
+                </thead>
                 <tbody>
-                  <tr class="summary-subtotal">
-                    <td>Subtotal:</td>
-                    <td>$160.00</td>
-                  </tr>
-                  <tr class="summary-shipping">
-                    <td>Shipping:</td>
-                    <td>&nbsp;</td>
-                  </tr>
-
-                  <tr class="summary-shipping-row">
-                    <td>
-                      <div class="custom-control custom-radio">
-                        <label for="free-shipping">Free Shipping</label>
-                      </div>
-                    </td>
-                    <td>$0.00</td>
-                  </tr>
-                  <tr class="summary-subtotal">
-                    <td>TOTAL:</td>
-                    <td>$160.00</td>
-                  </tr>
-
-                  <tr class="summary-shipping-estimate">
-                    <td>
-                      Estimate for Your Country<br /> <a href="">Change address</a>
-                    </td>
-                    <td>&nbsp;</td>
-                  </tr>
-
-                  <tr class="summary-total">
-                    <td>Total:</td>
-                    <td>$160.00</td>
-                  </tr>
+                  {% for item in cart_items %}
+                    <tr>
+                      <td class="product-col">
+                        <div class="product">
+                          <figure class="product-media">
+                            <a href="#"><img src="{{ item.product.product_color_image.main_image.url }}" alt="Product image" /></a>
+                          </figure>
+                          <h3 class="product-title two-lines"><a href="#">{{ item.product.product_color_image.products.name }}</a></h3>
+                        </div>
+                      </td>
+                      <td class="total-col">{{ item.product.size }}</td>
+                      <td class="price-col">₹{{ item.product.product_color_image.price }}.00</td>
+                      <td class="quantity-col">
+                        <div class="cart-product-quantity">
+                          {% if item.product.quantity > 10 %}
+                            <input type="number" id="quantity-{{ item.id }}" class="form-control" value="{{ item.quantity }}" min="1" max="10" step="1" data-decimals="0" required />
+                          {% else %}
+                            <input type="number" id="quantity-{{ item.id }}" class="form-control" value="{{ item.quantity }}" min="1" max="{{ item.product.quantity }}" step="1" data-decimals="0" required />
+                          {% endif %}
+                        </div>
+                      </td>
+                      <td class="total-col" id="total-price-{{ item.id }}">₹{{ item.total_price }}.00</td>
+                      <td class="remove-col">
+                        <a href="{% url 'remove_from_cart' item.id %}"><button class="btn-remove"><i class="icon-close"></i></button></a>
+                      </td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
+              <div class="cart-bottom">
+                <div class="cart-discount">
+                  <form action="#">
+                    <div class="input-group">
+                      <input type="text" class="form-control" required placeholder="coupon code" />
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-primary-2" type="submit"><i class="icon-long-arrow-right"></i></button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <a href="{% url 'clear_cart' %}" class="btn btn-outline-dark-2"><span>REMOVE ALL ITEMS FROM CART</span><i class="icon-refresh"></i></a>
+              </div>
+            {% else %}
+              <div class="empty-cart">
+                <h2>Your cart is empty</h2>
+                <a href="{% url 'shop_page_view' %}" class="btn btn-primary">Start Shopping</a>
+              </div>
+            {% endif %}
+          </div>
+          {% if cart_items %}
+            <aside class="col-lg-3">
+              <div class="summary summary-cart">
+                <h3 class="summary-title">Cart Total</h3>
 
-              <a href="checkout.html" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
-            </div>
+                <table class="table table-summary">
+                  <tbody>
+                    <tr class="summary-subtotal">
+                      <td>Subtotal:</td>
+                      <td>₹.00</td>
+                    </tr>
+                    <tr class="summary-shipping">
+                      <td>Shipping:</td>
+                      <td>&nbsp;</td>
+                    </tr>
 
-            <a href="category.html" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
-          </aside>
+                    <tr class="summary-shipping-row">
+                      <td>
+                        <div class="custom-control custom-radio">
+                          <label for="free-shipping">Free Shipping</label>
+                        </div>
+                      </td>
+                      <td>₹0.00</td>
+                    </tr>
+
+                    <tr class="summary-shipping-estimate">
+                      <td>
+                        Estimate for Your Country<br /> <a href="">Change address</a>
+                      </td>
+                      <td>&nbsp;</td>
+                    </tr>
+
+                    <tr class="summary-total">
+                      <td>Total:</td>
+                      <td>₹.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <a href="checkout.html" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</a>
+              </div>
+
+              <a href="category.html" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
+            </aside>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -141,10 +146,11 @@
 {% endblock %}
 
 {% block custom_scripts %}
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     function updateTotalPrice(productId) {
-      var quantity = $('#quantity-' + productId).val()
+      var quantityInput = $('#quantity-' + productId)
+      var quantity = quantityInput.val()
+      var maxQuantity = quantityInput.attr('max')
       var csrfToken = '{{ csrf_token }}'
     
       $.ajax({
@@ -157,7 +163,83 @@
         },
         dataType: 'json',
         success: function (data) {
+          // Update the total price element with the new total price
           $('#total-price-' + productId).text('₹' + data.total_price.toFixed(2))
+          if (data.error) {
+            // If there's an error, update the quantity input value to the maximum available quantity
+            quantityInput.val(maxQuantity)
+          } else {
+            // If the update was successful, ensure the quantity input is not greater than the maximum available quantity
+            if (parseInt(quantity) > parseInt(maxQuantity)) {
+              quantityInput.val(maxQuantity)
+            }
+            // Update subtotal and total
+            updateSubtotal()
+          }
+        }
+      })
+    }
+    
+    function updateSubtotal() {
+      var subtotal = 0
+      var hasItems = false
+      // Loop through each row in the table
+      $('.table-cart tbody tr').each(function () {
+        hasItems = true
+        var productId = $(this).find('.quantity-col input').attr('id').split('-')[1]
+        var quantity = $('#quantity-' + productId).val()
+        var price = parseFloat($(this).find('.price-col').text().replace('₹', ''))
+        subtotal += parseFloat(quantity) * price
+      })
+    
+      // Apply shipping charge if subtotal is less than 2500 and there are items in the cart
+      var shippingCharge = 0
+      if (subtotal < 2500 && hasItems) {
+        shippingCharge = 99
+      }
+    
+      // Update subtotal and total in the summary table
+      $('.summary-subtotal td:nth-child(2)').text('₹' + subtotal.toFixed(2))
+      $('.summary-shipping-row td:nth-child(2)').text('₹' + shippingCharge.toFixed(2))
+      $('.summary-total td:nth-child(2)').text('₹' + (subtotal + shippingCharge).toFixed(2))
+    }
+    
+    // Bind the updateTotalPrice function to the change event of quantity inputs
+    $(document).on('change', '[id^="quantity-"]', function () {
+      var productId = $(this).attr('id').split('-')[1]
+      updateTotalPrice(productId)
+    })
+    
+    // Calculate subtotal on page load
+    $(document).ready(function () {
+      updateSubtotal()
+    })
+    
+    $(document).on('change', '[id^="quantity-"]', function () {
+      var productId = $(this).attr('id').split('-')[1]
+      var newQuantity = $(this).val()
+      updateQuantity(productId, newQuantity)
+    })
+    
+    function updateQuantity(itemId, newQuantity) {
+      var csrfToken = '{{ csrf_token }}'
+    
+      $.ajax({
+        type: 'POST',
+        url: '/update_quantity/',
+        data: {
+          item_id: itemId,
+          quantity: newQuantity,
+          csrfmiddlewaretoken: csrfToken
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (!data.error) {
+            $('#total-price-' + itemId).text('₹' + data.total_price.toFixed(2))
+            updateSubtotal() // Update subtotal and total
+          } else {
+            // Handle error
+          }
         }
       })
     }

@@ -139,47 +139,61 @@
                         </div>
                       </form>
                     </div>
+                    {% if user.is_authenticated %}
+                      <div class="dropdown cart-dropdown">
+                        {% if cart_items %}
+                          <a href="" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                            <i class="icon-shopping-cart"></i>
+                            {% comment %} <span class="cart-count">2</span> {% endcomment %}
+                          </a>
 
-                    <div class="dropdown cart-dropdown">
-                      <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                        <i class="icon-shopping-cart"></i>
-                        {% comment %} <span class="cart-count">2</span> {% endcomment %}
-                      </a>
+                          <div class="dropdown-menu dropdown-menu-right">
+                            {% for items in cart_items %}
+                              <div class="dropdown-cart-products">
+                                <div class="product">
+                                  <div class="product-cart-details">
+                                    <h4 class="product-title"><a href="">{{ items.product.product_color_image.products.name }}</a></h4>
 
-                      {% if user.is_authenticated %}
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <div class="dropdown-cart-products">
-                            <div class="product">
-                              <div class="product-cart-details">
-                                <h4 class="product-title"><a href="">Beige knitted elastic runner shoes</a></h4>
+                                    <span class="cart-product-info">
+                                      <span class="cart-product-qty">{{ items.quantity }}</span>
+                                      x ₹{{ items.product.product_color_image.price }}
+                                    </span>
+                                  </div>
 
-                                <span class="cart-product-info">
-                                  <span class="cart-product-qty">1</span>
-                                  x $84.00
-                                </span>
+                                  <figure class="product-image-container">
+                                    <a href="" class="product-image"><img src="{{ items.product.product_color_image.main_image.url }}" alt="product" /></a>
+                                  </figure>
+                                  <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
+                                </div>
                               </div>
-                              <!-- End .product-cart-details -->
+                            {% endfor %}
 
-                              <figure class="product-image-container">
-                                <a href="" class="product-image"><img src="{% static 'user/assets/images/products/cart/product-1.jpg' %}" alt="product" /></a>
-                              </figure>
-                              <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
+                            <div class="dropdown-cart-total">
+                              <span>Total</span>
+
+                              <span class="cart-total-price">$160.00</span>
+                            </div>
+
+                            <div class="dropdown-cart-action">
+                              <a href="{% url 'cart_view_page' user.id %}" class="btn btn-primary">View Cart</a>
+                              <a href="" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
                             </div>
                           </div>
-
-                          <div class="dropdown-cart-total">
-                            <span>Total</span>
-
-                            <span class="cart-total-price">$160.00</span>
+                        {% else %}
+                          <div class="dropdown-toggle" role="button">
+                            <i class="icon-shopping-cart"></i>
                           </div>
-
-                          <div class="dropdown-cart-action">
-                            <a href="{% url 'cart_view_page' user.id %}" class="btn btn-primary">View Cart</a>
-                            <a href="" class="btn btn-outline-primary-2"><span>Checkout</span><i class="icon-long-arrow-right"></i></a>
+                          <div class="dropdown-menu dropdown-menu-right">
+                            <div class="dropdown-cart-empty">
+                              <p>Your cart is empty</p>
+                              <a href="{% url 'shop_page_view' %}" class="btn btn-primary">Start Shopping</a>
+                            </div>
                           </div>
-                        </div>
-                      {% endif %}
-                    </div>
+                        {% endif %}
+                      </div>
+                    {% else %}
+                      <a href="{% url 'sign_in_page' %}" class="mt-1 mx-2"><i class="icon-shopping-cart" style="font-size: 32px;"></i></a>
+                    {% endif %}
                   </div>
                 </div>
               </div>

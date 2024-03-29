@@ -67,20 +67,19 @@
                       </select>
                   </div>
                   <a href="#" class="size-guide"><i class="icon-th-list"></i>size guide</a>
-                </div>              
-
-                <div class="details-filter-row details-row-size {% if not product_color.is_listed %}{% endif %}">
-                  <label for="qty">Qty:</label>
-                  <div class="product-details-quantity">
-                    <input type="number" id="qty" class="form-control" name="qty" value="1" min="1" max="10" step="1" data-decimals="0" required />
-                  </div>
-                </div>
+                </div>      
 
                 <div class="product-details-action">
-                  {% if product_color.is_listed %}
-                    <button type="submit" class="btn-product btn-cart"><span>Add to cart</span></button>
-                  {% else %}
-                    <button type="button" class="btn-product btn-add" style="margin-top: 40px;"><span>Out of stock</span></button>
+                  {% if not cart_items.product_color_image == product_color %}
+                    {% if product_color.is_listed %}
+                    {% if in_cart == product_color %}
+                      <button type="submit" class="btn-product btn-cart"><span>Add to cart</span></button>
+                    {% else %}
+                    <a href="{% url 'cart_view_page' user.id %}"><button type="button" class="btn-product btn-add" style="margin-top: 40px;"><span>Go to cart</span></button></a>
+                    {% endif %}
+                    {% else %}
+                      <button type="button" class="btn-product btn-add" style="margin-top: 40px;"><span>Out of stock</span></button>
+                    {% endif %}
                   {% endif %}
                   <div class="details-action-wrapper">
                     <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>

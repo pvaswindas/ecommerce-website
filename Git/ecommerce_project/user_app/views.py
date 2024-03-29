@@ -14,7 +14,9 @@ from django.db.models import *
 from django.db.models import Q
 from django.http import JsonResponse
 import random
+from django.views.decorators.csrf import csrf_exempt
 import re
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import check_password
 from random import shuffle
 from django.urls import reverse
@@ -32,8 +34,16 @@ from django.contrib.auth.decorators import login_required
 @never_cache
 def index_page(request):
     if request.user.is_authenticated:
-        customer = Customer.objects.all()
-        return render(request, 'index.html', {'customer': customer})
+        user = request.user
+        customer = Customer.objects.get(user = user)
+        cart = Cart.objects.get(customer = customer)
+        cart_items = CartProducts.objects.filter(cart = cart)
+        context = {
+            'customer' : customer,
+            'cart' : cart,
+            'cart_items' : cart_items,
+        }
+        return render(request, 'index.html', context)
     return render(request, 'index.html')
 
 @never_cache
@@ -281,6 +291,7 @@ def logout(request):
 
 @never_cache
 def shop_page_view(request):
+    context = {}
     price_ranges = [
         {"min": 1000, "max": 1500},
         {"min": 1500, "max": 2500},
@@ -289,19 +300,29 @@ def shop_page_view(request):
         {"min": 3500, "max": 5000},
         {"min": 5000, "max": None},
     ]
-    product_color_list = list(ProductColorImage.objects.filter(is_deleted = False))
+    if request.user.is_authenticated:
+        user = request.user
+        customer = Customer.objects.get(user = user)
+        cart = Cart.objects.get(customer = customer)
+        cart_items = CartProducts.objects.filter(cart = cart)
+        context.update({'cart' : cart,
+            'cart_items' : cart_items,})
+        print(cart_items)
+        
+    product_color_list = list(ProductColorImage.objects.filter(is_deleted = False, is_listed = True))
     shuffle(product_color_list)
     latest_products = ProductColorImage.objects.all()[:10]
     category_list = Category.objects.annotate(product_count=Count('products'))
     brand_list = Brand.objects.annotate(product_count=Count('products'))
     
-    context = {
+    context.update({
         'product_color_list': product_color_list,
         'brand_list': brand_list,
         'category_list': category_list,
         'price_ranges': price_ranges,
         'latest_products': latest_products,
-    }
+    })
+        
     return render(request, 'shop_page.html', context)
     
 
@@ -311,10 +332,29 @@ def shop_page_view(request):
 
 @never_cache
 def product_single_view_page(request, product_name, pdt_id):
+        context = {}
         product_color = ProductColorImage.objects.get(pk=pdt_id)
+
+        if request.user.is_authenticated:
+            user = request.user
+            customer = Customer.objects.get(user = user)
+            cart = Cart.objects.get(customer = customer)
+            cart_items = CartProducts.objects.filter(cart = cart)
+            in_cart = CartProducts.objects.filter(~Q(cart = cart), product__product_color_image = product_color)
+            print(in_cart)
+            context.update({
+                'user' : user, 
+                'cart' : cart,
+                'in_cart' : in_cart,
+                'cart_items' : cart_items,
+                })
         last_five_products = ProductColorImage.objects.order_by('-id')[:5]
         product_sizes = ProductSize.objects.filter(product_color_image = product_color)
-        context = {'product_color' : product_color, 'product_sizes': product_sizes, 'last_five_products': last_five_products}
+        
+        
+        
+        
+        context.update({'product_color' : product_color, 'product_sizes': product_sizes, 'last_five_products': last_five_products,})
         return render(request, 'product_view.html', context)
 
 
@@ -332,8 +372,17 @@ def user_dashboard(request, user_id):
         if user_id:
             user = User.objects.get(pk = user_id)
             customer = Customer.objects.get(user = user)
+            cart = Cart.objects.get(customer = customer)
+            cart_items = CartProducts.objects.filter(cart = cart)
             addresses = Address.objects.filter(customer = customer)
-            return render(request, 'dashboard.html', {'user' : user, 'customer' : customer, 'addresses' : addresses})
+            context =  {
+                'cart' : cart,
+                'user' : user, 
+                'customer' : customer,
+                'addresses' : addresses,
+                'cart_items' : cart_items
+                }
+            return render(request, 'dashboard.html', context)
         else:
             messages.error(request, 'Not able to get user details at this moment')
             return redirect(index_page)
@@ -495,10 +544,8 @@ def user_change_password(request, user_id):
             current_password  = request.POST.get('current_password')
             new_password = request.POST.get('new_password')
             confirm_password = request.POST.get('confirm_password')
-            print(current_password)
             
             user = User.objects.get(pk = user_id)
-            print(user.password)
             is_valid_current_password = True
             if not check_password(current_password, user.password):
                 messages.error(request, '''Current password don't match''')
@@ -546,7 +593,7 @@ def cart_view_page(request, user_id):
         user = User.objects.get(pk = user_id)
         customer = Customer.objects.get(user = user)
         cart = Cart.objects.get(customer = customer)
-        cart_items = CartProducts.objects.filter(cart = cart)   
+        cart_items = CartProducts.objects.filter(cart = cart)
         return render(request, 'cart.html', {'cart_items' : cart_items})
     
     
@@ -554,15 +601,11 @@ def cart_view_page(request, user_id):
 @never_cache
 def add_to_cart(request, product_id):
     if request.user.is_authenticated:
-        print('entered inside the function')
         if request.method == 'POST':
-            print('entered inside post')
             user_id = request.user.id
             user = User.objects.get(pk = user_id)
             customer = Customer.objects.get(user = user)
             size = request.POST.get('size')
-            quantity = request.POST.get('qty')
-            print(size)
             
             product_size = ProductSize.objects.filter(product_color_image__id = product_id).get(pk = size)
             
@@ -571,24 +614,67 @@ def add_to_cart(request, product_id):
             cart_product = CartProducts.objects.create(
                 cart = cart,
                 product = product_size,
-                quantity = quantity,
             )
             cart_product.save()
             return redirect('cart_view_page', user_id = user_id)
     else:
         return redirect(sign_in)
         
-        
 
+@login_required
+@never_cache
+def remove_from_cart(request, cart_item_id):
+    if request.user.is_authenticated:
+        cart_item = CartProducts.objects.get(pk = cart_item_id)
+        cart_item.delete()
+        return redirect(reverse('cart_view_page', kwargs={'user_id': request.user.pk}))
+    
+    
+@login_required
+@never_cache
+def clear_cart(request):
+    if request.user.is_authenticated:
+        user_id = request.user.id
+        CartProducts.objects.filter(cart__customer__user_id=user_id).delete()
+        return redirect('cart_view_page', user_id=user_id)
+        
+        
+        
+@login_required
+@never_cache
 def update_total_price(request):
-    if request.method == 'POST' and request.is_ajax():
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         product_id = request.POST.get('product_id')
         quantity = int(request.POST.get('quantity'))
         
         product = ProductSize.objects.get(pk=product_id)
-        total_price = product.product_color_image.price * quantity
-        print(total_price)
+        available_quantity = product.quantity
         
-        return JsonResponse({'total_price': total_price})
+        if quantity <= available_quantity:
+            total_price = product.product_color_image.price * quantity
+            return JsonResponse({'total_price': total_price})
+        else:
+            return JsonResponse({'error': f'Only {available_quantity} units available'})
+    else:
+        return JsonResponse({'error': 'Invalid request'})
+    
+    
+    
+@login_required
+@never_cache
+def update_quantity(request):
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        item_id = request.POST.get('item_id')
+        new_quantity = int(request.POST.get('quantity'))
+        
+        try:
+            cart_item = CartProducts.objects.get(pk=item_id)
+            cart_item.quantity = new_quantity
+            cart_item.save()
+            
+            total_price = cart_item.product.product_color_image.price * new_quantity
+            return JsonResponse({'total_price': total_price})
+        except CartProducts.DoesNotExist:
+            return JsonResponse({'error': 'Product not found'})
     else:
         return JsonResponse({'error': 'Invalid request'})

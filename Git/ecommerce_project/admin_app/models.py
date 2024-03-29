@@ -56,6 +56,7 @@ class ProductColorImage(models.Model):
     back_image = models.FileField(upload_to= ' product_all_images/')
     is_deleted = models.BooleanField(default = False)
     is_listed = models.BooleanField(default = True)
+    in_stock = models.BooleanField(default = True)
     
     def __str__(self):
         return self.color
@@ -167,9 +168,13 @@ def create_cart(sender, instance, created, **kwargs):
     
 
 class CartProducts(models.Model):
-    cart = models.ForeignKey(Cart, on_delete = models.CASCADE)
-    product = models.ForeignKey(ProductSize, on_delete = models.CASCADE)
-    quantity = models.PositiveBigIntegerField(default = 1)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product = models.ForeignKey(ProductSize, on_delete=models.CASCADE)
+    quantity = models.PositiveBigIntegerField(default=1)
     
     def __str__(self):
-        return f"{self.cart.customer.user.first_name} {self.cart.customer.user.last_name},  {self.product.product_color_image.color} {self.product.product_color_image.products.name}"
+        return f"{self.id} {self.cart.customer.user.first_name} {self.cart.customer.user.last_name},  {self.product.product_color_image.color} {self.product.product_color_image.products.name}"
+    
+    @property
+    def total_price(self):
+        return self.quantity * self.product.product_color_image.price

@@ -29,6 +29,11 @@ urlpatterns = [
     path('sneakerheads/user/change-password/<int:user_id>/', views.user_change_password, name='user_change_password'),
     
     path('sneakerheads/user/cart/<int:user_id>/', views.cart_view_page, name='cart_view_page'),
+    path('update_total_price/', views.update_total_price, name='update_total_price'),
+    path('sneakerheads/user/remove_from_cart/<int:cart_item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('clear_cart/', views.clear_cart, name='clear_cart'),
+    path('update_quantity/', views.update_quantity, name='update_quantity'),
     
     path('sneakerheads/user/add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    
 ]
