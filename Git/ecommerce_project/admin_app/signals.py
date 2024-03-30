@@ -34,3 +34,11 @@ def update_products_on_brand_change(sender, instance, **kwargs):
 def update_product_size_on_color_image_change(sender, instance, **kwargs):
     product_sizes = ProductSize.objects.filter(product_color_image=instance)
     product_sizes.update(is_listed=instance.is_listed, is_deleted=instance.is_deleted)
+
+
+
+@receiver(post_save, sender=ProductSize)
+def update_cart_in_stock_on_product_size_quantity_change(sender, instance, **kwargs):
+    cart_products = CartProducts.objects.filter(product = instance)
+    cart_products.update(in_stock= instance.in_stock)
+    

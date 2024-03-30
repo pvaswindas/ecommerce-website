@@ -57,9 +57,9 @@
               <form action="{% url 'add_to_cart' product_color.id %}" method="post">
                 {% csrf_token %}
                 <div class="details-filter-row details-row-size">
-                  <label {% if not product_color.is_listed %} class="disabled" {% endif %} for="size">Size:</label>
+                  <label {% if not product_color.in_stock %} class="disabled" {% endif %} for="size">Size:</label>
                   <div class="select-custom {% if not product_color.is_listed %}disabled{% endif %}">
-                      <select name="size" id="size" class="form-control" {% if not product_color.is_listed %}disabled{% endif %} required>
+                      <select name="size" id="size" class="form-control" {% if not product_color.in_stock %}disabled{% endif %} required>
                           <option value="" disabled selected>Select a size</option>
                           {% for product_size in product_sizes %}
                               <option value="{{ product_size.id }}">{{ product_size.size }}</option>
@@ -71,12 +71,12 @@
 
                 <div class="product-details-action">
                   {% if not cart_items.product_color_image == product_color %}
-                    {% if product_color.is_listed %}
-                    {% if in_cart == product_color %}
-                      <button type="submit" class="btn-product btn-cart"><span>Add to cart</span></button>
-                    {% else %}
-                    <a href="{% url 'cart_view_page' user.id %}"><button type="button" class="btn-product btn-add" style="margin-top: 40px;"><span>Go to cart</span></button></a>
-                    {% endif %}
+                    {% if product_color.in_stock %}
+                      {% if not in_cart %}
+                        <button type="submit" class="btn-product btn-cart"><span>Add to cart</span></button>
+                      {% else %}
+                        <button type="button" class="btn-product btn-add" style="margin-top: 40px;" onclick="goToCart({{ user.id }})"><span>Go to cart</span></button>
+                      {% endif %}
                     {% else %}
                       <button type="button" class="btn-product btn-add" style="margin-top: 40px;"><span>Out of stock</span></button>
                     {% endif %}
@@ -179,6 +179,7 @@
 {% block custom_scripts %}
   <script src="{% static 'user/assets/js/jquery.elevateZoom.min.js' %}"></script>
   <script src="{% static 'user/assets/js/jquery.magnific-popup.min.js' %}"></script>
+  
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       // Select the color selector
@@ -205,5 +206,9 @@
         }
       })
     })
+
+    function goToCart() {
+      window.location.href = "{% url 'cart_view_page' user.id %}";
+    }
   </script>
 {% endblock %}

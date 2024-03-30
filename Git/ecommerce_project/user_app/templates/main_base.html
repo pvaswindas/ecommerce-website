@@ -152,7 +152,7 @@
                               <div class="dropdown-cart-products">
                                 <div class="product">
                                   <div class="product-cart-details">
-                                    <h4 class="product-title"><a href="">{{ items.product.product_color_image.products.name }}</a></h4>
+                                    <h4 class="product-title"><a href="{% url 'cart_view_page' user.id %}">{{ items.product.product_color_image.products.name }}</a></h4>
 
                                     <span class="cart-product-info">
                                       <span class="cart-product-qty">{{ items.quantity }}</span>
@@ -161,7 +161,7 @@
                                   </div>
 
                                   <figure class="product-image-container">
-                                    <a href="" class="product-image"><img src="{{ items.product.product_color_image.main_image.url }}" alt="product" /></a>
+                                    <a href="{% url 'cart_view_page' user.id %}" class="product-image"><img src="{{ items.product.product_color_image.main_image.url }}" alt="product" /></a>
                                   </figure>
                                   <a href="#" class="btn-remove" title="Remove Product"><i class="icon-close"></i></a>
                                 </div>

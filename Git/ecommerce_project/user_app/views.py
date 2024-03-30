@@ -27,8 +27,7 @@ from django.contrib.auth.decorators import login_required
 
 
 
-
-# ---------------------------------------------------------------------------------- INDEX PAGE ----------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------- INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
 @never_cache
@@ -284,7 +283,11 @@ def logout(request):
 
 
 
-# ---------------------------------------------------------------------------------- SHOP PAGE ----------------------------------------------------------------------------------
+
+
+
+
+# ---------------------------------------------------------------------------------- SHOP PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
 
@@ -307,7 +310,6 @@ def shop_page_view(request):
         cart_items = CartProducts.objects.filter(cart = cart)
         context.update({'cart' : cart,
             'cart_items' : cart_items,})
-        print(cart_items)
         
     product_color_list = list(ProductColorImage.objects.filter(is_deleted = False, is_listed = True))
     shuffle(product_color_list)
@@ -327,39 +329,45 @@ def shop_page_view(request):
     
 
 
-# -------------------------------------------------------------------------------- PRODUCT SINGLE VIEW PAGE --------------------------------------------------------------------------------
+
+
+
+# -------------------------------------------------------------------------------- PRODUCT SINGLE PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 @never_cache
 def product_single_view_page(request, product_name, pdt_id):
-        context = {}
-        product_color = ProductColorImage.objects.get(pk=pdt_id)
+    context = {}
+    product_color = ProductColorImage.objects.get(pk=pdt_id)
 
-        if request.user.is_authenticated:
-            user = request.user
-            customer = Customer.objects.get(user = user)
-            cart = Cart.objects.get(customer = customer)
-            cart_items = CartProducts.objects.filter(cart = cart)
-            in_cart = CartProducts.objects.filter(~Q(cart = cart), product__product_color_image = product_color)
-            print(in_cart)
-            context.update({
-                'user' : user, 
-                'cart' : cart,
-                'in_cart' : in_cart,
-                'cart_items' : cart_items,
-                })
-        last_five_products = ProductColorImage.objects.order_by('-id')[:5]
-        product_sizes = ProductSize.objects.filter(product_color_image = product_color)
-        
-        
-        
-        
-        context.update({'product_color' : product_color, 'product_sizes': product_sizes, 'last_five_products': last_five_products,})
-        return render(request, 'product_view.html', context)
+    if request.user.is_authenticated:
+        user = request.user
+        customer = Customer.objects.get(user=user)
+        cart = Cart.objects.get(customer=customer)
+        cart_items = CartProducts.objects.filter(cart=cart)
+        in_cart = CartProducts.objects.filter(cart=cart, product__product_color_image=product_color).exists()
+        context.update({
+            'user': user, 
+            'cart': cart,
+            'in_cart': in_cart,
+            'cart_items': cart_items,
+        })
+    
+    last_five_products = ProductColorImage.objects.order_by('-id')[:5]
+    product_sizes = ProductSize.objects.filter(product_color_image=product_color)
+
+    context.update({
+        'product_color': product_color,
+        'last_five_products': last_five_products,
+        'product_sizes': product_sizes,
+    })
+
+    return render(request, 'product_view.html', context)
 
 
 
-# -------------------------------------------------------------------------------- USER ACCOUNT DETAILS VIEW PAGE --------------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------------- USER ACCOUNT DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 
@@ -449,8 +457,7 @@ def user_details_edit(request, user_id):
             
         
         
-
-# -------------------------------------------------------------------------------- USER ADDRESS DETAILS VIEW PAGE --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- USER ADDRESS DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 
@@ -583,7 +590,9 @@ def user_change_password(request, user_id):
                 
                 
                 
-# -------------------------------------------------------------------------------- USER CART VIEW PAGE --------------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------------- USER CART PAGE FUNCTIONS --------------------------------------------------------------------------------
                 
                 
 @login_required
@@ -592,9 +601,16 @@ def cart_view_page(request, user_id):
     if request.user.is_authenticated:
         user = User.objects.get(pk = user_id)
         customer = Customer.objects.get(user = user)
+        shipping_addresses = Address.objects.filter(customer = customer)
         cart = Cart.objects.get(customer = customer)
         cart_items = CartProducts.objects.filter(cart = cart)
-        return render(request, 'cart.html', {'cart_items' : cart_items})
+        any_in_stock = any(item.in_stock for item in cart_items)
+        context = {
+            'shipping_addresses' : shipping_addresses,
+            'cart_items' : cart_items,
+            'any_in_stock' : any_in_stock
+        }
+        return render(request, 'cart.html', context)
     
     
 @login_required
@@ -645,18 +661,22 @@ def clear_cart(request):
 def update_total_price(request):
     if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
         product_id = request.POST.get('product_id')
-        quantity = int(request.POST.get('quantity'))
         
-        product = ProductSize.objects.get(pk=product_id)
-        available_quantity = product.quantity
-        
-        if quantity <= available_quantity:
-            total_price = product.product_color_image.price * quantity
-            return JsonResponse({'total_price': total_price})
-        else:
-            return JsonResponse({'error': f'Only {available_quantity} units available'})
+        try:
+            product = ProductSize.objects.get(pk=product_id)
+            quantity = int(request.POST.get('quantity'))
+            available_quantity = product.quantity
+
+            if quantity <= available_quantity:
+                total_price = product.product_color_image.price * quantity
+                return JsonResponse({'total_price': total_price})
+            else:
+                return JsonResponse({'error': f'Only {available_quantity} units available'})
+        except ProductSize.DoesNotExist:
+            return JsonResponse({'error': 'Product does not exist'})
     else:
         return JsonResponse({'error': 'Invalid request'})
+
     
     
     
@@ -678,3 +698,140 @@ def update_quantity(request):
             return JsonResponse({'error': 'Product not found'})
     else:
         return JsonResponse({'error': 'Invalid request'})
+    
+    
+
+
+
+
+
+# -------------------------------------------------------------------------------- USER CHECKOUT PAGE FUNCTIONS --------------------------------------------------------------------------------
+   
+        
+@login_required
+@never_cache
+def checkout_page(request):
+    if request.user.is_authenticated:
+        user = request.user
+        customer = Customer.objects.get(user = user)
+        cart = Cart.objects.get(customer = customer)
+        cart_items = CartProducts.objects.filter(cart = cart, in_stock = True)
+        
+        if cart_items:
+            subtotal = 0
+            for items in cart_items:
+                each_price =  items.product.product_color_image.price * items.quantity
+                subtotal = subtotal + each_price
+                print(subtotal)
+            if subtotal <= 2500:
+                shipping_charge = 99
+                total_charge = subtotal + shipping_charge
+                print(total_charge)
+            else:
+                shipping_charge = 0
+                total_charge = each_price
+            context = {
+                'shipping_charge' : shipping_charge,
+                'subtotal' : subtotal,
+                'total_charge' : total_charge,
+                'user' : user,
+                'customer' : customer,
+                'cart' : cart,
+                'cart_items' : cart_items,
+            }
+            return render(request, 'checkout.html', context)
+        else:
+            user_id = request.user.id
+            return redirect('cart_view_page', user_id = user_id)
+    else:
+        return redirect(index_page)
+            
+            
+
+                  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

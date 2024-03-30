@@ -1,6 +1,8 @@
 from django.db import models
 from django.dispatch import receiver
 from user_app.models import *
+import string
+import random
 
 
 
@@ -59,21 +61,30 @@ class ProductColorImage(models.Model):
     in_stock = models.BooleanField(default = True)
     
     def __str__(self):
-        return self.color
+        return f"{self.color} - {self.products.name}"
     
     
 
     
 class ProductSize(models.Model):
-    product_color_image = models.ForeignKey(ProductColorImage, on_delete = models.CASCADE)
-    size = models.CharField(max_length = 50)
-    quantity = models.BigIntegerField()
-    is_listed = models.BooleanField(default = True)
-    is_deleted = models.BooleanField(default = False)
+    product_color_image = models.ForeignKey(ProductColorImage, on_delete=models.CASCADE)
+    size = models.CharField(max_length=50)
+    quantity = models.PositiveBigIntegerField()
+    is_listed = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    in_stock = models.BooleanField(default=True)
     
     def __str__(self):
-        return self.size
+        return f"Size : {self.size} - {self.product_color_image.products.name}, {self.product_color_image.color}"
 
+    def save(self, *args, **kwargs):
+        if self.quantity <= 0:
+            self.in_stock = False
+        else:
+            self.in_stock = True
+        super(ProductSize, self).save(*args, **kwargs)
+
+ 
  
     
 class Coupon(models.Model):
@@ -95,21 +106,44 @@ class Payment(models.Model):
         return self.method_name
 
 
+
+
     
-class Order(models.Model):
-    products = models.OneToOneField(Products, on_delete = models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete = models.CASCADE)
+class Orders(models.Model):
+    order_id = models.CharField(primary_key = True, max_length = 12, unique = True)
+    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
     order_status = models.CharField(max_length = 100)
-    address = models.OneToOneField(Address, on_delete = models.CASCADE)
-    coupon = models.OneToOneField(Coupon, on_delete = models.CASCADE)
-    payment = models.OneToOneField(Payment, on_delete = models.CASCADE)
-    
+    address = models.OneToOneField(Address, on_delete=models.PROTECT)
+    payment = models.OneToOneField(Payment, on_delete=models.PROTECT)
     
     def __str__(self):
-        return self.order_status
+        return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.order_status}"
+    
+    def save(self, *args, **kwargs):
+        self.order_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        super().save(*args, **kwargs)
     
 
 
+
+class OrderItem(models.Model):
+    order_items_id = models.CharField(primary_key=True, max_length=12, unique=True)
+    order = models.ForeignKey(Orders, on_delete=models.PROTECT)
+    product = models.OneToOneField(ProductSize, on_delete=models.PROTECT)
+    order_status = models.CharField(max_length=100)  
+    
+    def __str__(self):
+        customer_name = f"{self.order.customer.user.first_name} {self.order.customer.user.last_name}"
+        product_name = self.product.product_color_image.products.name
+        return f"{customer_name}: {self.order_items_id} - {product_name}"
+    
+    def save(self, *args, **kwargs):
+        self.order_items_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        super().save(*args, **kwargs)
+        
+        
+        
+        
 
 class Banner(models.Model):
     name = models.CharField(max_length = 200)
@@ -171,9 +205,10 @@ class CartProducts(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(ProductSize, on_delete=models.CASCADE)
     quantity = models.PositiveBigIntegerField(default=1)
+    in_stock = models.BooleanField(default = True)
     
     def __str__(self):
-        return f"{self.id} {self.cart.customer.user.first_name} {self.cart.customer.user.last_name},  {self.product.product_color_image.color} {self.product.product_color_image.products.name}"
+        return f"{self.cart.customer.user.first_name} {self.cart.customer.user.last_name} :  {self.product.product_color_image.color} - {self.product.product_color_image.products.name}"
     
     @property
     def total_price(self):

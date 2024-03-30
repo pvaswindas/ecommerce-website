@@ -1,0 +1,155 @@
+/* Styles for the summary section */
+.summary {
+    background-color: #F7F7F7;
+}
+
+.table-summary {
+    width: 100%;
+    background-color: #F7F7F7;
+}
+
+.table-summary th,
+.table-summary td {
+    background-color: #F7F7F7;
+}
+
+.card {
+    background-color: #F7F7F7;
+}
+
+.card-header {
+    background-color: #F7F7F7;
+    color: #000;
+    cursor: pointer;
+}
+
+
+.card-body {
+    background-color: #F7F7F7;
+    max-height: 0;
+    overflow: hidden;
+}
+
+
+
+
+.summary {
+    background-color: #F7F7F7;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.summary-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    animation: slideInLeft 0.5s ease forwards;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.table-summary {
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: #F7F7F7;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.accordion-summary {
+    margin-top: 30px;
+    animation: slideInRight 0.5s ease forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+
+
+.custom-radio input[type="radio"] {
+    display: none;
+}
+
+.custom-radio label {
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+.custom-radio label:before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #09386b;
+    background-color: #fff;
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+
+.custom-radio input[type="radio"]:checked+label:before {
+    background-color: #09386b;
+}
+
+
+.custom-radio label span {
+    color: #000;
+    font-weight: normal;
+}
+
+
+
+.billing-details-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+.form-text {
+    margin-top: 5px;
+}
+
+.custom-control-label {
+    font-weight: normal;
+}
+
