@@ -44,10 +44,10 @@ class Address(models.Model):
             RegexValidator(regex=r'^\d{10}$', message='Phone number must have 10 digits.')
         ]
     )
-    country = models.CharField(max_length=50)
-    state = models.CharField(max_length=50)
-    city = models.CharField(max_length=50)
-    street_address = models.CharField(max_length=50)
+    country = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    street_address = models.CharField(max_length=200)
     pin_code = models.CharField(max_length=50)
     
     def __str__(self):

@@ -1,11 +1,25 @@
-/* Styles for the summary section */
+.col-lg-3 {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.col-lg-3:hover {
+    transform: scale(1.05);
+}
+
 .summary {
     background-color: #F7F7F7;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.summary:hover {
+
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
 }
 
 .table-summary {
     width: 100%;
     background-color: #F7F7F7;
+    margin-bottom: 20px;
 }
 
 .table-summary th,
@@ -23,56 +37,10 @@
     cursor: pointer;
 }
 
-
 .card-body {
     background-color: #F7F7F7;
     max-height: 0;
     overflow: hidden;
-}
-
-
-
-
-.summary {
-    background-color: #F7F7F7;
-    animation: fadeIn 0.5s ease forwards;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.summary-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-    animation: slideInLeft 0.5s ease forwards;
-}
-
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.table-summary {
-    width: 100%;
-    margin-bottom: 20px;
-    background-color: #F7F7F7;
-    animation: fadeIn 0.5s ease forwards;
 }
 
 .accordion-summary {
@@ -91,8 +59,6 @@
         transform: translateX(0);
     }
 }
-
-
 
 .custom-radio input[type="radio"] {
     display: none;
@@ -117,39 +83,109 @@
     margin-right: 10px;
 }
 
-
 .custom-radio input[type="radio"]:checked+label:before {
     background-color: #09386b;
 }
-
 
 .custom-radio label span {
     color: #000;
     font-weight: normal;
 }
 
-
-
-.billing-details-container {
-    background-color: #f8f9fa;
+.address-details,
+.delivery-address-container {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
     padding: 20px;
-    border: 1px solid #dee2e6;
     border-radius: 5px;
-}
-
-.form-group {
     margin-bottom: 20px;
 }
 
-.form-group label {
+.address-heading {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.address-select-label {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.address-list {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.address-item {
+    width: 100%;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.custom-radio-input {
+    display: none;
+}
+
+.custom-radio-label {
+    display: inline-block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.custom-radio-label:hover {
+    background-color: #f0f0f0;
+}
+
+.custom-radio-input:checked+.custom-radio-label {
+    background-color: #929da4;
+    color: #fff;
+}
+
+.custom-radio-input:checked+.custom-radio-label .address-name {
+    color: #fff;
+}
+
+.address-name {
+    margin: 15px;
     font-weight: bold;
 }
 
-.form-text {
-    margin-top: 5px;
+.address-details {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 14px;
+    color: #666;
 }
 
-.custom-control-label {
-    font-weight: normal;
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
+.address-item {
+    animation: slideInFromLeft 0.5s ease forwards;
+}
+
+.payment-method {
+    margin-right: 10px;
+    font-size: 24px;
+}
+
+.payment-method i {
+    color: #173f69;
+}

@@ -13,8 +13,8 @@ from datetime import datetime
 from django.db.models import *
 from django.db.models import Q
 from django.http import JsonResponse
+from django.db import transaction
 import random
-from django.views.decorators.csrf import csrf_exempt
 import re
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import check_password
@@ -33,15 +33,42 @@ from django.contrib.auth.decorators import login_required
 @never_cache
 def index_page(request):
     if request.user.is_authenticated:
+        context = {}
         user = request.user
         customer = Customer.objects.get(user = user)
         cart = Cart.objects.get(customer = customer)
         cart_items = CartProducts.objects.filter(cart = cart)
-        context = {
+        
+        if cart_items:
+            item_count = 0
+            subtotal = 0
+            for items in cart_items:
+                item_count += 1
+                each_price =  items.product.product_color_image.price * items.quantity
+                subtotal = subtotal + each_price
+                print(subtotal)
+            if subtotal <= 2500:
+                shipping_charge = 99
+                total_charge = subtotal + shipping_charge
+                print(total_charge)
+            else:
+                shipping_charge = 0
+                total_charge = subtotal
+            context.update({
+                'item_count' : item_count,
+                'shipping_charge' : shipping_charge,
+                'subtotal' : subtotal,
+                'total_charge' : total_charge,
+                'user' : user,
+                'customer' : customer,
+                'cart' : cart,
+                'cart_items' : cart_items,
+            })
+        context.update({
             'customer' : customer,
             'cart' : cart,
             'cart_items' : cart_items,
-        }
+        })
         return render(request, 'index.html', context)
     return render(request, 'index.html')
 
@@ -308,8 +335,31 @@ def shop_page_view(request):
         customer = Customer.objects.get(user = user)
         cart = Cart.objects.get(customer = customer)
         cart_items = CartProducts.objects.filter(cart = cart)
-        context.update({'cart' : cart,
-            'cart_items' : cart_items,})
+        context.update({
+            'cart' : cart,
+            'cart_items' : cart_items,
+            })
+        if cart_items:
+            item_count = 0
+            subtotal = 0
+            for items in cart_items:
+                item_count += 1
+                each_price =  items.product.product_color_image.price * items.quantity
+                subtotal = subtotal + each_price
+                print(subtotal)
+            if subtotal <= 2500:
+                shipping_charge = 99
+                total_charge = subtotal + shipping_charge
+                print(total_charge)
+            else:
+                shipping_charge = 0
+                total_charge = subtotal
+            context.update({
+                'item_count' : item_count,
+                'shipping_charge' : shipping_charge,
+                'subtotal' : subtotal,
+                'total_charge' : total_charge,
+            })
         
     product_color_list = list(ProductColorImage.objects.filter(is_deleted = False, is_listed = True))
     shuffle(product_color_list)
@@ -352,6 +402,27 @@ def product_single_view_page(request, product_name, pdt_id):
             'in_cart': in_cart,
             'cart_items': cart_items,
         })
+        if cart_items:
+            item_count = 0
+            subtotal = 0
+            for items in cart_items:
+                item_count += 1
+                each_price =  items.product.product_color_image.price * items.quantity
+                subtotal = subtotal + each_price
+                print(subtotal)
+            if subtotal <= 2500:
+                shipping_charge = 99
+                total_charge = subtotal + shipping_charge
+                print(total_charge)
+            else:
+                shipping_charge = 0
+                total_charge = subtotal
+            context.update({
+                'item_count' : item_count,
+                'shipping_charge' : shipping_charge,
+                'subtotal' : subtotal,
+                'total_charge' : total_charge,
+            })
     
     last_five_products = ProductColorImage.objects.order_by('-id')[:5]
     product_sizes = ProductSize.objects.filter(product_color_image=product_color)
@@ -390,6 +461,27 @@ def user_dashboard(request, user_id):
                 'addresses' : addresses,
                 'cart_items' : cart_items
                 }
+            if cart_items:
+                item_count = 0
+                subtotal = 0
+                for items in cart_items:
+                    item_count += 1
+                    each_price =  items.product.product_color_image.price * items.quantity
+                    subtotal = subtotal + each_price
+                    print(subtotal)
+                if subtotal <= 2500:
+                    shipping_charge = 99
+                    total_charge = subtotal + shipping_charge
+                    print(total_charge)
+                else:
+                    shipping_charge = 0
+                    total_charge = subtotal
+                context.update({
+                    'item_count' : item_count,
+                    'shipping_charge' : shipping_charge,
+                    'subtotal' : subtotal,
+                    'total_charge' : total_charge,
+                })
             return render(request, 'dashboard.html', context)
         else:
             messages.error(request, 'Not able to get user details at this moment')
@@ -599,17 +691,39 @@ def user_change_password(request, user_id):
 @never_cache
 def cart_view_page(request, user_id):
     if request.user.is_authenticated:
+        context = {}
         user = User.objects.get(pk = user_id)
         customer = Customer.objects.get(user = user)
         shipping_addresses = Address.objects.filter(customer = customer)
         cart = Cart.objects.get(customer = customer)
         cart_items = CartProducts.objects.filter(cart = cart)
         any_in_stock = any(item.in_stock for item in cart_items)
-        context = {
+        if cart_items:
+            item_count = 0
+            subtotal = 0
+            for items in cart_items:
+                item_count += 1
+                each_price =  items.product.product_color_image.price * items.quantity
+                subtotal = subtotal + each_price
+                print(subtotal)
+            if subtotal <= 2500:
+                shipping_charge = 99
+                total_charge = subtotal + shipping_charge
+                print(total_charge)
+            else:
+                shipping_charge = 0
+                total_charge = subtotal
+            context.update({
+                'item_count' : item_count,
+                'shipping_charge' : shipping_charge,
+                'subtotal' : subtotal,
+                'total_charge' : total_charge,
+            })
+        context.update({
             'shipping_addresses' : shipping_addresses,
             'cart_items' : cart_items,
             'any_in_stock' : any_in_stock
-        }
+        })
         return render(request, 'cart.html', context)
     
     
@@ -713,43 +827,54 @@ def update_quantity(request):
 def checkout_page(request):
     if request.user.is_authenticated:
         user = request.user
-        customer = Customer.objects.get(user = user)
-        cart = Cart.objects.get(customer = customer)
-        cart_items = CartProducts.objects.filter(cart = cart, in_stock = True)
+        customer = Customer.objects.get(user=user)
+        cart = Cart.objects.get(customer=customer)
+        cart_items = CartProducts.objects.filter(cart=cart, in_stock=True)
         
+        addresses = Address.objects.filter(customer=customer)
+
         if cart_items:
+            item_count = 0
             subtotal = 0
             for items in cart_items:
-                each_price =  items.product.product_color_image.price * items.quantity
+                item_count += 1
+                each_price = items.product.product_color_image.price * items.quantity
                 subtotal = subtotal + each_price
-                print(subtotal)
             if subtotal <= 2500:
                 shipping_charge = 99
                 total_charge = subtotal + shipping_charge
-                print(total_charge)
             else:
                 shipping_charge = 0
-                total_charge = each_price
+                total_charge = subtotal
             context = {
-                'shipping_charge' : shipping_charge,
-                'subtotal' : subtotal,
-                'total_charge' : total_charge,
-                'user' : user,
-                'customer' : customer,
-                'cart' : cart,
-                'cart_items' : cart_items,
+                'item_count': item_count,
+                'shipping_charge': shipping_charge,
+                'subtotal': subtotal,
+                'total_charge': total_charge,
+                'user': user,
+                'customer': customer,
+                'cart': cart,
+                'cart_items': cart_items,
+                'addresses': addresses,
             }
             return render(request, 'checkout.html', context)
         else:
             user_id = request.user.id
-            return redirect('cart_view_page', user_id = user_id)
+            return redirect('cart_view_page', user_id=user_id)
     else:
         return redirect(index_page)
+
             
             
 
-                  
-    
+@login_required
+@never_cache
+def place_order(request):
+    if request.user.is_authenticated:
+        with transaction.atomic():
+            user = request.user
+            customer = Customer.objects.get(user = user)
+            
     
     
     

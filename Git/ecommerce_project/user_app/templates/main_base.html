@@ -144,7 +144,9 @@
                         {% if cart_items %}
                           <a href="" class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                             <i class="icon-shopping-cart"></i>
-                            {% comment %} <span class="cart-count">2</span> {% endcomment %}
+                            {% if item_count > 0 %}
+                              <span class="cart-count">{{ item_count }}</span>
+                            {% endif %}
                           </a>
 
                           <div class="dropdown-menu dropdown-menu-right">
@@ -171,7 +173,7 @@
                             <div class="dropdown-cart-total">
                               <span>Total</span>
 
-                              <span class="cart-total-price">$160.00</span>
+                              <span class="cart-total-price">₹ {{ total_charge }}.00</span>
                             </div>
 
                             <div class="dropdown-cart-action">

@@ -1,5 +1,4 @@
 {% extends 'main_base.html' %}
-
 {% load static %}
 
 {% block extra_css %}
@@ -20,10 +19,10 @@
       <div class="container">
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
-            <a href="index.html">Home</a>
+            <a href="{% url 'index_page' %}">Home</a>
           </li>
           <li class="breadcrumb-item">
-            <a href="#">Shop</a>
+            <a href="{% url 'shop_page_view' %}">Shop</a>
           </li>
           <li class="breadcrumb-item active" aria-current="page">Checkout</li>
         </ol>
@@ -34,140 +33,96 @@
   <div class="page-content">
     <div class="checkout">
       <div class="container">
-        <div class="checkout-discount">
-          <input type="text" class="form-control" required id="checkout-discount-input" />
-          <label for="checkout-discount-input" class="text-truncate">Have a coupon? <span>Click here to enter your code</span></label>
-        </div>
         <div class="row">
-          <div class="col-lg-9">
-            <div class="billing-details-container">
-              <h2 class="checkout-title">Billing Details</h2>
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="first-name">First Name *</label>
-                    <p class="form-text">John</p>
-                  </div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="last-name">Last Name *</label>
-                    <p class="form-text">Doe</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="country">Country *</label>
-                <p class="form-text">United States</p>
-              </div>
-
-              <div class="form-group">
-                <label for="street-address">Street Address *</label>
-                <p class="form-text">123 Main St</p>
-              </div>
-
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="town-city">Town / City *</label>
-                    <p class="form-text">New York</p>
-                  </div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="state-county">State / County *</label>
-                    <p class="form-text">New York</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="postcode-zip">Postcode / ZIP *</label>
-                    <p class="form-text">10001</p>
-                  </div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="form-group">
-                    <label for="phone">Phone *</label>
-                    <p class="form-text">123-456-7890</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="email-address">Email Address *</label>
-                <p class="form-text">johndoe@example.com</p>
-              </div>
-
-              <div class="form-group">
-                <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="checkout-diff-address" />
-                  <label class="custom-control-label" for="checkout-diff-address">Ship to a different address?</label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <aside class="col-lg-3">
-            <div class="summary">
-              <h3 class="summary-title">Your Order</h3>
-
-              <table class="table table-summary">
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Total</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {% for item in cart_items %}
-                    <tr>
-                      <td>
-                        <a href="#">{{ item.product.product_color_image.products.name }}</a>
-                      </td>
-                      <td>₹{{ item.product.product_color_image.price }}.00</td>
-                    </tr>
+          <form action="" method="post">
+            <div class="col-lg-9">
+              <div class="delivery-address-container">
+                <h2 class="address-heading">Delivery Address</h2>
+                <h6 class="address-select-label">Select from the addresses</h6>
+                <div class="address-list">
+                  {% for addr in addresses %}
+                    <div class="address-item">
+                      <input type="radio" id="address-{{ addr.id }}" name="delivery_address" value="{{ addr.id }}" class="custom-radio-input" />
+                      <label for="address-{{ addr.id }}" class="custom-radio-label">
+                        <span class="address-name">{{ addr.name }} : {{ addr.phone_number }}</span><br />
+                        <span class="address-details">{{ addr.street_address }}, {{ addr.city }}, {{ addr.state }}, {{ addr.country }}, {{ addr.pin_code }}</span>
+                      </label>
+                    </div>
                   {% endfor %}
-
-                  <tr class="summary-subtotal">
-                    <td>Subtotal:</td>
-                    <td>₹ {{ subtotal }}.00</td>
-                  </tr>
-                  <tr>
-                    <td>Shipping:</td>
-                    <td>₹ {{ shipping_charge }}.00</td>
-                  </tr>
-                  <tr class="summary-total">
-                    <td>Total:</td>
-                    <td>₹ {{ total_charge }}.00</td>
-                  </tr>
-                </tbody>
-              </table>
-
-              <div class="accordion-summary" id="accordion-payment">
-                <div class="card">
-                  <div class="card-header" id="heading-3">
-                    <h2 class="card-title"><label><input type="radio" name="payment_method" value="cash_on_delivery" />Cash on delivery</label></h2>
-                  </div>
-                </div>
-
-                <div class="card">
-                  <div class="card-header" id="heading-4">
-                    <h2 class="card-title"><label><input type="radio" name="payment_method" value="paypal" />PayPal</label></h2>
-                  </div>
                 </div>
               </div>
-
-              <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
-                <span class="btn-text">Place Order</span>
-                <span class="btn-hover-text">Proceed to Checkout</span>
-              </button>
             </div>
-          </aside>
+
+            <aside class="col-lg-3">
+              <div class="summary">
+                <h3 class="summary-title">Your Order</h3>
+
+                <table class="table table-summary">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {% for item in cart_items %}
+                      <tr>
+                        <td>
+                          <a href="#">{{ item.product.product_color_image.products.name }}</a>
+                        </td>
+                        <td>₹{{ item.product.product_color_image.price }}.00</td>
+                      </tr>
+                    {% endfor %}
+
+                    <tr class="summary-subtotal">
+                      <td>Subtotal:</td>
+                      <td>₹ {{ subtotal }}.00</td>
+                    </tr>
+                    <tr>
+                      <td>Shipping:</td>
+                      <td>₹ {{ shipping_charge }}.00</td>
+                    </tr>
+                    <tr class="summary-total">
+                      <td>Total:</td>
+                      <td>₹ {{ total_charge }}.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="accordion-summary" id="accordion-payment">
+                  <div class="card">
+                    <div class="card-header" id="heading-3">
+                      <h2 class="card-title">
+                        <label>
+                          <input type="radio" name="payment_method" value="cash_on_delivery" />
+                          <span class="payment-method"><i class="fas fa-money-bill"></i></span>
+                          Cash on delivery
+                        </label>
+                      </h2>
+                    </div>
+                  </div>
+
+                  {% comment %} <div class="card">
+                    <div class="card-header" id="heading-4">
+                      <h2 class="card-title">
+                        <label>
+                          <input type="radio" name="payment_method" value="paypal" />
+                          <span class="payment-method"><i class="fab fa-paypal"></i></span>
+                          PayPal
+                        </label>
+                      </h2>
+                    </div>
+                  </div> {% endcomment %}
+                </div>
+
+                <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
+                  <span class="btn-text">Place Order</span>
+                  <span class="btn-hover-text">Proceed to Checkout</span>
+                </button>
+              </div>
+            </aside>
+          </form>
         </div>
       </div>
     </div>
