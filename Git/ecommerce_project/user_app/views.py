@@ -46,11 +46,9 @@ def index_page(request):
                 item_count += 1
                 each_price =  items.product.product_color_image.price * items.quantity
                 subtotal = subtotal + each_price
-                print(subtotal)
             if subtotal <= 2500:
                 shipping_charge = 99
                 total_charge = subtotal + shipping_charge
-                print(total_charge)
             else:
                 shipping_charge = 0
                 total_charge = subtotal
@@ -346,11 +344,9 @@ def shop_page_view(request):
                 item_count += 1
                 each_price =  items.product.product_color_image.price * items.quantity
                 subtotal = subtotal + each_price
-                print(subtotal)
             if subtotal <= 2500:
                 shipping_charge = 99
                 total_charge = subtotal + shipping_charge
-                print(total_charge)
             else:
                 shipping_charge = 0
                 total_charge = subtotal
@@ -409,11 +405,9 @@ def product_single_view_page(request, product_name, pdt_id):
                 item_count += 1
                 each_price =  items.product.product_color_image.price * items.quantity
                 subtotal = subtotal + each_price
-                print(subtotal)
             if subtotal <= 2500:
                 shipping_charge = 99
                 total_charge = subtotal + shipping_charge
-                print(total_charge)
             else:
                 shipping_charge = 0
                 total_charge = subtotal
@@ -454,12 +448,14 @@ def user_dashboard(request, user_id):
             cart = Cart.objects.get(customer = customer)
             cart_items = CartProducts.objects.filter(cart = cart)
             addresses = Address.objects.filter(customer = customer)
+            orders = Orders.objects.filter(customer = customer)
             context =  {
                 'cart' : cart,
                 'user' : user, 
                 'customer' : customer,
                 'addresses' : addresses,
-                'cart_items' : cart_items
+                'cart_items' : cart_items,
+                'orders' : orders,
                 }
             if cart_items:
                 item_count = 0
@@ -468,11 +464,9 @@ def user_dashboard(request, user_id):
                     item_count += 1
                     each_price =  items.product.product_color_image.price * items.quantity
                     subtotal = subtotal + each_price
-                    print(subtotal)
                 if subtotal <= 2500:
                     shipping_charge = 99
                     total_charge = subtotal + shipping_charge
-                    print(total_charge)
                 else:
                     shipping_charge = 0
                     total_charge = subtotal
@@ -683,6 +677,42 @@ def user_change_password(request, user_id):
                 
                 
 
+# -------------------------------------------------------------------------------- PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
+
+
+
+@login_required
+@never_cache
+def order_detail(request, order_id):
+    if request.user.is_authenticated:
+        if order_id:
+            order = Orders.objects.get(pk = order_id)
+            order_items = OrderItem.objects.filter(order = order)
+            placed = False
+            shipped = False
+            delivery = False
+            delivered = False
+            if order.order_status == 'Order Placed':
+                placed = True
+            if order.order_status == 'Shipped':
+                shipped = True
+            if order.order_status == 'Out for delivery':
+                delivery = True
+            if order.order_status == 'Delivered':
+                delivered = True
+            
+            context = {
+                'order' : order,
+                'order_items' : order_items,
+                'placed' : placed,
+                'shipped' : shipped,
+                'delivery' : delivery,
+                'delivered' : delivered,
+            }
+            return render(request, 'dashboard/orders/order_detailed_page.html', context)
+
+
+
 
 # -------------------------------------------------------------------------------- USER CART PAGE FUNCTIONS --------------------------------------------------------------------------------
                 
@@ -705,11 +735,9 @@ def cart_view_page(request, user_id):
                 item_count += 1
                 each_price =  items.product.product_color_image.price * items.quantity
                 subtotal = subtotal + each_price
-                print(subtotal)
             if subtotal <= 2500:
                 shipping_charge = 99
                 total_charge = subtotal + shipping_charge
-                print(total_charge)
             else:
                 shipping_charge = 0
                 total_charge = subtotal
@@ -867,27 +895,80 @@ def checkout_page(request):
             
             
 
+            
+    
+    
+# -------------------------------------------------------------------------------- PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
+    
+    
+    
+    
 @login_required
 @never_cache
 def place_order(request):
     if request.user.is_authenticated:
         with transaction.atomic():
             user = request.user
-            customer = Customer.objects.get(user = user)
-            
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+            customer = Customer.objects.get(user=user)
+            cart = Cart.objects.get(customer=customer)
+            cart_items = CartProducts.objects.filter(cart=cart)
+            if cart_items:
+                item_count = 0
+                subtotal = 0
+                for items in cart_items:
+                    item_count += 1
+                    each_price = items.product.product_color_image.price * items.quantity
+                    subtotal = subtotal + each_price
+                if subtotal <= 2500:
+                    shipping_charge = 99
+                    total_charge = subtotal + shipping_charge
+                else:
+                    shipping_charge = 0
+                    total_charge = subtotal
+
+                address_id = request.POST.get('delivery_address')
+                payment_method = request.POST.get('payment_method')
+                order_status = "Order Placed"
+
+                address = Address.objects.get(pk=address_id)
+
+                payment = Payment.objects.create(
+                    method_name=payment_method
+                )
+
+                order = Orders.objects.create(
+                    customer=customer,
+                    order_status=order_status,
+                    address=address,
+                    payment=payment,
+                    number_of_orders=item_count,
+                    subtotal=subtotal,
+                    shipping_charge=shipping_charge,
+                    total_charge=total_charge
+                )
+                
+                for item in cart_items:
+                    order_item = OrderItem.objects.create(
+                        order = order,
+                        product = item.product,
+                        quantity = item.quantity,
+                        order_status="Order Placed",
+                        each_price = item.product.product_color_image.price,
+                    )
+                    
+                    product_size_id = item.product.id
+                    product_size = ProductSize.objects.get(pk = product_size_id)
+                    product_size.quantity -= item.quantity
+                    product_size.save()
+                
+                cart_items.delete()
+                return render(request, 'order_placed.html', { 'order' : order } )
+        return redirect('index_page')
+    else:
+        return redirect('index_page')
+
+                
+        
     
     
     

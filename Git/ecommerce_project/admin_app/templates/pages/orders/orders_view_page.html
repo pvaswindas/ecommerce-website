@@ -1,0 +1,39 @@
+{% extends 'admin_base.html' %}
+
+{% load static %}
+
+{% block title %}
+  <title>Sneakerheads Manage Order</title>
+{% endblock %}
+
+{% block custom_css %}
+  <link rel="stylesheet" href="{% static 'admin_css/orders.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="orders">
+    <h1>Manage Orders</h1>
+    <table>
+      <thead>
+        <tr>
+          <th class="order-id-column">Order ID</th>
+          <th class="status-column">Status</th>
+          <th class="subtotal-column">Subtotal</th>
+          <th class="shipping-charge-column">Items</th>
+          <th class="total-charge-column">Total Charge</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+          <tr>
+            <td> <a href="{% url 'order_detailed_view' order.order_id %}"> {{ order.order_id }} </a></td>
+            <td>{{ order.order_status }}</td>
+            <td>{{ order.subtotal }}</td>
+            <td>{{ order.number_of_orders }}</td>
+            <td>{{ order.total_charge }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

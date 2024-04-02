@@ -62,7 +62,9 @@
                       <select name="size" id="size" class="form-control" {% if not product_color.in_stock %}disabled{% endif %} required>
                           <option value="" disabled selected>Select a size</option>
                           {% for product_size in product_sizes %}
+                            {% if product_size.in_stock == True  %}
                               <option value="{{ product_size.id }}">{{ product_size.size }}</option>
+                            {% endif %}
                           {% endfor %}
                       </select>
                   </div>
@@ -86,12 +88,7 @@
                   </div>
                 </div>
               </form>
-
-              {% if product_color.is_listed %}
-                <div class="product-details-action">
-                  <a href="#" class="btn-product btn-add"><span>Buy now</span></a>
-                </div>
-              {% endif %}
+              
               <div class="product-details-footer">
                 <div class="product-cat">
                   <span>Category:</span>

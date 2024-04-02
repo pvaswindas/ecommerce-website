@@ -34,11 +34,12 @@
     <div class="checkout">
       <div class="container">
         <div class="row">
-          <form action="" method="post">
-            <div class="col-lg-9">
+          <div class="col-lg-9">
+            <form action="{% url 'place_order' %}" method="post" id="checkout_form">
+              {% csrf_token %}
               <div class="delivery-address-container">
                 <h2 class="address-heading">Delivery Address</h2>
-                <h6 class="address-select-label">Select from the addresses</h6>
+                <p class="address-select-info">Please select a delivery address:</p>
                 <div class="address-list">
                   {% for addr in addresses %}
                     <div class="address-item">
@@ -51,78 +52,82 @@
                   {% endfor %}
                 </div>
               </div>
-            </div>
 
-            <aside class="col-lg-3">
-              <div class="summary">
-                <h3 class="summary-title">Your Order</h3>
-
-                <table class="table table-summary">
-                  <thead>
-                    <tr>
-                      <th>Product</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {% for item in cart_items %}
-                      <tr>
-                        <td>
-                          <a href="#">{{ item.product.product_color_image.products.name }}</a>
-                        </td>
-                        <td>₹{{ item.product.product_color_image.price }}.00</td>
-                      </tr>
-                    {% endfor %}
-
-                    <tr class="summary-subtotal">
-                      <td>Subtotal:</td>
-                      <td>₹ {{ subtotal }}.00</td>
-                    </tr>
-                    <tr>
-                      <td>Shipping:</td>
-                      <td>₹ {{ shipping_charge }}.00</td>
-                    </tr>
-                    <tr class="summary-total">
-                      <td>Total:</td>
-                      <td>₹ {{ total_charge }}.00</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                <div class="accordion-summary" id="accordion-payment">
-                  <div class="card">
-                    <div class="card-header" id="heading-3">
-                      <h2 class="card-title">
-                        <label>
-                          <input type="radio" name="payment_method" value="cash_on_delivery" />
-                          <span class="payment-method"><i class="fas fa-money-bill"></i></span>
-                          Cash on delivery
-                        </label>
-                      </h2>
-                    </div>
+              <div class="payment-method-selection">
+                <h2 class="payment-method-heading">Payment Method</h2>
+                <p class="payment-method-info">Please select a payment method:</p>
+                <div class="payment-method-list">
+                  <div class="payment-method-item">
+                    <input type="radio" id="payment_method_cash" class="payment-method" name="payment_method" value="cash_on_delivery" />
+                    <label for="payment_method_cash" class="payment-method-label"><img src="{% static 'user/assets/images/cash_on_delivery.png' %}" alt="Cash on Delivery" class="payment-method-image" /></label>
                   </div>
-
-                  {% comment %} <div class="card">
-                    <div class="card-header" id="heading-4">
-                      <h2 class="card-title">
-                        <label>
-                          <input type="radio" name="payment_method" value="paypal" />
-                          <span class="payment-method"><i class="fab fa-paypal"></i></span>
-                          PayPal
-                        </label>
-                      </h2>
-                    </div>
-                  </div> {% endcomment %}
+                  <div class="payment-method-item">
+                    <input type="radio" id="payment_method_paypal" class="payment-method" name="payment_method" value="paypal" />
+                    <label for="payment_method_paypal" class="payment-method-label"><img src="{% static 'user/assets/images/paypal.png' %}" alt="PayPal" class="payment-method-image" /></label>
+                  </div>
                 </div>
-
-                <button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">
-                  <span class="btn-text">Place Order</span>
-                  <span class="btn-hover-text">Proceed to Checkout</span>
-                </button>
               </div>
-            </aside>
-          </form>
+
+              <button type="submit" class="btn btn-outline-primary-2 rounded-2 my-4 btn-order btn-block" id="submit_button">
+                <span class="btn-text">Place Order</span>
+                <span class="btn-hover-text">Proceed to Checkout</span>
+              </button>
+            </form>
+          </div>
+
+          <aside class="col-lg-3">
+            <div class="summary">
+              <h3 class="summary-title">Your Order</h3>
+
+              <table class="table table-summary">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% for item in cart_items %}
+                    <tr>
+                      <td>
+                        <a href="#">{{ item.product.product_color_image.products.name }}</a>
+                      </td>
+                      <td>₹{{ item.product.product_color_image.price }}.00</td>
+                    </tr>
+                  {% endfor %}
+
+                  <tr class="summary-subtotal">
+                    <td>Subtotal:</td>
+                    <td>₹ {{ subtotal }}.00</td>
+                  </tr>
+                  <tr>
+                    <td>Shipping:</td>
+                    <td>₹ {{ shipping_charge }}.00</td>
+                  </tr>
+                  <tr class="summary-total">
+                    <td>Total:</td>
+                    <td>₹ {{ total_charge }}.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentModalLabel">Payment Method</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">Please select an address and a payment method.</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -137,4 +142,15 @@
   <script src="{% static 'user/assets/js/superfish.min.js' %}"></script>
   <script src="{% static 'user/assets/js/owl.carousel.min.js' %}"></script>
   <script src="{% static 'user/assets/js/main.js' %}"></script>
+  <script>
+    document.getElementById('checkout_form').addEventListener('submit', function (event) {
+      var deliveryAddressChecked = document.querySelector('input[name="delivery_address"]:checked')
+      var paymentMethodChecked = document.querySelector('input[name="payment_method"]:checked')
+    
+      if (!deliveryAddressChecked || !paymentMethodChecked) {
+        event.preventDefault()
+        $('#paymentModal').modal('show')
+      }
+    })
+  </script>
 {% endblock %}

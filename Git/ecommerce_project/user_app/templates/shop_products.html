@@ -5,7 +5,7 @@
       <div class="col-6 col-md-4 col-lg-4 col-xl-3">
         <div class="product product-7 text-center">
           <figure class="product-media">
-            {% if not product_color.is_listed %}
+            {% if not product_color.in_stock %}
               <span class="product-label bg-danger text-white">Out Of Stock</span>
             {% elif latest_products %}
               <span class="product-label label-new">New</span>
@@ -17,13 +17,13 @@
               <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
             </div>
 
-            <div class="product-action">
+            {% comment %} <div class="product-action">
               {% if not product_color.is_listed %}
                 <a href="#" class="btn-product"><span>Notify Me</span></a>
               {% else %}
                 <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
               {% endif %}
-            </div>
+            </div> {% endcomment %}
           </figure>
 
           <div class="product-body">

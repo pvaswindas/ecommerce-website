@@ -8,6 +8,11 @@
   {% load static %}
   <link rel="stylesheet" href="{% static 'admin_css/add_products.css' %}" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <style>
+    .form-container {
+      display: none;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -26,15 +31,14 @@
           {% endfor %}
         {% endif %}
         {% for size in product_sizes %}
-          <form id="sizeForm_{{ size.id }}" method="post" action="{% url 'edit_product_size' size.id %}">
+          <button class="btn btn-primary mb-3" onclick="toggleForm('{{ size.id }}')">Edit {{ size.size }}</button>
+          <form id="sizeForm_{{ size.id }}" class="form-container" method="post" action="{% url 'edit_product_size' size.id %}">
             {% csrf_token %}
             <div class="container">
               <div class="row">
                 <div class="col">
                   <label for="product_size">Sizes</label>
-                  <select id="sizeSelect_{{ size.id }}" class="form-control" name="product_size">
-                    <!-- Options will be added dynamically using JavaScript -->
-                  </select>
+                  <select id="sizeSelect_{{ size.id }}" class="form-control" name="product_size"></select>
                 </div>
                 <div class="col">
                   <label for="product_quantity">Quantity</label>
@@ -58,6 +62,13 @@
 {% block custom_scripts %}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
+    function toggleForm(id) {
+      var form = $('#sizeForm_' + id)
+      form.toggleClass('form-container')
+    }
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
     $(document).ready(function () {
       {% for size in product_sizes %}
         $.ajax({
@@ -69,7 +80,6 @@
             sizeSelect.empty().append('<option value="" disabled>Select Size</option>');
             data.sizes.forEach(function (sizeOption) {
               var option = $('<option value="' + sizeOption + '">' + sizeOption + '</option>');
-              // Check if the size matches the one from the database
               if ("{{ size.size }}" === sizeOption) {
                 option.attr('selected', 'selected');
               }

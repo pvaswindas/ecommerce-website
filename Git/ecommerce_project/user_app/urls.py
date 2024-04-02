@@ -1,5 +1,7 @@
 from django.urls import path
 from user_app import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.index_page, name = 'index_page'),
@@ -37,5 +39,11 @@ urlpatterns = [
     path('sneakerheads/user/add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     
     path('sneakerheads/user/checkout/', views.checkout_page, name='checkout_page'),
+    path('sneakerheads/user/place-order/', views.place_order, name='place_order'),
+    path('sneakerheads/user/order-details-page/<str:order_id>/', views.order_detail, name='order_detail'),
     
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

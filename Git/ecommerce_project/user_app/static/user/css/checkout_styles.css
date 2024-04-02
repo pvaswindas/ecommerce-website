@@ -1,98 +1,44 @@
-.col-lg-3 {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+/* Custom Styles for Checkout Page */
 
-.col-lg-3:hover {
-    transform: scale(1.05);
-}
-
+/* Summary Section */
 .summary {
-    background-color: #F7F7F7;
-    animation: fadeIn 0.5s ease forwards;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
 }
 
 .summary:hover {
-
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
 
 .table-summary {
     width: 100%;
-    background-color: #F7F7F7;
-    margin-bottom: 20px;
 }
 
 .table-summary th,
 .table-summary td {
-    background-color: #F7F7F7;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
 }
 
-.card {
-    background-color: #F7F7F7;
+.table-summary th {
+    text-align: left;
+    font-weight: bold;
 }
 
-.card-header {
-    background-color: #F7F7F7;
-    color: #000;
-    cursor: pointer;
+.table-summary td {
+    text-align: right;
 }
 
-.card-body {
-    background-color: #F7F7F7;
-    max-height: 0;
-    overflow: hidden;
+.summary-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
 }
 
-.accordion-summary {
-    margin-top: 30px;
-    animation: slideInRight 0.5s ease forwards;
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.custom-radio input[type="radio"] {
-    display: none;
-}
-
-.custom-radio label {
-    display: flex;
-    align-items: center;
-    position: relative;
-    cursor: pointer;
-}
-
-.custom-radio label:before {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid #09386b;
-    background-color: #fff;
-    flex-shrink: 0;
-    margin-right: 10px;
-}
-
-.custom-radio input[type="radio"]:checked+label:before {
-    background-color: #09386b;
-}
-
-.custom-radio label span {
-    color: #000;
-    font-weight: normal;
-}
-
-.address-details,
+/* Delivery Address Section */
 .delivery-address-container {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -102,28 +48,23 @@
 }
 
 .address-heading {
-    font-size: 24px;
+    font-size: 20px;
     margin-bottom: 10px;
     color: #333;
 }
 
-.address-select-label {
-    padding: 10px;
+.address-select-info {
     font-size: 16px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     color: #555;
 }
 
 .address-list {
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
 }
 
 .address-item {
-    width: 100%;
-    margin-bottom: 20px;
-    box-sizing: border-box;
+    margin-bottom: 10px;
 }
 
 .custom-radio-input {
@@ -131,13 +72,13 @@
 }
 
 .custom-radio-label {
-    display: inline-block;
-    width: 100%;
+    display: flex;
+    align-items: center;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease;
 }
 
 .custom-radio-label:hover {
@@ -145,47 +86,46 @@
 }
 
 .custom-radio-input:checked+.custom-radio-label {
-    background-color: #929da4;
-    color: #fff;
-}
-
-.custom-radio-input:checked+.custom-radio-label .address-name {
+    background-color: #4371a1;
     color: #fff;
 }
 
 .address-name {
-    margin: 15px;
+    margin-right: 10px;
     font-weight: bold;
 }
 
 .address-details {
-    display: inline-block;
-    margin-left: 10px;
     font-size: 14px;
     color: #666;
 }
 
-@keyframes slideInFromLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+.payment-method-item {
+    margin-bottom: 15px;
 }
 
-.address-item {
-    animation: slideInFromLeft 0.5s ease forwards;
+.payment-method-label {
+    cursor: pointer;
+    display: inline-block;
+    transition: transform 0.3s ease;
 }
 
+.payment-method-label:hover {
+    transform: translateY(-5px);
+}
+
+.payment-method-image {
+    width: 100px;
+    /* Adjust as needed */
+    height: auto;
+}
+
+/* Adjustments for radio buttons */
 .payment-method {
-    margin-right: 10px;
-    font-size: 24px;
+    display: none;
 }
 
-.payment-method i {
-    color: #173f69;
+.payment-method:checked+.payment-method-label {
+    border: 2px solid #4371a1;
+    /* Highlight the selected payment method */
 }

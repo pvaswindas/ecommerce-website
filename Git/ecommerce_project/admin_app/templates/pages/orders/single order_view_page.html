@@ -1,0 +1,59 @@
+{% extends 'admin_base.html' %}
+
+{% load static %}
+
+{% block title %}
+  <title>Sneakerheads Manage Order</title>
+{% endblock %}
+
+{% block custom_css %}
+  <link rel="stylesheet" href="{% static 'admin_css/order_details.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="order-details-container">
+    <h1 class="page-title">Order Details</h1>
+    <div class="order-details-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order_items %}
+            <tr>
+              <td>{{ item.product.product_color_image.products.name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>₹{{ item.each_price }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="order-address">
+      <h2>Delivery Address</h2>
+      <p><strong>Name:</strong> {{ orders.customer.user.first_name }} {{ orders.customer.user.last_name }}</p>
+      <p><strong>Address:</strong> {{ orders.address.address_line1 }}</p>
+      <p><strong>City:</strong> {{ orders.address.city }}</p>
+      <p><strong>State:</strong> {{ orders.address.state }}</p>
+      <p><strong>Zip Code:</strong> {{ orders.address.pin_code }}</p>
+    </div>
+    <div class="order-status-form">
+      <h2>Change Order Status</h2>
+      <form action="{% url 'change_order_status' orders.order_id %}" method="post">
+        {% csrf_token %}
+        <select name="order_status" class="status-select">
+          <option value="Order Placed">Order Placed</option>
+          <option value="Shipped">Shipped</option>
+          <option value="Out for Delivery">Out for Delivery</option>
+          <option value="Delivered">Delivered</option>
+          <option value="Order Cancelled">Order Cancelled</option>
+        </select>
+        <button type="submit" class="status-button">Change Status</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

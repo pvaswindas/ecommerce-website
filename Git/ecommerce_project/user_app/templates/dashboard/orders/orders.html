@@ -1,0 +1,22 @@
+<h1>Your Orders</h1>
+{% if orders %}
+  <div class="order-list">
+    {% for order in orders %}
+      <div class="order-item">
+        <h5>Order ID: {{ order.order_id }}</h5>
+        <p>Order Status: {{ order.order_status }}</p>
+        <p>Total Items: {{ order.number_of_orders }}</p>
+        <p>Subtotal: ₹{{ order.subtotal }}</p>
+        <p>Shipping Charge: ₹{{ order.shipping_charge }}</p>
+        <p>Total Charge: ₹{{ order.total_charge }}</p>
+        <a href="{% url 'order_detail' order.order_id %}" class="btn btn-primary">View Details</a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No orders have been made yet.</p>
+  <a href="{% url 'shop_page_view' %}" class="btn btn-outline-primary-2"><span>Go Shopping</span><i class="icon-long-arrow-right"></i></a>
+{% endif %}
+
+
+

@@ -78,7 +78,7 @@ class ProductSize(models.Model):
         return f"Size : {self.size} - {self.product_color_image.products.name}, {self.product_color_image.color}"
 
     def save(self, *args, **kwargs):
-        if self.quantity <= 0:
+        if int(self.quantity) <= 0:
             self.in_stock = False
         else:
             self.in_stock = True
@@ -110,37 +110,49 @@ class Payment(models.Model):
 
     
 class Orders(models.Model):
-    order_id = models.CharField(primary_key = True, max_length = 12, unique = True)
+    order_id = models.CharField(primary_key=True, max_length=12, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
-    order_status = models.CharField(max_length = 100)
-    address = models.OneToOneField(Address, on_delete=models.PROTECT)
-    payment = models.OneToOneField(Payment, on_delete=models.PROTECT)
+    order_status = models.CharField(max_length=100)
+    address = models.ForeignKey(Address, on_delete=models.PROTECT)
+    payment = models.ForeignKey(Payment, on_delete=models.PROTECT)
+    number_of_orders = models.PositiveBigIntegerField(default=1)
+    subtotal = models.PositiveBigIntegerField(default=0)
+    shipping_charge = models.PositiveBigIntegerField(default=0)
+    total_charge = models.PositiveBigIntegerField(default=0)
     
     def __str__(self):
         return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.order_status}"
     
     def save(self, *args, **kwargs):
-        self.order_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        if not self.order_id:
+            first_part = 'OD'
+            random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
+            random_numbers = ''.join(random.choices(string.digits, k=6))
+            self.order_id = f"{first_part}{random_letters}{random_numbers}"
         super().save(*args, **kwargs)
-    
-
 
 
 class OrderItem(models.Model):
     order_items_id = models.CharField(primary_key=True, max_length=12, unique=True)
-    order = models.ForeignKey(Orders, on_delete=models.PROTECT)
-    product = models.OneToOneField(ProductSize, on_delete=models.PROTECT)
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE)
+    product = models.ForeignKey(ProductSize, on_delete=models.PROTECT)
+    quantity = models.PositiveBigIntegerField(default=1)
     order_status = models.CharField(max_length=100)  
+    each_price = models.PositiveBigIntegerField(default=0)
     
     def __str__(self):
         customer_name = f"{self.order.customer.user.first_name} {self.order.customer.user.last_name}"
         product_name = self.product.product_color_image.products.name
-        return f"{customer_name}: {self.order_items_id} - {product_name}"
+        return f"{customer_name}: {self.order.order_id} - {self.order_items_id} - {product_name}"
     
     def save(self, *args, **kwargs):
-        self.order_items_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+        if not self.order_items_id:
+            first_part = 'ODIN'
+            random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
+            random_numbers = ''.join(random.choices(string.digits, k=4))
+            self.order_items_id = f"{first_part}{random_letters}{random_numbers}"
         super().save(*args, **kwargs)
-        
+
         
         
         

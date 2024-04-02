@@ -42,3 +42,14 @@ def update_cart_in_stock_on_product_size_quantity_change(sender, instance, **kwa
     cart_products = CartProducts.objects.filter(product = instance)
     cart_products.update(in_stock= instance.in_stock)
     
+    
+
+@receiver(post_save, sender=ProductSize)
+def update_product_color_in_stock_on_product_size_quantity_change(sender, instance, **kwargs):
+    product_color_image = instance.product_color_image
+    total_sizes = ProductSize.objects.filter(product_color_image=product_color_image).count()
+    out_of_stock_sizes = ProductSize.objects.filter(product_color_image=product_color_image, in_stock=False).count()
+    if out_of_stock_sizes == total_sizes:
+        ProductColorImage.objects.filter(pk=product_color_image.pk).update(in_stock=False)
+    else:
+        ProductColorImage.objects.filter(pk=product_color_image.pk).update(in_stock=True)

@@ -698,12 +698,9 @@ def edit_product_size(request, p_id):
             size = request.POST.get('product_size')
             quantity = request.POST.get('product_quantity')
             
-            print("Size:", size)
-            print("Quantity:", quantity)
-            
             product_size = ProductSize.objects.get(pk=p_id)
             
-            if size and quantity:  # Check if size and quantity are not empty
+            if size and quantity:
                 product_size.size = size
                 product_size.quantity = quantity
                 product_size.save()
@@ -1078,3 +1075,58 @@ def un_list_the_brand(request, brand_id):
     
 
 
+
+
+# ---------------------------------------------------------------- ADMIN ORDER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+
+
+
+@login_required
+@never_cache
+def orders_view_page(request):
+    if request.user.is_superuser:
+        orders = Orders.objects.all().order_by('customer').values()
+        context = {
+            'orders' : orders,
+            'is_active_order' : is_active_order,
+        }
+        return render(request, 'pages/orders/orders_view_page.html', context)
+    
+    
+
+
+@login_required
+@never_cache
+def order_detailed_view(request, order_id):
+    if request.user.is_superuser:
+        orders = Orders.objects.get(pk = order_id)
+        order_items = OrderItem.objects.filter(order = orders)
+        context = {
+            'is_active_order' : is_active_order,
+            'orders' : orders,
+            'order_items' : order_items,
+        }
+        return render(request, 'pages/orders/single order_view_page.html', context)
+    else:
+        return redirect('admin_login_page')
+    
+    
+
+
+
+@login_required
+@never_cache
+def change_order_status(request, order_id):
+    print(order_id)
+    if request.user.is_superuser:
+        order_status = request.POST.get('order_status')
+        order = Orders.objects.get(pk = order_id)
+        
+        if order:
+            order.order_status = order_status
+            order.save()
+            messages.success(request, 'Order Status Updated')
+            return redirect('orders_view_page')
+    else:
+        return redirect('admin_login_page')
+        

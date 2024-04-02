@@ -163,6 +163,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
+LOGIN_URL= 'index_page'
 
 
 LOGIN_REDIRECT_URL = 'index_page'

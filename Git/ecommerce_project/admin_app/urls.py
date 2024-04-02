@@ -71,6 +71,13 @@ urlpatterns = [
     path('sneakerheads/admin/customers/block-user/<int:user_id>/', views.block_user, name='block_user'),
     path('sneakerheads/admin/customers/unblock-user/<int:user_id>/', views.unblock_user, name='unblock_user'),
     path('sneakerheads/admin/customers/sneakerheads/admin/customer/search/', views.search_user, name='search_user'),
+    
+    
+    
+    
+    path('sneakerheads/admin/orders/', views.orders_view_page, name='orders_view_page'),
+    path('sneakerheads/admin/orders/detailed-view/<str:order_id>/', views.order_detailed_view, name='order_detailed_view'),
+    path('sneakerheads/admin/change-order-status/<str:order_id>/', views.change_order_status, name='change_order_status'),
 ]
 
 

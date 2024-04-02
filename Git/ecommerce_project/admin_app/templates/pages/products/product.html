@@ -1,7 +1,8 @@
 {% extends 'admin_base.html' %}
 
+{% load static %}
+
 {% block custom_css %}
-  {% load static %}
   <link rel="stylesheet" href="{% static 'admin_css/product.css' %}" />
 {% endblock %}
 
@@ -57,13 +58,15 @@
               {% if color.main_image %}
                 <img class="my-2" src="{{ color.main_image.url }}" alt="{{ color.products.name }}" style="max-width: 100px;" />
                 <br />
-                {% if color.is_listed %}
+                {% if color.in_stock %}
                   <span class="badge bg-success">Product in Stock</span>
                 {% else %}
-                  <span class="badge bg-danger">Product Blocked</span>
+                  <span class="badge bg-warning">Product out of stock</span>
                 {% endif %}
-              {% else %}
-                <span>No Image Available</span>
+                {% if not color.is_listed %}
+                  <br />
+                  <span class="badge bg-danger mt-2">Product is blocked</span>
+                {% endif %}
               {% endif %}
             </td>
             <td class="align-middle" style="max-width: 200px; word-wrap: break-word;">{{ color.products.name }}</td>
@@ -83,12 +86,20 @@
             <td class="align-middle">
               {% for size in color.productsize_set.all %}
                 <div>
-                  <span class="quantity">{{ size.quantity }}</span>
+                  {% if size.quantity == 0 %}
+                    <span class="quantity text-warning">{{ size.quantity }}</span>
+                  {% else %}
+                    <span class="quantity">{{ size.quantity }}</span>
+                  {% endif %}
                 </div>
                 {% empty %}No Quantity Available
               {% endfor %}
             </td>
-            <td class="align-middle">{{ color.total_quantity }}</td>
+            {% if color.total_quantity == 0 %}
+              <td class="align-middle text-warning">{{ color.total_quantity }}</td>
+            {% else %}
+              <td class="align-middle">{{ color.total_quantity }}</td>
+            {% endif %}
             <td class="align-middle">
               <div class="btn-group">
                 <a href="{% url 'edit_product_page' color.id %}" class="btn btn-outline-primary rounded-start">Edit</a>
