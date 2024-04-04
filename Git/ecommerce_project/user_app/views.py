@@ -1,33 +1,38 @@
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-from django.contrib import auth
-from django.contrib import messages
-from django.shortcuts import redirect, render
-from django.utils.text import normalize_newlines
-from django.core.validators import validate_email
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import make_password
+from django.views.decorators.cache import never_cache
 from django.core.exceptions import ValidationError
-from user_app.models import Customer
-from admin_app.models import *
+from django.core.validators import validate_email
+from django.utils.text import normalize_newlines
+from django.http import HttpResponseBadRequest
+from django.shortcuts import redirect, render
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from django.utils.html import format_html
+from django.core.mail import send_mail
+from django.http import HttpResponse
+from django.http import JsonResponse
+from user_app.models import Customerd
+from django.contrib import messages
+from django.db import transaction
 from django.utils import timezone
-from datetime import datetime
+from django.urls import reverse
+from django.contrib import auth
 from django.db.models import *
 from django.db.models import Q
-from django.http import JsonResponse
-from django.db import transaction
-import random
-import re
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.hashers import check_password
+from admin_app.models import *
+from datetime import datetime
 from random import shuffle
-from django.urls import reverse
-from django.core.mail import send_mail
-from django.views.decorators.cache import never_cache
-from django.contrib.auth.decorators import login_required
-
+import random
+import time
+import re
 
 
 
 # ---------------------------------------------------------------------------------- INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
+
+
+
 
 
 @never_cache
@@ -86,6 +91,9 @@ def sign_up(request):
         return render(request, 'signup.html')
     
     
+ 
+ 
+ 
     
 @never_cache
 def verify_otp(request):
@@ -97,7 +105,7 @@ def verify_otp(request):
     
 
 
-def generate_otp(user):
+def generate_otp():
     return int(random.randint(100000,999999))
 
 
@@ -109,6 +117,7 @@ def send_otp_email(email, otp):
     send_mail(subject, message, from_email, to_email)
 
     
+
 
 
 @never_cache
@@ -154,7 +163,7 @@ def register_function(request):
         if is_valid_email and is_valid_password and is_valid_confirm_password:
             try:
                 user = User(first_name = name, username = email, email=email)
-                otp = generate_otp(user)
+                otp = generate_otp()
                 email = user.email
                 if otp:
                     send_otp_email(user, otp)
@@ -174,6 +183,10 @@ def register_function(request):
                 return redirect('sign_up_page')
                 
     return redirect('sign_up_page')   
+
+
+
+
 
 
 
@@ -232,7 +245,6 @@ def otp_verification_page(request):
 
 
 
-
 @never_cache
 def resend_otp(request):
     if request.user.is_authenticated:
@@ -258,7 +270,6 @@ def resend_otp(request):
             return redirect('sign_up')
     else:
         return redirect('resend_otp_page')
-
 
 
 
@@ -292,6 +303,93 @@ def sign_in_function(request):
 
 
 
+@never_cache
+def forgot_password_page(request):
+    return render(request, 'forgot_password.html')
+
+
+@never_cache
+def reset_password(request, user_id):
+    timestamp = request.GET.get('timestamp')
+    if not timestamp or int(timestamp) < int(time.time()):
+        return HttpResponseBadRequest('The link has expired or is invalid.')
+    
+    return render(request, 'reset_password_page.html', {'user_id' : user_id})
+
+
+@never_cache
+def reset_password_change(request, user_id):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+            
+        is_valid_password = True
+        if len(password) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            is_valid_password = False
+        elif ' ' in password:
+            messages.error(request, 'Password cannot contain spaces.')
+            is_valid_password = False
+        
+        is_valid_confirm_password = True
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            is_valid_confirm_password = False
+                
+        if is_valid_password and is_valid_confirm_password:
+            try:
+                user = User.objects.get(pk=user_id)
+                user.set_password(password)
+                user.save()
+                messages.success(request, 'Password reset successfully. You can now log in with your new password.')
+                return redirect('sign_in_page')
+            except User.DoesNotExist:
+                return HttpResponseBadRequest('Invalid user ID.')
+    else:
+        return HttpResponseBadRequest('Invalid request method.')
+            
+            
+
+
+def send_link_email(email, page_url, timestamp):
+    subject = 'Link to reset your password'
+    message = format_html("Click <a href='{}'>here</a> to reset your password.", page_url)
+    from_email = 'sneakerheadsweb@gmail.com'
+    to_email = [email]
+    send_mail(subject, '', from_email, to_email, html_message=message)
+    
+    
+@never_cache
+def verify_email(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        if email:
+            email = normalize_newlines(email).strip()
+            is_valid_email = True
+            try:
+                validate_email(email)
+            except ValidationError as e:
+                is_valid_email = False
+                messages.error(request, f'Invalid email: {e}')
+                
+            if User.objects.filter(username=email).exists():
+                if is_valid_email:
+                    user = User.objects.get(username=email)
+                    timestamp = int(time.time()) + 120
+                    page_url = request.build_absolute_uri(
+                        reverse('reset_password', kwargs={'user_id': user.id}) + f'?timestamp={timestamp}'
+                    )
+                    send_link_email(email, page_url, timestamp)
+                    messages.success(request, 'Check email for the link to reset your password')
+                    return redirect(forgot_password_page)
+            else:
+                messages.error(request, 'User does not exist. Please try with a correct email.')
+                return redirect(forgot_password_page)
+    else:
+        return redirect('sign_in')
+                
+
 
 @never_cache
 def logout(request):
@@ -304,10 +402,6 @@ def logout(request):
     else:
         return render(request, '404.html')
     
-
-
-
-
 
 
 
@@ -331,11 +425,15 @@ def shop_page_view(request):
     if request.user.is_authenticated:
         user = request.user
         customer = Customer.objects.get(user = user)
+        wishlist = Wishlist.objects.get(customer = customer)
+        wishlist_items = WishlistItem.objects.filter(wishlist = wishlist)
         cart = Cart.objects.get(customer = customer)
         cart_items = CartProducts.objects.filter(cart = cart)
         context.update({
             'cart' : cart,
             'cart_items' : cart_items,
+            'wishlist' : wishlist,
+            'wishlist_items' : wishlist_items,
             })
         if cart_items:
             item_count = 0
@@ -381,6 +479,8 @@ def shop_page_view(request):
 # -------------------------------------------------------------------------------- PRODUCT SINGLE PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
+
+
 @never_cache
 def product_single_view_page(request, product_name, pdt_id):
     context = {}
@@ -391,10 +491,16 @@ def product_single_view_page(request, product_name, pdt_id):
         customer = Customer.objects.get(user=user)
         cart = Cart.objects.get(customer=customer)
         cart_items = CartProducts.objects.filter(cart=cart)
+        wishlist = Wishlist.objects.get(customer = customer)
+        wishlist_items = WishlistItem.objects.filter(wishlist = wishlist)
+        in_wishlist = WishlistItem.objects.filter(wishlist = wishlist, product = product_color).exists()
         in_cart = CartProducts.objects.filter(cart=cart, product__product_color_image=product_color).exists()
         context.update({
             'user': user, 
             'cart': cart,
+            'wishlist' : wishlist,
+            'wishlist_items' : wishlist_items,
+            'in_wishlist' : in_wishlist,
             'in_cart': in_cart,
             'cart_items': cart_items,
         })
@@ -432,13 +538,114 @@ def product_single_view_page(request, product_name, pdt_id):
 
 
 
+
+
+
+
+# -------------------------------------------------------------------------------- WISHLIST FUNCTIONS --------------------------------------------------------------------------------
+
+
+
+@never_cache
+def wishlist_view(request):
+    if request.user.is_authenticated:
+        user = request.user
+        customer = Customer.objects.get(user = user)
+        wishlist = Wishlist.objects.get(customer = customer)
+        wishlist_items = WishlistItem.objects.filter(wishlist = wishlist)
+        
+        context = {
+            'wishlist' : wishlist,
+            'wishlist_items' : wishlist_items,
+        }
+        return render(request, 'wishlist.html', context)
+
+@never_cache
+def add_to_wishlist(request, product_color_id):
+    if request.user.is_authenticated:
+        user = request.user
+        customer = Customer.objects.get(user = user)
+        wishlist = Wishlist.objects.get(customer = customer)
+        product_color = ProductColorImage.objects.get(pk = product_color_id)
+        
+        
+        in_wishlist = WishlistItem.objects.filter(wishlist = wishlist, product = product_color)
+        
+        
+        if not in_wishlist:
+            wishlist_item = WishlistItem.objects.create(
+                wishlist = wishlist,
+                product = product_color
+            )
+            wishlist_item.save()
+            return redirect('product_single_view_page', product_color.products.name, product_color.id )
+        else:
+            return redirect('product_single_view_page', product_color.products.name, product_color.id )
+    else:
+        return redirect('index_page')
+    
+    
+    
+    
+    
+    
+@never_cache
+def remove_from_wishlist(request, product_color_id):
+    if request.user.is_authenticated:
+        user = request.user
+        customer = Customer.objects.get(user = user)
+        wishlist = Wishlist.objects.get(customer = customer)
+        product_color = ProductColorImage.objects.get(pk = product_color_id)
+        
+        
+        in_wishlist = WishlistItem.objects.filter(wishlist = wishlist, product = product_color)
+        
+        
+        if in_wishlist:
+            wishlist_item = WishlistItem.objects.get(
+                wishlist = wishlist,
+                product = product_color
+            )
+            wishlist_item.delete()
+            return redirect('product_single_view_page', product_color.products.name, product_color.id )
+        else:
+            return redirect('product_single_view_page', product_color.products.name, product_color.id )
+    else:
+        return redirect('index_page')
+            
+
+
+@never_cache
+def remove_in_wishlist(request, product_color_id):
+    if request.user.is_authenticated:
+        user = request.user
+        customer = Customer.objects.get(user = user)
+        wishlist = Wishlist.objects.get(customer = customer)
+        product_color = ProductColorImage.objects.get(pk = product_color_id)
+        
+        
+        in_wishlist = WishlistItem.objects.filter(wishlist = wishlist, product = product_color)
+        
+        
+        if in_wishlist:
+            wishlist_item = WishlistItem.objects.get(
+                wishlist = wishlist,
+                product = product_color
+            )
+            wishlist_item.delete()
+            return redirect('wishlist_view' )
+        else:
+            return redirect('wishlist_view' )
+    else:
+        return redirect('index_page')
+
+
+
+
 # -------------------------------------------------------------------------------- USER ACCOUNT DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 
-
-
-@login_required
 @never_cache
 def user_dashboard(request, user_id):
     if request.user.is_authenticated:
@@ -481,10 +688,14 @@ def user_dashboard(request, user_id):
             messages.error(request, 'Not able to get user details at this moment')
             return redirect(index_page)
     else:
-        return render(index_page)
+        return redirect(index_page)
     
     
-@login_required
+
+
+
+
+
 @never_cache
 def user_details_edit(request, user_id):
     if request.user.is_authenticated:
@@ -538,16 +749,18 @@ def user_details_edit(request, user_id):
             messages.error(request, 'Not able to change user details at this moment')
             return redirect(index_page)
     else:
-        return render(index_page)
+        return redirect(index_page)
 
             
         
         
+
+
 # -------------------------------------------------------------------------------- USER ADDRESS DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 
-@login_required
+
 @never_cache
 def update_address(request, address_id):
     if request.user.is_authenticated:
@@ -586,7 +799,9 @@ def update_address(request, address_id):
 
 
 
-@login_required
+
+
+
 @never_cache
 def add_new_address(request, customer_id):
     if request.user.is_authenticated:
@@ -628,8 +843,10 @@ def add_new_address(request, customer_id):
                 
                 
                 
+     
+     
                 
-@login_required
+
 @never_cache
 def user_change_password(request, user_id):
     if request.user.is_authenticated:
@@ -677,11 +894,14 @@ def user_change_password(request, user_id):
                 
                 
 
+
+
+
 # -------------------------------------------------------------------------------- PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
 
 
 
-@login_required
+
 @never_cache
 def order_detail(request, order_id):
     if request.user.is_authenticated:
@@ -714,10 +934,14 @@ def order_detail(request, order_id):
 
 
 
+
+
+
 # -------------------------------------------------------------------------------- USER CART PAGE FUNCTIONS --------------------------------------------------------------------------------
                 
                 
-@login_required
+                
+                
 @never_cache
 def cart_view_page(request, user_id):
     if request.user.is_authenticated:
@@ -755,7 +979,9 @@ def cart_view_page(request, user_id):
         return render(request, 'cart.html', context)
     
     
-@login_required
+    
+    
+    
 @never_cache
 def add_to_cart(request, product_id):
     if request.user.is_authenticated:
@@ -779,16 +1005,20 @@ def add_to_cart(request, product_id):
         return redirect(sign_in)
         
 
-@login_required
+
+
 @never_cache
 def remove_from_cart(request, cart_item_id):
     if request.user.is_authenticated:
         cart_item = CartProducts.objects.get(pk = cart_item_id)
         cart_item.delete()
         return redirect(reverse('cart_view_page', kwargs={'user_id': request.user.pk}))
+    else:
+        return redirect(index_page)
     
     
-@login_required
+    
+    
 @never_cache
 def clear_cart(request):
     if request.user.is_authenticated:
@@ -798,48 +1028,57 @@ def clear_cart(request):
         
         
         
-@login_required
+        
 @never_cache
 def update_total_price(request):
-    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        product_id = request.POST.get('product_id')
-        
-        try:
-            product = ProductSize.objects.get(pk=product_id)
-            quantity = int(request.POST.get('quantity'))
-            available_quantity = product.quantity
+    if request.user.is_authenticated:
+        if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            product_id = request.POST.get('product_id')
+            
+            try:
+                product = ProductSize.objects.get(pk=product_id)
+                quantity = int(request.POST.get('quantity'))
+                available_quantity = product.quantity
 
-            if quantity <= available_quantity:
-                total_price = product.product_color_image.price * quantity
-                return JsonResponse({'total_price': total_price})
-            else:
-                return JsonResponse({'error': f'Only {available_quantity} units available'})
-        except ProductSize.DoesNotExist:
-            return JsonResponse({'error': 'Product does not exist'})
+                if quantity <= available_quantity:
+                    total_price = product.product_color_image.price * quantity
+                    return JsonResponse({'total_price': total_price})
+                else:
+                    return JsonResponse({'error': f'Only {available_quantity} units available'})
+            except ProductSize.DoesNotExist:
+                return JsonResponse({'error': 'Product does not exist'})
+        else:
+            return JsonResponse({'error': 'Invalid request'})
     else:
-        return JsonResponse({'error': 'Invalid request'})
+        return redirect('index_page')
 
     
     
     
-@login_required
+    
+    
+    
+    
 @never_cache
 def update_quantity(request):
-    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        item_id = request.POST.get('item_id')
-        new_quantity = int(request.POST.get('quantity'))
-        
-        try:
-            cart_item = CartProducts.objects.get(pk=item_id)
-            cart_item.quantity = new_quantity
-            cart_item.save()
+    if request.user.is_authenticated:
+        if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            item_id = request.POST.get('item_id')
+            new_quantity = int(request.POST.get('quantity'))
             
-            total_price = cart_item.product.product_color_image.price * new_quantity
-            return JsonResponse({'total_price': total_price})
-        except CartProducts.DoesNotExist:
-            return JsonResponse({'error': 'Product not found'})
+            try:
+                cart_item = CartProducts.objects.get(pk=item_id)
+                cart_item.quantity = new_quantity
+                cart_item.save()
+                
+                total_price = cart_item.product.product_color_image.price * new_quantity
+                return JsonResponse({'total_price': total_price})
+            except CartProducts.DoesNotExist:
+                return JsonResponse({'error': 'Product not found'})
+        else:
+            return JsonResponse({'error': 'Invalid request'})
     else:
-        return JsonResponse({'error': 'Invalid request'})
+        return redirect('index_page')
     
     
 
@@ -850,7 +1089,6 @@ def update_quantity(request):
 # -------------------------------------------------------------------------------- USER CHECKOUT PAGE FUNCTIONS --------------------------------------------------------------------------------
    
         
-@login_required
 @never_cache
 def checkout_page(request):
     if request.user.is_authenticated:
@@ -890,7 +1128,7 @@ def checkout_page(request):
             user_id = request.user.id
             return redirect('cart_view_page', user_id=user_id)
     else:
-        return redirect(index_page)
+        return redirect('index_page')
 
             
             
@@ -903,7 +1141,6 @@ def checkout_page(request):
     
     
     
-@login_required
 @never_cache
 def place_order(request):
     if request.user.is_authenticated:

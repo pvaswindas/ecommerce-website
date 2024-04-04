@@ -1,6 +1,12 @@
 {% extends 'main_base.html' %}
 {% load static %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock%}
+
+
+
 {% block breadcrumbs %}
   <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
     <div class="container d-flex align-items-center">
@@ -84,7 +90,13 @@
                     {% endif %}
                   {% endif %}
                   <div class="details-action-wrapper">
-                    <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                    {% if not wishlist_items.product == product_color %}
+                      {% if not in_wishlist %}
+                        <a href="{% url 'add_to_wishlist' product_color.id %}" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
+                      {% else %}
+                        <a class="mt-4" href="{% url 'remove_from_wishlist' product_color.id %}"><i class="bi bi-heart-fill fs-3 text-danger"></i></a>
+                      {% endif %}
+                    {% endif %}
                   </div>
                 </div>
               </form>
@@ -205,7 +217,9 @@
     })
 
     function goToCart() {
-      window.location.href = "{% url 'cart_view_page' user.id %}";
+      {% if user.is_authenticated %}
+        window.location.href = "{% url 'cart_view_page' user.id %}";
+      {% endif %}
     }
   </script>
 {% endblock %}

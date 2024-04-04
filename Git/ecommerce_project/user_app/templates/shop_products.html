@@ -13,15 +13,14 @@
 
             <a href="{% url 'product_single_view_page' product_color.products.name product_color.id %}"><img src="{{ product_color.main_image.url }}" alt="Product image" class="product-image" id="mainImage{{ product_color.id }}" /></a>
 
-            <div class="product-action-vertical">
-              <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-            </div>
-
-            {% comment %} <div class="product-action">
-              {% if not product_color.is_listed %}
-                <a href="#" class="btn-product"><span>Notify Me</span></a>
-              {% else %}
-                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
+            {% comment %} <div class="product-action-vertical">
+              {% if wishlist_items %}
+                {% for item in wishlist_items %}
+                  {% if product_color == item.product %}
+                  
+                  {% endif %}
+                {% endfor %}
+                <a href="{% url 'add_to_wishlist_shop' product_color.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
               {% endif %}
             </div> {% endcomment %}
           </figure>
@@ -38,22 +37,9 @@
               </div>
               <span class="ratings-text">( 2 Reviews )</span>
             </div>
-
-            {% comment %} <div class="product-nav product-nav-thumbs">
-              {% for product_color_image in product.productcolorimage_set.all %}
-                <a href="#" onclick="changeMainImage('{{ product_color_image.main_image.url }}', '{{ product.id }}')"><img src="{{ product_color_image.main_image.url }}" alt="Product image" /></a>
-              {% endfor %}
-            </div> {% endcomment %}
           </div>
         </div>
       </div>
     {% endfor %}
   </div>
 </div>
-
-<script>
-  function changeMainImage(imageUrl, productId) {
-    var mainImage = document.getElementById('mainImage' + productId)
-    mainImage.src = imageUrl
-  }
-</script>

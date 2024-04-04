@@ -15,6 +15,11 @@ urlpatterns = [
     path('sneakerheads/user/register/', views.register_function, name='register_function'),
     path('sneakerheads/sign-in/user/', views.sign_in_function, name='sign_in_function'),
     
+    path('sneakerheads/user/forgot-password/', views.forgot_password_page, name='forgot_password_page'),
+    path('sneakerheads/user/reset-password/<int:user_id>/', views.reset_password, name='reset_password'),
+    path('sneakerheads/user/verify-email/', views.verify_email, name='verify_email'),
+    path('sneakerheads/user/reset_password_change/<int:user_id>/', views.reset_password_change, name='reset_password_change'),
+    
     
     path('sneakerheads/shop/page/', views.shop_page_view, name='shop_page_view'),
     path('sneakerheads/<str:product_name>/<int:pdt_id>/', views.product_single_view_page, name='product_single_view_page'),
@@ -42,6 +47,11 @@ urlpatterns = [
     path('sneakerheads/user/place-order/', views.place_order, name='place_order'),
     path('sneakerheads/user/order-details-page/<str:order_id>/', views.order_detail, name='order_detail'),
     
+    
+    path('sneakerheads/user/wishlist/',  views.wishlist_view, name='wishlist_view'),
+    path('sneakerheads/user/add-to-wishlist/<int:product_color_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('sneakerheads/user/remove-from-wishlist/<int:product_color_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+    path('sneakerheads/user/remove-in-wishlist/<int:product_color_id>', views.remove_in_wishlist, name='remove_in_wishlist'),
 ]
 
 

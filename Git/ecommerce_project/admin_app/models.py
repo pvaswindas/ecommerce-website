@@ -190,11 +190,23 @@ class Review(models.Model):
     
 class Wishlist(models.Model):
     customer = models.OneToOneField(Customer, on_delete = models.CASCADE)
-    products = models.ForeignKey(Products, on_delete = models.CASCADE)
-    in_stock = models.BooleanField(default = True)
+    
     
     def __str__(self):
-        return f"{self.customer}, {self.product}, {self.in_stock}"
+        return f"{self.id} : {self.customer.user.first_name} {self.customer.user.last_name}"
+
+@receiver(post_save, sender=Customer)
+def create_wishlist(sender, instance, created, **kwargs):
+    if created:
+        Wishlist.objects.create(customer=instance)
+
+
+class WishlistItem(models.Model):
+    wishlist = models.ForeignKey(Wishlist, on_delete = models.CASCADE)
+    product = models.ForeignKey(ProductColorImage, on_delete = models.CASCADE)
+    
+    def __str__(self):
+        return f"{self.id} : {self.product}"
     
     
     
