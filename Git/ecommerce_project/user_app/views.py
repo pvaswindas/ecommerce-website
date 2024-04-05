@@ -12,7 +12,7 @@ from django.utils.html import format_html
 from django.core.mail import send_mail
 from django.http import HttpResponse
 from django.http import JsonResponse
-from user_app.models import Customerd
+from user_app.models import *
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
@@ -43,6 +43,8 @@ def index_page(request):
         customer = Customer.objects.get(user = user)
         cart = Cart.objects.get(customer = customer)
         cart_items = CartProducts.objects.filter(cart = cart)
+        wishlist = Wishlist.objects.get(customer = customer)
+        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
         
         if cart_items:
             item_count = 0
@@ -71,6 +73,7 @@ def index_page(request):
             'customer' : customer,
             'cart' : cart,
             'cart_items' : cart_items,
+            'wishlist_item_count' : wishlist_item_count,
         })
         return render(request, 'index.html', context)
     return render(request, 'index.html')
@@ -426,14 +429,14 @@ def shop_page_view(request):
         user = request.user
         customer = Customer.objects.get(user = user)
         wishlist = Wishlist.objects.get(customer = customer)
-        wishlist_items = WishlistItem.objects.filter(wishlist = wishlist)
+        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
         cart = Cart.objects.get(customer = customer)
         cart_items = CartProducts.objects.filter(cart = cart)
         context.update({
             'cart' : cart,
             'cart_items' : cart_items,
             'wishlist' : wishlist,
-            'wishlist_items' : wishlist_items,
+            'wishlist_item_count' : wishlist_item_count,
             })
         if cart_items:
             item_count = 0
@@ -494,6 +497,7 @@ def product_single_view_page(request, product_name, pdt_id):
         wishlist = Wishlist.objects.get(customer = customer)
         wishlist_items = WishlistItem.objects.filter(wishlist = wishlist)
         in_wishlist = WishlistItem.objects.filter(wishlist = wishlist, product = product_color).exists()
+        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
         in_cart = CartProducts.objects.filter(cart=cart, product__product_color_image=product_color).exists()
         context.update({
             'user': user, 
@@ -501,6 +505,7 @@ def product_single_view_page(request, product_name, pdt_id):
             'wishlist' : wishlist,
             'wishlist_items' : wishlist_items,
             'in_wishlist' : in_wishlist,
+            'wishlist_item_count' : wishlist_item_count,
             'in_cart': in_cart,
             'cart_items': cart_items,
         })
@@ -553,10 +558,12 @@ def wishlist_view(request):
         customer = Customer.objects.get(user = user)
         wishlist = Wishlist.objects.get(customer = customer)
         wishlist_items = WishlistItem.objects.filter(wishlist = wishlist)
+        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
         
         context = {
             'wishlist' : wishlist,
             'wishlist_items' : wishlist_items,
+            'wishlist_item_count' : wishlist_item_count,
         }
         return render(request, 'wishlist.html', context)
 
@@ -654,14 +661,18 @@ def user_dashboard(request, user_id):
             customer = Customer.objects.get(user = user)
             cart = Cart.objects.get(customer = customer)
             cart_items = CartProducts.objects.filter(cart = cart)
+            wishlist = Wishlist.objects.get(customer = customer)
+            wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
             addresses = Address.objects.filter(customer = customer)
             orders = Orders.objects.filter(customer = customer)
+            
             context =  {
                 'cart' : cart,
                 'user' : user, 
                 'customer' : customer,
                 'addresses' : addresses,
                 'cart_items' : cart_items,
+                'wishlist_item_count' : wishlist_item_count,
                 'orders' : orders,
                 }
             if cart_items:
@@ -951,6 +962,8 @@ def cart_view_page(request, user_id):
         shipping_addresses = Address.objects.filter(customer = customer)
         cart = Cart.objects.get(customer = customer)
         cart_items = CartProducts.objects.filter(cart = cart)
+        wishlist = Wishlist.objects.get(customer = customer)
+        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
         any_in_stock = any(item.in_stock for item in cart_items)
         if cart_items:
             item_count = 0
@@ -974,7 +987,8 @@ def cart_view_page(request, user_id):
         context.update({
             'shipping_addresses' : shipping_addresses,
             'cart_items' : cart_items,
-            'any_in_stock' : any_in_stock
+            'any_in_stock' : any_in_stock,
+            'wishlist_item_count' : wishlist_item_count,
         })
         return render(request, 'cart.html', context)
     
@@ -1096,6 +1110,8 @@ def checkout_page(request):
         customer = Customer.objects.get(user=user)
         cart = Cart.objects.get(customer=customer)
         cart_items = CartProducts.objects.filter(cart=cart, in_stock=True)
+        wishlist = Wishlist.objects.get(customer = customer)
+        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
         
         addresses = Address.objects.filter(customer=customer)
 
@@ -1121,6 +1137,7 @@ def checkout_page(request):
                 'customer': customer,
                 'cart': cart,
                 'cart_items': cart_items,
+                'wishlist_item_count' : wishlist_item_count,
                 'addresses': addresses,
             }
             return render(request, 'checkout.html', context)
