@@ -1,7 +1,7 @@
 import re
 import time
 import random
-import razorpay
+import razorpay # type: ignore
 from random import shuffle
 from datetime import datetime
 from user_app.models import *
@@ -1267,21 +1267,22 @@ def razorpay_payment(request):
 
             result = razorpay_client.utility.verify_payment_signature(params_dict)
             if result is not None:
-                print('entered inside razorpay_verify')
                 order = Orders.objects.get(razorpay_id = razorpay_order_id)
                 total = order.total_charge * 100
-                print(total)
                 try:
                     razorpay_client.payment.capture(payment_id, total)
+                    order.paid = True
+                    order.payment.pending = False
+                    order.payment.success = True
+                    order.save()
+                    
                     return render(request, 'paymentsuccess.html')
                 except Exception as e:
-                    print("Razorpay Capture Error:", e)
                     return render(request, 'paymentfail.html')
 
             else:
                 return render(request, 'paymentfail.html')
         except Exception as e:
-            print("Payment Handler Error:", e)
             return HttpResponseBadRequest()
     else:
         return HttpResponseBadRequest()
