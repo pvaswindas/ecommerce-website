@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'user_app',
 ]
 
+
+
+RAZORPAY_KEY_ID = 'rzp_test_RG8cmNPoKDf1Xt'
+RAZORPAY_KEY_SECRET = 'tMgZ8DTvegWFLvGwFV4poONR'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -24,6 +24,18 @@
           <td>{{ order.order_status }}</td>
         </tr>
         <tr>
+          <th>Payment Status:</th>
+          <td>
+            {% if order.payment.method_name == 'Razorpay' %}
+              {% if order.paid == True %}
+                Paid
+              {% endif %}
+            {% else %}
+              Cash On Delivery
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
           <th>Total Items:</th>
           <td>{{ order.number_of_orders }}</td>
         </tr>

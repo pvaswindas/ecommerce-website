@@ -1,32 +1,33 @@
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.hashers import make_password
-from django.views.decorators.cache import never_cache
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
-from django.utils.text import normalize_newlines
-from django.http import HttpResponseBadRequest
-from django.shortcuts import redirect, render
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-from django.utils.html import format_html
-from django.core.mail import send_mail
-from django.http import HttpResponse
-from django.http import JsonResponse
-from user_app.models import *
-from django.contrib import messages
-from django.db import transaction
-from django.utils import timezone
-from django.urls import reverse
-from django.contrib import auth
-from django.db.models import *
-from django.db.models import Q
-from admin_app.models import *
-from datetime import datetime
-from random import shuffle
-import random
-import time
 import re
-
+import time
+import random
+import razorpay
+from random import shuffle
+from datetime import datetime
+from user_app.models import *
+from admin_app.models import *
+from django.db.models import Q
+from django.db.models import *
+from django.contrib import auth
+from django.urls import reverse
+from django.conf import settings
+from django.utils import timezone
+from django.db import transaction
+from django.contrib import messages
+from django.http import JsonResponse
+from django.http import HttpResponse
+from django.core.mail import send_mail
+from django.utils.html import format_html
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from django.shortcuts import redirect, render
+from django.http import HttpResponseBadRequest
+from django.utils.text import normalize_newlines
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.hashers import check_password
 
 
 # ---------------------------------------------------------------------------------- INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
@@ -1152,12 +1153,13 @@ def checkout_page(request):
 
             
     
-    
 # -------------------------------------------------------------------------------- PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
     
-    
-    
-    
+
+
+
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
 @never_cache
 def place_order(request):
     if request.user.is_authenticated:
@@ -1183,13 +1185,13 @@ def place_order(request):
                 address_id = request.POST.get('delivery_address')
                 payment_method = request.POST.get('payment_method')
                 order_status = "Order Placed"
-
+                
                 address = Address.objects.get(pk=address_id)
 
                 payment = Payment.objects.create(
                     method_name=payment_method
                 )
-
+                
                 order = Orders.objects.create(
                     customer=customer,
                     order_status=order_status,
@@ -1200,6 +1202,7 @@ def place_order(request):
                     shipping_charge=shipping_charge,
                     total_charge=total_charge
                 )
+                order.save()
                 
                 for item in cart_items:
                     order_item = OrderItem.objects.create(
@@ -1214,84 +1217,73 @@ def place_order(request):
                     product_size = ProductSize.objects.get(pk = product_size_id)
                     product_size.quantity -= item.quantity
                     product_size.save()
+                    cart_items.delete()
+                    
+                razorpay = None
                 
-                cart_items.delete()
-                return render(request, 'order_placed.html', { 'order' : order } )
+                if payment_method == 'Razorpay':
+                    try: 
+                        
+                        currency = 'INR'
+                        callback_url = request.build_absolute_uri(reverse('razorpay_payment'))
+                        amount_in_paise = int(total_charge * 100)
+                        razorpay_order = razorpay_client.order.create(dict(amount=amount_in_paise,currency=currency, payment_capture='0'))
+                        razorpay_order_id = razorpay_order['id']
+                        order.razorpay_id = razorpay_order_id
+                        order.save()
+                        razorpay = {
+                            'razorpay_order_id' : razorpay_order_id,
+                            'total' : amount_in_paise,
+                            'currency' : currency,
+                            'user' : user,
+                            'callback_url' : callback_url,
+                            'customer' : customer,
+                            'settings' : settings,
+                        }
+                        return render(request, 'razorpay_test.html', razorpay)
+                    except Exception as e:
+                        return HttpResponseBadRequest("Razorpay Order Creation Failed: " + str(e))
+                else:    
+                    return render(request, 'order_placed.html', { 'order' : order } )
         return redirect('index_page')
     else:
         return redirect('index_page')
 
                 
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+@csrf_exempt
+def razorpay_payment(request):
+    if request.method == "POST":
+        try:
+            payment_id = request.POST.get('razorpay_payment_id', '')
+            razorpay_order_id = request.POST.get('razorpay_order_id', '')
+            signature = request.POST.get('razorpay_signature', '')
+            
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            }
+
+            result = razorpay_client.utility.verify_payment_signature(params_dict)
+            if result is not None:
+                print('entered inside razorpay_verify')
+                order = Orders.objects.get(razorpay_id = razorpay_order_id)
+                total = order.total_charge * 100
+                print(total)
+                try:
+                    razorpay_client.payment.capture(payment_id, total)
+                    return render(request, 'paymentsuccess.html')
+                except Exception as e:
+                    print("Razorpay Capture Error:", e)
+                    return render(request, 'paymentfail.html')
+
+            else:
+                return render(request, 'paymentfail.html')
+        except Exception as e:
+            print("Payment Handler Error:", e)
+            return HttpResponseBadRequest()
+    else:
+        return HttpResponseBadRequest()
+    
+

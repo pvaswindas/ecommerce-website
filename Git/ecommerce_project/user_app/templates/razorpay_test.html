@@ -1,0 +1,47 @@
+{% extends 'main_base.html' %}
+{% block main_content %}
+  <div class="container">
+    <h1>Pay with Razorpay</h1>
+    <p>Total Amount: ₹{{ total_charge }}</p>
+    <p>Delivery Address: {{ address.street_address }}, {{ address.city }}, {{ address.state }}, {{ address.country }}, {{ address.pin_code }}</p>
+    <button id="pay-btn" class="btn btn-primary">Pay Now</button>
+  </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    var options = {
+      key: '{{ settings.RAZORPAY_KEY_ID }}',
+      amount: '{{ total }}',
+      currency: '{{ currency }}',
+      name: 'Razorpay',
+      order_id: '{{ razorpay_order_id }}',
+      callback_url: '{{ callback_url }}',
+      prefill: {
+        name: '{{ user.first_name }} {{ user.last_name }}',
+        email: '{{ user.email }}',
+        contact: '{{ customer.phone_number }}'
+      },
+      theme: {
+        color: '#3399cc'
+      }
+    }
+    
+    var rzp1 = new Razorpay(options)
+    
+    document.getElementById('pay-btn').onclick = function (e) {
+      rzp1.open()
+      e.preventDefault()
+    }
+    
+    options.handler = function (response) {
+      console.log(response)
+      var customerName = response.user.name
+      var customerEmail = response.user.email
+      var customerContact = response.user.contact
+    
+      alert('Payment Successful!\nCustomer Name: ' + customerName + '\nCustomer Email: ' + customerEmail + '\nCustomer Contact: ' + customerContact)
+    }
+  </script>
+{% endblock %}

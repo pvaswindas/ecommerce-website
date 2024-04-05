@@ -101,7 +101,9 @@ class Coupon(models.Model):
 
 class Payment(models.Model):
     method_name = models.CharField(max_length = 100)
-    
+    pending = models.BooleanField(default=True)
+    failed = models.BooleanField(default=False)
+    success = models.BooleanField(default=False)
     def __str__(self):
         return self.method_name
 
@@ -119,6 +121,8 @@ class Orders(models.Model):
     subtotal = models.PositiveBigIntegerField(default=0)
     shipping_charge = models.PositiveBigIntegerField(default=0)
     total_charge = models.PositiveBigIntegerField(default=0)
+    razorpay_id = models.CharField(max_length=100, blank=True)
+    paid = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.order_status}"

@@ -46,12 +46,17 @@ urlpatterns = [
     path('sneakerheads/user/checkout/', views.checkout_page, name='checkout_page'),
     path('sneakerheads/user/place-order/', views.place_order, name='place_order'),
     path('sneakerheads/user/order-details-page/<str:order_id>/', views.order_detail, name='order_detail'),
+    path('sneakerheads/user/razorpay_payment/', views.razorpay_payment, name='razorpay_payment'),
     
     
     path('sneakerheads/user/wishlist/',  views.wishlist_view, name='wishlist_view'),
     path('sneakerheads/user/add-to-wishlist/<int:product_color_id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('sneakerheads/user/remove-from-wishlist/<int:product_color_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('sneakerheads/user/remove-in-wishlist/<int:product_color_id>', views.remove_in_wishlist, name='remove_in_wishlist'),
+    
+    
+    # path('payment/', views.homepage, name='index'),
+    # path('paymenthandler/', views.paymenthandler, name='paymenthandler'),
 ]
 
 

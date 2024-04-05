@@ -3,10 +3,15 @@
         "allauth",
         "ecommerce",
         "globalstatic",
+        "paise",
+        "paymentfail",
+        "paymentsuccess",
         "Pincode",
         "productsize",
+        "RAZORPAY",
         "signin",
         "socialaccount",
-        "updation"
+        "updation",
+        "XHVC"
     ]
 }
