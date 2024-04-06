@@ -1,0 +1,15 @@
+.order-details-container,
+    .payment-summary {
+      background-color: #f8f9fa;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .order-details p,
+    .payment-summary p {
+      margin: 5px 0;
+    }
+    #pay-btn {
+      margin-top: 20px;
+    }

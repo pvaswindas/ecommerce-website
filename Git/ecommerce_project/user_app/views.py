@@ -30,7 +30,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.hashers import check_password
 
 
-# ---------------------------------------------------------------------------------- INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------- CC_INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
 
@@ -95,7 +95,8 @@ def sign_up(request):
         return render(request, 'signup.html')
     
     
- 
+# ---------------------------------------------------------------------------------- CC_OTP GENERATE FUNCTIONS ----------------------------------------------------------------------------------
+
  
  
     
@@ -112,6 +113,8 @@ def verify_otp(request):
 def generate_otp():
     return int(random.randint(100000,999999))
 
+# ---------------------------------------------------------------------------------- CC_SEND OTP IN MAIL FUNCTIONS ----------------------------------------------------------------------------------
+
 
 def send_otp_email(email, otp):
     subject = 'Your OTP for Email Verification'
@@ -121,6 +124,8 @@ def send_otp_email(email, otp):
     send_mail(subject, message, from_email, to_email)
 
     
+
+# ---------------------------------------------------------------------------------- CC_USER_REGISTER PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
 
@@ -190,6 +195,8 @@ def register_function(request):
 
 
 
+
+# ---------------------------------------------------------------------------------- CC_OTP VERIFICATION PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
 
@@ -279,6 +286,10 @@ def resend_otp(request):
 
 
 
+
+# ---------------------------------------------------------------------------------- CC_SIGN IN FUNCTIONS ----------------------------------------------------------------------------------
+
+
 @never_cache
 def sign_in_function(request):
     if request.user.is_authenticated:
@@ -305,6 +316,8 @@ def sign_in_function(request):
     else:
         return redirect('sign_in_page')
 
+
+# ---------------------------------------------------------------------------------- CC_FORGOT PASSWORD FUNCTIONS ----------------------------------------------------------------------------------
 
 
 @never_cache
@@ -394,6 +407,10 @@ def verify_email(request):
         return redirect('sign_in')
                 
 
+# ---------------------------------------------------------------------------------- CC_USER_LOGOUT PASSWORD FUNCTIONS ----------------------------------------------------------------------------------
+
+
+
 
 @never_cache
 def logout(request):
@@ -410,7 +427,7 @@ def logout(request):
 
 
 
-# ---------------------------------------------------------------------------------- SHOP PAGE FUNCTIONS ----------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------- CC_SHOP PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
 
@@ -480,7 +497,7 @@ def shop_page_view(request):
 
 
 
-# -------------------------------------------------------------------------------- PRODUCT SINGLE PAGE FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_PRODUCT SINGLE PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 
@@ -548,7 +565,7 @@ def product_single_view_page(request, product_name, pdt_id):
 
 
 
-# -------------------------------------------------------------------------------- WISHLIST FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_WISHLIST FUNCTIONS --------------------------------------------------------------------------------
 
 
 
@@ -650,7 +667,7 @@ def remove_in_wishlist(request, product_color_id):
 
 
 
-# -------------------------------------------------------------------------------- USER ACCOUNT DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_ACCOUNT DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 
@@ -768,7 +785,7 @@ def user_details_edit(request, user_id):
         
 
 
-# -------------------------------------------------------------------------------- USER ADDRESS DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_ADDRESS DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 
@@ -909,7 +926,7 @@ def user_change_password(request, user_id):
 
 
 
-# -------------------------------------------------------------------------------- PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_ORDER FUNCTIONS --------------------------------------------------------------------------------
 
 
 
@@ -949,7 +966,7 @@ def order_detail(request, order_id):
 
 
 
-# -------------------------------------------------------------------------------- USER CART PAGE FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_CART PAGE FUNCTIONS --------------------------------------------------------------------------------
                 
                 
                 
@@ -1101,7 +1118,7 @@ def update_quantity(request):
 
 
 
-# -------------------------------------------------------------------------------- USER CHECKOUT PAGE FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_CHECKOUT PAGE FUNCTIONS --------------------------------------------------------------------------------
    
         
 @never_cache
@@ -1153,8 +1170,10 @@ def checkout_page(request):
 
             
     
-# -------------------------------------------------------------------------------- PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
     
+
+
 
 
 
@@ -1188,50 +1207,23 @@ def place_order(request):
                 
                 address = Address.objects.get(pk=address_id)
 
-                payment = Payment.objects.create(
-                    method_name=payment_method
-                )
                 
-                order = Orders.objects.create(
-                    customer=customer,
-                    order_status=order_status,
-                    address=address,
-                    payment=payment,
-                    number_of_orders=item_count,
-                    subtotal=subtotal,
-                    shipping_charge=shipping_charge,
-                    total_charge=total_charge
-                )
-                order.save()
                 
-                for item in cart_items:
-                    order_item = OrderItem.objects.create(
-                        order = order,
-                        product = item.product,
-                        quantity = item.quantity,
-                        order_status="Order Placed",
-                        each_price = item.product.product_color_image.price,
-                    )
-                    
-                    product_size_id = item.product.id
-                    product_size = ProductSize.objects.get(pk = product_size_id)
-                    product_size.quantity -= item.quantity
-                    product_size.save()
-                    cart_items.delete()
-                    
                 razorpay = None
                 
                 if payment_method == 'Razorpay':
                     try: 
-                        
+                        request.session['address_id'] = address_id
+                        request.session['payment_method'] = payment_method
                         currency = 'INR'
                         callback_url = request.build_absolute_uri(reverse('razorpay_payment'))
                         amount_in_paise = int(total_charge * 100)
                         razorpay_order = razorpay_client.order.create(dict(amount=amount_in_paise,currency=currency, payment_capture='0'))
                         razorpay_order_id = razorpay_order['id']
-                        order.razorpay_id = razorpay_order_id
-                        order.save()
                         razorpay = {
+                            'shipping_charge' : shipping_charge,
+                            'address' : address,
+                            'total_charge' : total_charge,
                             'razorpay_order_id' : razorpay_order_id,
                             'total' : amount_in_paise,
                             'currency' : currency,
@@ -1243,13 +1235,52 @@ def place_order(request):
                         return render(request, 'razorpay_test.html', razorpay)
                     except Exception as e:
                         return HttpResponseBadRequest("Razorpay Order Creation Failed: " + str(e))
-                else:    
+                else:
+                    payment = Payment.objects.create(
+                        method_name=payment_method,
+                        started_at = timezone.now()
+                    )
+                    order = Orders.objects.create(
+                    customer=customer,
+                    order_status=order_status,
+                    address=address,
+                    payment=payment,
+                    number_of_orders=item_count,
+                    subtotal=subtotal,
+                    shipping_charge=shipping_charge,
+                    total_charge=total_charge
+                    )
+                    order.save()
+                    
+                    for item in cart_items:
+                        order_item = OrderItem.objects.create(
+                            order = order,
+                            product = item.product,
+                            quantity = item.quantity,
+                            order_status="Order Placed",
+                            each_price = item.product.product_color_image.price,
+                        )
+                        order_item.save()
+                        
+                        product_size_id = item.product.id
+                        product_size = ProductSize.objects.get(pk = product_size_id)
+                        product_size.quantity -= item.quantity
+                        product_size.save()
+                        cart_items.delete()
                     return render(request, 'order_placed.html', { 'order' : order } )
         return redirect('index_page')
     else:
         return redirect('index_page')
 
                 
+                
+                
+                
+                
+                
+                
+# ---------------------------------------------------------------------------------- CC_RAZORPAY PAYMENT FUNCTIONS ----------------------------------------------------------------------------------
+
         
 @csrf_exempt
 def razorpay_payment(request):
@@ -1259,24 +1290,90 @@ def razorpay_payment(request):
             razorpay_order_id = request.POST.get('razorpay_order_id', '')
             signature = request.POST.get('razorpay_signature', '')
             
+            user = request.user
+            customer = Customer.objects.get(user = user)
+            cart = Cart.objects.get(customer = customer)
+            cart_items = CartProducts.objects.filter(cart = cart)
+            if cart_items:
+                item_count = 0
+                subtotal = 0
+                for items in cart_items:
+                    item_count += 1
+                    each_price = items.product.product_color_image.price * items.quantity
+                    subtotal = subtotal + each_price
+                if subtotal <= 2500:
+                    shipping_charge = 99
+                    total_charge = subtotal + shipping_charge
+                else:
+                    shipping_charge = 0
+                    total_charge = subtotal
+                    
+                print('REACHED NEAR')
+                address_id = request.session.get('address_id')
+                address = Address.objects.get(pk=address_id)
+                payment_method = request.session.get('payment_method')
+                order_status = "Order Placed"
+                print(address)
+                print(payment_method)
+                print(order_status)
+                
+            
             params_dict = {
                 'razorpay_order_id': razorpay_order_id,
                 'razorpay_payment_id': payment_id,
                 'razorpay_signature': signature
             }
+            payment = Payment.objects.create(
+                    method_name=payment_method,
+                    started_at = timezone.now()
+                )
 
             result = razorpay_client.utility.verify_payment_signature(params_dict)
+            print(result)
             if result is not None:
+                print('ENTERED RAZOR')
                 order = Orders.objects.get(razorpay_id = razorpay_order_id)
                 total = order.total_charge * 100
                 try:
+                    print('Entered inside razorpay')
                     razorpay_client.payment.capture(payment_id, total)
-                    order.paid = True
-                    order.payment.pending = False
-                    order.payment.success = True
+                    order = Orders.objects.create(
+                        customer=customer,
+                        order_status=order_status,
+                        address=address,
+                        payment=payment,
+                        number_of_orders=item_count,
+                        subtotal=subtotal,
+                        shipping_charge=shipping_charge,
+                        total_charge=total_charge,
+                        razorpay_id = razorpay_order_id,
+                        paid = True,
+                    )
                     order.save()
-                    
-                    return render(request, 'paymentsuccess.html')
+                        
+                    for item in cart_items:
+                        print('print item in cart')
+                        order_item = OrderItem.objects.create(
+                            order = order,
+                            product = item.product,
+                            quantity = item.quantity,
+                            order_status="Order Placed",
+                            each_price = item.product.product_color_image.price,
+                        )
+                        order_item.save()
+                            
+                        product_size_id = item.product.id
+                        product_size = ProductSize.objects.get(pk = product_size_id)
+                        product_size.quantity -= item.quantity
+                        product_size.save()
+                        cart_items.delete()
+                        order.paid = True
+                        order.payment.pending = False
+                        order.payment.success = True
+                        order.payment.paid_at = timezone.now()
+                        order.save()
+                        
+                        return render(request, 'order_placed.html', { 'order' : order })
                 except Exception as e:
                     return render(request, 'paymentfail.html')
 
@@ -1287,4 +1384,5 @@ def razorpay_payment(request):
     else:
         return HttpResponseBadRequest()
     
-
+    
+    

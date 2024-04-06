@@ -1,10 +1,63 @@
 {% extends 'main_base.html' %}
+
+{% load static %}
+
+{% block custom_styles %}
+  <link rel="stylesheet" href="{% static 'user/css/razorpay_styles.css' %}" />
+{% endblock %}
+
 {% block main_content %}
   <div class="container">
-    <h1>Pay with Razorpay</h1>
-    <p>Total Amount: ₹{{ total_charge }}</p>
-    <p>Delivery Address: {{ address.street_address }}, {{ address.city }}, {{ address.state }}, {{ address.country }}, {{ address.pin_code }}</p>
-    <button id="pay-btn" class="btn btn-primary">Pay Now</button>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="order-details-container">
+          <h2>Order Details</h2>
+          <div class="order-details">
+            <p>
+              <strong>Total Amount:</strong> ₹ {{ total_charge }}.00
+            </p>
+            <p>
+              <strong>Delivery Address:</strong>
+            </p>
+            <p>{{ address.street_address }}</p>
+            <p>{{ address.city }}, {{ address.state }}, {{ address.country }}, {{ address.pin_code }}</p>
+          </div>
+        </div>
+      </div>
+      <aside class="col-lg-3">
+        <div class="summary">
+          <h3 class="summary-title">Your Order</h3>
+
+          <table class="table table-summary">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr class="summary-subtotal">
+                <td>Subtotal:</td>
+                <td>₹ {{ subtotal }}.00</td>
+              </tr>
+              <tr>
+                <td>Shipping:</td>
+                <td>₹ {{ shipping_charge }}.00</td>
+              </tr>
+              <tr class="summary-total">
+                <td>Total:</td>
+                <td>₹ {{ total_charge }}.00</td>
+              </tr>
+              <tr>
+                <button id="pay-btn" class="btn btn-primary">Pay Now</button>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </aside>
+    </div>
   </div>
 {% endblock %}
 
@@ -24,7 +77,7 @@
         contact: '{{ customer.phone_number }}'
       },
       theme: {
-        color: '#3399cc'
+        color: '#1F618D'
       }
     }
     

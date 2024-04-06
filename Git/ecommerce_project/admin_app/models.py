@@ -1,8 +1,10 @@
 from django.db import models
 from django.dispatch import receiver
 from user_app.models import *
+from django.db.models import F
 import string
 import random
+from django.utils import timezone
 
 
 
@@ -86,22 +88,12 @@ class ProductSize(models.Model):
 
  
  
-    
-class Coupon(models.Model):
-    name = models.CharField(max_length = 200)
-    value = models.BigIntegerField()
-    starting_date = models.DateField()
-    expiry_date = models.DateField()
-    is_listed = models.BooleanField(default = True)
-    
-    def __str__(self):
-        return self.name
   
-
-
 class Payment(models.Model):
     method_name = models.CharField(max_length = 100)
     pending = models.BooleanField(default=True)
+    started_at = models.DateTimeField(default=timezone.now)
+    paid_at = models.DateTimeField(null=True)
     failed = models.BooleanField(default=False)
     success = models.BooleanField(default=False)
     def __str__(self):
@@ -123,9 +115,11 @@ class Orders(models.Model):
     total_charge = models.PositiveBigIntegerField(default=0)
     razorpay_id = models.CharField(max_length=100, blank=True)
     paid = models.BooleanField(default=False)
-    
+    placed_at = models.DateTimeField(default=timezone.now)
+
     def __str__(self):
-        return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.order_status}"
+        paid_status = "- Paid" if self.paid else ""
+        return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.payment} - {self.order_status} {paid_status}"
     
     def save(self, *args, **kwargs):
         if not self.order_id:
@@ -136,9 +130,11 @@ class Orders(models.Model):
         super().save(*args, **kwargs)
 
 
+
+
 class OrderItem(models.Model):
     order_items_id = models.CharField(primary_key=True, max_length=12, unique=True)
-    order = models.ForeignKey(Orders, on_delete=models.CASCADE)
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='order')
     product = models.ForeignKey(ProductSize, on_delete=models.PROTECT)
     quantity = models.PositiveBigIntegerField(default=1)
     order_status = models.CharField(max_length=100)  
@@ -156,24 +152,9 @@ class OrderItem(models.Model):
             random_numbers = ''.join(random.choices(string.digits, k=4))
             self.order_items_id = f"{first_part}{random_letters}{random_numbers}"
         super().save(*args, **kwargs)
-
         
         
         
-
-class Banner(models.Model):
-    name = models.CharField(max_length = 200)
-    image_video = models.FileField(upload_to= 'banner_images/')
-    target_id = models.IntegerField()
-    target_name = models.CharField()
-    start_date = models.DateField()
-    expiry_date = models.DateField()
-    is_listed = models.BooleanField()
-    
-    def __str__(self):
-        return self.name
-    
-    
     
 
 
