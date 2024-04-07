@@ -45,7 +45,7 @@ urlpatterns = [
     
     path('sneakerheads/user/checkout/', checkout_page, name='checkout_page'),
     path('sneakerheads/user/order-details-page/<str:order_id>/', order_detail, name='order_detail'),
-    path('sneakerheads/user/razorpay_payment/', razorpay_payment, name='razorpay_payment'),
+    path('sneakerheads/user/razorpay_payment/<int:user_id>/', razorpay_payment, name='razorpay_payment'),
     path('sneakerheads/user/place-order/', place_order, name='place_order'),
     
     

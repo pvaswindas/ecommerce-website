@@ -91,13 +91,21 @@ class ProductSize(models.Model):
   
 class Payment(models.Model):
     method_name = models.CharField(max_length = 100)
-    pending = models.BooleanField(default=True)
-    started_at = models.DateTimeField(default=timezone.now)
     paid_at = models.DateTimeField(null=True)
+    pending = models.BooleanField(default=True)
     failed = models.BooleanField(default=False)
     success = models.BooleanField(default=False)
+    
     def __str__(self):
-        return self.method_name
+        
+        if self.success:
+            status = "Success" 
+        elif self.failed:
+            status =  "Failed"
+        else:
+            status = "Pending"
+            
+        return f"{self.method_name} : {status}"
 
 
 

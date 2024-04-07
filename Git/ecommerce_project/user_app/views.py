@@ -1179,6 +1179,8 @@ def checkout_page(request):
 
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
+from urllib.parse import urlencode
+
 @never_cache
 def place_order(request):
     if request.user.is_authenticated:
@@ -1207,23 +1209,28 @@ def place_order(request):
                 
                 address = Address.objects.get(pk=address_id)
 
-                
-                
                 razorpay = None
                 
                 if payment_method == 'Razorpay':
-                    try: 
+                    try:
+                        callback_params = {
+                            'address_id': address_id,
+                        }
+                        callback_query_string = urlencode(callback_params)
+                        callback_url = request.build_absolute_uri(reverse('razorpay_payment', kwargs={'user_id': user.id})) + '?' + callback_query_string
+                        
+                        request.session['user_id'] = user.id
                         request.session['address_id'] = address_id
                         request.session['payment_method'] = payment_method
                         currency = 'INR'
-                        callback_url = request.build_absolute_uri(reverse('razorpay_payment'))
                         amount_in_paise = int(total_charge * 100)
-                        razorpay_order = razorpay_client.order.create(dict(amount=amount_in_paise,currency=currency, payment_capture='0'))
+                        razorpay_order = razorpay_client.order.create(dict(amount=amount_in_paise, currency=currency, payment_capture='0'))
                         razorpay_order_id = razorpay_order['id']
                         razorpay = {
                             'shipping_charge' : shipping_charge,
                             'address' : address,
                             'total_charge' : total_charge,
+                            'subtotal' : subtotal,
                             'razorpay_order_id' : razorpay_order_id,
                             'total' : amount_in_paise,
                             'currency' : currency,
@@ -1238,7 +1245,7 @@ def place_order(request):
                 else:
                     payment = Payment.objects.create(
                         method_name=payment_method,
-                        started_at = timezone.now()
+                        started_at=timezone.now()
                     )
                     order = Orders.objects.create(
                     customer=customer,
@@ -1254,20 +1261,20 @@ def place_order(request):
                     
                     for item in cart_items:
                         order_item = OrderItem.objects.create(
-                            order = order,
-                            product = item.product,
-                            quantity = item.quantity,
+                            order=order,
+                            product=item.product,
+                            quantity=item.quantity,
                             order_status="Order Placed",
-                            each_price = item.product.product_color_image.price,
+                            each_price=item.product.product_color_image.price,
                         )
                         order_item.save()
                         
                         product_size_id = item.product.id
-                        product_size = ProductSize.objects.get(pk = product_size_id)
+                        product_size = ProductSize.objects.get(pk=product_size_id)
                         product_size.quantity -= item.quantity
                         product_size.save()
                         cart_items.delete()
-                    return render(request, 'order_placed.html', { 'order' : order } )
+                    return render(request, 'order_placed.html', {'order': order})
         return redirect('index_page')
     else:
         return redirect('index_page')
@@ -1281,108 +1288,75 @@ def place_order(request):
                 
 # ---------------------------------------------------------------------------------- CC_RAZORPAY PAYMENT FUNCTIONS ----------------------------------------------------------------------------------
 
-        
+ 
 @csrf_exempt
-def razorpay_payment(request):
+def razorpay_payment(request, user_id):
     if request.method == "POST":
         try:
             payment_id = request.POST.get('razorpay_payment_id', '')
             razorpay_order_id = request.POST.get('razorpay_order_id', '')
             signature = request.POST.get('razorpay_signature', '')
             
-            user = request.user
-            customer = Customer.objects.get(user = user)
-            cart = Cart.objects.get(customer = customer)
-            cart_items = CartProducts.objects.filter(cart = cart)
-            if cart_items:
-                item_count = 0
-                subtotal = 0
-                for items in cart_items:
-                    item_count += 1
-                    each_price = items.product.product_color_image.price * items.quantity
-                    subtotal = subtotal + each_price
-                if subtotal <= 2500:
-                    shipping_charge = 99
-                    total_charge = subtotal + shipping_charge
-                else:
-                    shipping_charge = 0
-                    total_charge = subtotal
-                    
-                print('REACHED NEAR')
-                address_id = request.session.get('address_id')
-                address = Address.objects.get(pk=address_id)
-                payment_method = request.session.get('payment_method')
-                order_status = "Order Placed"
-                print(address)
-                print(payment_method)
-                print(order_status)
-                
+            user = User.objects.get(pk=user_id)
+            customer = Customer.objects.get(user=user)
             
-            params_dict = {
-                'razorpay_order_id': razorpay_order_id,
-                'razorpay_payment_id': payment_id,
-                'razorpay_signature': signature
-            }
-            payment = Payment.objects.create(
-                    method_name=payment_method,
-                    started_at = timezone.now()
-                )
-
+            cart = Cart.objects.get(customer=customer)
+            cart_items = CartProducts.objects.filter(cart=cart)
+            subtotal = sum(item.product.product_color_image.price * item.quantity for item in cart_items)
+            shipping_charge = 99 if subtotal <= 2500 else 0
+            
+            address_id = request.GET.get('address_id')
+            address = Address.objects.get(pk=address_id)
+            
+            payment_method = 'Razorpay'
+            payment = Payment.objects.create(method_name=payment_method)
+            payment.save()
+            params_dict = {'razorpay_order_id': razorpay_order_id, 'razorpay_payment_id': payment_id, 'razorpay_signature': signature}
             result = razorpay_client.utility.verify_payment_signature(params_dict)
-            print(result)
             if result is not None:
-                print('ENTERED RAZOR')
-                order = Orders.objects.get(razorpay_id = razorpay_order_id)
-                total = order.total_charge * 100
-                try:
-                    print('Entered inside razorpay')
+                with transaction.atomic():
+                    payment.paid_at = timezone.now()
+                    payment.pending = False
+                    payment.success = True
+                    payment.save()
+                    total_charge = subtotal + shipping_charge
+                    total = total_charge * 100
                     razorpay_client.payment.capture(payment_id, total)
                     order = Orders.objects.create(
                         customer=customer,
-                        order_status=order_status,
+                        order_status="Order Placed",
                         address=address,
                         payment=payment,
-                        number_of_orders=item_count,
+                        number_of_orders=len(cart_items),
                         subtotal=subtotal,
                         shipping_charge=shipping_charge,
                         total_charge=total_charge,
-                        razorpay_id = razorpay_order_id,
-                        paid = True,
+                        razorpay_id=razorpay_order_id,
+                        paid=True
                     )
                     order.save()
-                        
                     for item in cart_items:
-                        print('print item in cart')
                         order_item = OrderItem.objects.create(
-                            order = order,
-                            product = item.product,
-                            quantity = item.quantity,
+                            order=order,
+                            product=item.product,
+                            quantity=item.quantity,
                             order_status="Order Placed",
-                            each_price = item.product.product_color_image.price,
+                            each_price=item.product.product_color_image.price,
                         )
                         order_item.save()
-                            
                         product_size_id = item.product.id
-                        product_size = ProductSize.objects.get(pk = product_size_id)
+                        product_size = ProductSize.objects.get(pk=product_size_id)
                         product_size.quantity -= item.quantity
                         product_size.save()
                         cart_items.delete()
-                        order.paid = True
-                        order.payment.pending = False
-                        order.payment.success = True
-                        order.payment.paid_at = timezone.now()
-                        order.save()
-                        
-                        return render(request, 'order_placed.html', { 'order' : order })
-                except Exception as e:
-                    return render(request, 'paymentfail.html')
-
+                    
+                    return render(request, 'order_placed.html', {'order': order})
             else:
+                payment.failed = True
+                payment.pending = False
+                payment.save()
                 return render(request, 'paymentfail.html')
         except Exception as e:
             return HttpResponseBadRequest()
     else:
         return HttpResponseBadRequest()
-    
-    
-    
