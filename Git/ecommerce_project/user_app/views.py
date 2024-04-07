@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
+from urllib.parse import urlencode
 from django.contrib import messages
 from django.http import JsonResponse
 from django.http import HttpResponse
@@ -36,46 +37,57 @@ from django.contrib.auth.hashers import check_password
 
 
 
-@never_cache
-def index_page(request):
+def get_cart_wishlist_address_order_data(request):
+    data = {}
     if request.user.is_authenticated:
-        context = {}
         user = request.user
-        customer = Customer.objects.get(user = user)
-        cart = Cart.objects.get(customer = customer)
-        cart_items = CartProducts.objects.filter(cart = cart)
-        wishlist = Wishlist.objects.get(customer = customer)
-        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
+        customer = Customer.objects.get(user=user)
+        cart = Cart.objects.get(customer=customer)
+        cart_items = CartProducts.objects.filter(cart=cart)
+        wishlist = Wishlist.objects.get(customer=customer)
+        wishlist_item_count = WishlistItem.objects.filter(wishlist=wishlist).count()
+        addresses = Address.objects.filter(customer = customer)
+        orders = Orders.objects.filter(customer = customer)
+        order_items = OrderItem.objects.filter(order__customer = customer)
+        
+        data.update({
+            'user': user,
+            'customer': customer,
+            'cart': cart,
+            'cart_items': cart_items,
+            'wishlist': wishlist,
+            'wishlist_item_count': wishlist_item_count,
+            'addresses' : addresses,
+            'orders' : orders,
+            'order_items' : order_items,
+        })
         
         if cart_items:
             item_count = 0
             subtotal = 0
             for items in cart_items:
                 item_count += 1
-                each_price =  items.product.product_color_image.price * items.quantity
+                each_price = items.product.product_color_image.price * items.quantity
                 subtotal = subtotal + each_price
-            if subtotal <= 2500:
-                shipping_charge = 99
-                total_charge = subtotal + shipping_charge
-            else:
-                shipping_charge = 0
-                total_charge = subtotal
-            context.update({
-                'item_count' : item_count,
-                'shipping_charge' : shipping_charge,
-                'subtotal' : subtotal,
-                'total_charge' : total_charge,
-                'user' : user,
-                'customer' : customer,
-                'cart' : cart,
-                'cart_items' : cart_items,
+            shipping_charge = 99 if subtotal <= 2500 else 0
+            total_charge = subtotal + shipping_charge
+            data.update({
+                'item_count': item_count,
+                'shipping_charge': shipping_charge,
+                'subtotal': subtotal,
+                'total_charge': total_charge,
             })
-        context.update({
-            'customer' : customer,
-            'cart' : cart,
-            'cart_items' : cart_items,
-            'wishlist_item_count' : wishlist_item_count,
-        })
+    return data
+
+
+
+
+@never_cache
+def index_page(request):
+    if request.user.is_authenticated:
+        context = {}
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        context.update(cart_wishlist_address_order_data)
         return render(request, 'index.html', context)
     return render(request, 'index.html')
 
@@ -444,38 +456,8 @@ def shop_page_view(request):
         {"min": 5000, "max": None},
     ]
     if request.user.is_authenticated:
-        user = request.user
-        customer = Customer.objects.get(user = user)
-        wishlist = Wishlist.objects.get(customer = customer)
-        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
-        cart = Cart.objects.get(customer = customer)
-        cart_items = CartProducts.objects.filter(cart = cart)
-        context.update({
-            'cart' : cart,
-            'cart_items' : cart_items,
-            'wishlist' : wishlist,
-            'wishlist_item_count' : wishlist_item_count,
-            })
-        if cart_items:
-            item_count = 0
-            subtotal = 0
-            for items in cart_items:
-                item_count += 1
-                each_price =  items.product.product_color_image.price * items.quantity
-                subtotal = subtotal + each_price
-            if subtotal <= 2500:
-                shipping_charge = 99
-                total_charge = subtotal + shipping_charge
-            else:
-                shipping_charge = 0
-                total_charge = subtotal
-            context.update({
-                'item_count' : item_count,
-                'shipping_charge' : shipping_charge,
-                'subtotal' : subtotal,
-                'total_charge' : total_charge,
-            })
-        
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        context.update(cart_wishlist_address_order_data)
     product_color_list = list(ProductColorImage.objects.filter(is_deleted = False, is_listed = True))
     shuffle(product_color_list)
     latest_products = ProductColorImage.objects.all()[:10]
@@ -497,6 +479,7 @@ def shop_page_view(request):
 
 
 
+
 # -------------------------------------------------------------------------------- CC_PRODUCT SINGLE PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
@@ -508,45 +491,18 @@ def product_single_view_page(request, product_name, pdt_id):
     product_color = ProductColorImage.objects.get(pk=pdt_id)
 
     if request.user.is_authenticated:
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        context.update(cart_wishlist_address_order_data)
         user = request.user
-        customer = Customer.objects.get(user=user)
-        cart = Cart.objects.get(customer=customer)
-        cart_items = CartProducts.objects.filter(cart=cart)
+        customer = Customer.objects.get(user = user)
         wishlist = Wishlist.objects.get(customer = customer)
-        wishlist_items = WishlistItem.objects.filter(wishlist = wishlist)
         in_wishlist = WishlistItem.objects.filter(wishlist = wishlist, product = product_color).exists()
-        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
-        in_cart = CartProducts.objects.filter(cart=cart, product__product_color_image=product_color).exists()
+        cart = Cart.objects.get(customer = customer)
+        in_cart = CartProducts.objects.filter(cart = cart, product__product_color_image = product_color).exists()
         context.update({
-            'user': user, 
-            'cart': cart,
-            'wishlist' : wishlist,
-            'wishlist_items' : wishlist_items,
             'in_wishlist' : in_wishlist,
-            'wishlist_item_count' : wishlist_item_count,
-            'in_cart': in_cart,
-            'cart_items': cart_items,
+            'in_cart' : in_cart,
         })
-        if cart_items:
-            item_count = 0
-            subtotal = 0
-            for items in cart_items:
-                item_count += 1
-                each_price =  items.product.product_color_image.price * items.quantity
-                subtotal = subtotal + each_price
-            if subtotal <= 2500:
-                shipping_charge = 99
-                total_charge = subtotal + shipping_charge
-            else:
-                shipping_charge = 0
-                total_charge = subtotal
-            context.update({
-                'item_count' : item_count,
-                'shipping_charge' : shipping_charge,
-                'subtotal' : subtotal,
-                'total_charge' : total_charge,
-            })
-    
     last_five_products = ProductColorImage.objects.order_by('-id')[:5]
     product_sizes = ProductSize.objects.filter(product_color_image=product_color)
 
@@ -564,8 +520,8 @@ def product_single_view_page(request, product_name, pdt_id):
 
 
 
-
 # -------------------------------------------------------------------------------- CC_WISHLIST FUNCTIONS --------------------------------------------------------------------------------
+
 
 
 
@@ -667,55 +623,17 @@ def remove_in_wishlist(request, product_color_id):
 
 
 
-# -------------------------------------------------------------------------------- CC_ACCOUNT DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------- CC_DASHBOARD DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
 
 
 
 @never_cache
 def user_dashboard(request, user_id):
     if request.user.is_authenticated:
-        if user_id:
-            user = User.objects.get(pk = user_id)
-            customer = Customer.objects.get(user = user)
-            cart = Cart.objects.get(customer = customer)
-            cart_items = CartProducts.objects.filter(cart = cart)
-            wishlist = Wishlist.objects.get(customer = customer)
-            wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
-            addresses = Address.objects.filter(customer = customer)
-            orders = Orders.objects.filter(customer = customer)
-            
-            context =  {
-                'cart' : cart,
-                'user' : user, 
-                'customer' : customer,
-                'addresses' : addresses,
-                'cart_items' : cart_items,
-                'wishlist_item_count' : wishlist_item_count,
-                'orders' : orders,
-                }
-            if cart_items:
-                item_count = 0
-                subtotal = 0
-                for items in cart_items:
-                    item_count += 1
-                    each_price =  items.product.product_color_image.price * items.quantity
-                    subtotal = subtotal + each_price
-                if subtotal <= 2500:
-                    shipping_charge = 99
-                    total_charge = subtotal + shipping_charge
-                else:
-                    shipping_charge = 0
-                    total_charge = subtotal
-                context.update({
-                    'item_count' : item_count,
-                    'shipping_charge' : shipping_charge,
-                    'subtotal' : subtotal,
-                    'total_charge' : total_charge,
-                })
-            return render(request, 'dashboard.html', context)
-        else:
-            messages.error(request, 'Not able to get user details at this moment')
-            return redirect(index_page)
+        context = {}
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        context.update(cart_wishlist_address_order_data)
+        return render(request, 'dashboard.html', context)
     else:
         return redirect(index_page)
     
@@ -880,44 +798,47 @@ def add_new_address(request, customer_id):
 def user_change_password(request, user_id):
     if request.user.is_authenticated:
         if request.method == 'POST':
-            current_password  = request.POST.get('current_password')
-            new_password = request.POST.get('new_password')
-            confirm_password = request.POST.get('confirm_password')
-            
-            user = User.objects.get(pk = user_id)
-            is_valid_current_password = True
-            if not check_password(current_password, user.password):
-                messages.error(request, '''Current password don't match''')
-                is_valid_current_password = False
+            try:
+                current_password  = request.POST.get('current_password')
+                new_password = request.POST.get('new_password')
+                confirm_password = request.POST.get('confirm_password')
                 
-            is_valid_new_password = True
-            if len(new_password) < 8:
-                messages.error(request, 'Password must be at least 8 characters long.')
-                is_valid_new_password = False
-            elif ' ' in new_password:
-                messages.error(request, 'Password cannot contain spaces.')
-                is_valid_new_password = False    
-                
-            is_valid_confirm_password = True
-            if new_password != confirm_password:
-                messages.error(request, 'Passwords not match.')
-                is_valid_confirm_password = False    
-                
-            if is_valid_current_password and is_valid_confirm_password and is_valid_new_password:
-                user.set_password(new_password)
-                user.save()
-                
-                user = authenticate(username=user.username, password=new_password)
-                if user is not None:
-                    auth.login(request, user)
+                user = User.objects.get(pk = user_id)
+                is_valid_current_password = True
+                if not check_password(current_password, user.password):
+                    messages.error(request, '''Current password don't match''')
+                    is_valid_current_password = False
                     
-                messages.success(request, 'Password Updated')
-                return redirect('user_dashboard', user_id = user_id)
-                
-            else:
-                return redirect('user_dashboard', user_id = user_id)
+                is_valid_new_password = True
+                if len(new_password) < 8:
+                    messages.error(request, 'Password must be at least 8 characters long.')
+                    is_valid_new_password = False
+                elif ' ' in new_password:
+                    messages.error(request, 'Password cannot contain spaces.')
+                    is_valid_new_password = False    
+                    
+                is_valid_confirm_password = True
+                if new_password != confirm_password:
+                    messages.error(request, 'Passwords not match.')
+                    is_valid_confirm_password = False    
+                    
+                if is_valid_current_password and is_valid_confirm_password and is_valid_new_password:
+                    user.set_password(new_password)
+                    user.save()
+                    
+                    user = authenticate(username=user.username, password=new_password)
+                    if user is not None:
+                        auth.login(request, user)
+                        
+                    messages.success(request, 'Password Updated')
+                    return redirect('user_dashboard', user_id = user_id)
+                    
+                else:
+                    return redirect('user_dashboard', user_id = user_id)
+            except Exception as e:
+                return redirect(index_page)
     else:
-        return redirect(index_page) 
+        return redirect(sign_in) 
                 
                 
                 
@@ -934,7 +855,7 @@ def user_change_password(request, user_id):
 @never_cache
 def order_detail(request, order_id):
     if request.user.is_authenticated:
-        if order_id:
+        try:
             order = Orders.objects.get(pk = order_id)
             order_items = OrderItem.objects.filter(order = order)
             placed = False
@@ -959,6 +880,10 @@ def order_detail(request, order_id):
                 'delivered' : delivered,
             }
             return render(request, 'dashboard/orders/order_detailed_page.html', context)
+        except Exception as e:
+            return redirect(index_page)
+    else:
+        return render(sign_in)
 
 
 
@@ -975,40 +900,11 @@ def order_detail(request, order_id):
 def cart_view_page(request, user_id):
     if request.user.is_authenticated:
         context = {}
-        user = User.objects.get(pk = user_id)
-        customer = Customer.objects.get(user = user)
-        shipping_addresses = Address.objects.filter(customer = customer)
-        cart = Cart.objects.get(customer = customer)
-        cart_items = CartProducts.objects.filter(cart = cart)
-        wishlist = Wishlist.objects.get(customer = customer)
-        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
-        any_in_stock = any(item.in_stock for item in cart_items)
-        if cart_items:
-            item_count = 0
-            subtotal = 0
-            for items in cart_items:
-                item_count += 1
-                each_price =  items.product.product_color_image.price * items.quantity
-                subtotal = subtotal + each_price
-            if subtotal <= 2500:
-                shipping_charge = 99
-                total_charge = subtotal + shipping_charge
-            else:
-                shipping_charge = 0
-                total_charge = subtotal
-            context.update({
-                'item_count' : item_count,
-                'shipping_charge' : shipping_charge,
-                'subtotal' : subtotal,
-                'total_charge' : total_charge,
-            })
-        context.update({
-            'shipping_addresses' : shipping_addresses,
-            'cart_items' : cart_items,
-            'any_in_stock' : any_in_stock,
-            'wishlist_item_count' : wishlist_item_count,
-        })
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        context.update(cart_wishlist_address_order_data)
         return render(request, 'cart.html', context)
+    else:
+        return render(sign_in)
     
     
     
@@ -1017,22 +913,25 @@ def cart_view_page(request, user_id):
 @never_cache
 def add_to_cart(request, product_id):
     if request.user.is_authenticated:
-        if request.method == 'POST':
-            user_id = request.user.id
-            user = User.objects.get(pk = user_id)
-            customer = Customer.objects.get(user = user)
-            size = request.POST.get('size')
-            
-            product_size = ProductSize.objects.filter(product_color_image__id = product_id).get(pk = size)
-            
-            cart = Cart.objects.get(customer =  customer)
-            
-            cart_product = CartProducts.objects.create(
-                cart = cart,
-                product = product_size,
-            )
-            cart_product.save()
-            return redirect('cart_view_page', user_id = user_id)
+        try:
+            if request.method == 'POST':
+                user_id = request.user.id
+                user = User.objects.get(pk = user_id)
+                customer = Customer.objects.get(user = user)
+                size = request.POST.get('size')
+                
+                product_size = ProductSize.objects.filter(product_color_image__id = product_id).get(pk = size)
+                
+                cart = Cart.objects.get(customer =  customer)
+                
+                cart_product = CartProducts.objects.create(
+                    cart = cart,
+                    product = product_size,
+                )
+                cart_product.save()
+                return redirect('cart_view_page', user_id = user_id)
+        except Exception as e:
+            return redirect(index_page)
     else:
         return redirect(sign_in)
         
@@ -1042,11 +941,14 @@ def add_to_cart(request, product_id):
 @never_cache
 def remove_from_cart(request, cart_item_id):
     if request.user.is_authenticated:
-        cart_item = CartProducts.objects.get(pk = cart_item_id)
-        cart_item.delete()
-        return redirect(reverse('cart_view_page', kwargs={'user_id': request.user.pk}))
+        try:
+            cart_item = CartProducts.objects.get(pk = cart_item_id)
+            cart_item.delete()
+            return redirect(reverse('cart_view_page', kwargs={'user_id': request.user.pk}))
+        except Exception as e:
+            return redirect(index_page)
     else:
-        return redirect(index_page)
+        return redirect(sign_in)
     
     
     
@@ -1057,6 +959,8 @@ def clear_cart(request):
         user_id = request.user.id
         CartProducts.objects.filter(cart__customer__user_id=user_id).delete()
         return redirect('cart_view_page', user_id=user_id)
+    else:
+        return redirect(sign_in)
         
         
         
@@ -1087,10 +991,7 @@ def update_total_price(request):
     
     
     
-    
-    
-    
-    
+     
 @never_cache
 def update_quantity(request):
     if request.user.is_authenticated:
@@ -1112,13 +1013,13 @@ def update_quantity(request):
     else:
         return redirect('index_page')
     
-    
-
 
 
 
 
 # -------------------------------------------------------------------------------- CC_CHECKOUT PAGE FUNCTIONS --------------------------------------------------------------------------------
+   
+   
    
         
 @never_cache
@@ -1128,36 +1029,11 @@ def checkout_page(request):
         customer = Customer.objects.get(user=user)
         cart = Cart.objects.get(customer=customer)
         cart_items = CartProducts.objects.filter(cart=cart, in_stock=True)
-        wishlist = Wishlist.objects.get(customer = customer)
-        wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
-        
-        addresses = Address.objects.filter(customer=customer)
 
         if cart_items:
-            item_count = 0
-            subtotal = 0
-            for items in cart_items:
-                item_count += 1
-                each_price = items.product.product_color_image.price * items.quantity
-                subtotal = subtotal + each_price
-            if subtotal <= 2500:
-                shipping_charge = 99
-                total_charge = subtotal + shipping_charge
-            else:
-                shipping_charge = 0
-                total_charge = subtotal
-            context = {
-                'item_count': item_count,
-                'shipping_charge': shipping_charge,
-                'subtotal': subtotal,
-                'total_charge': total_charge,
-                'user': user,
-                'customer': customer,
-                'cart': cart,
-                'cart_items': cart_items,
-                'wishlist_item_count' : wishlist_item_count,
-                'addresses': addresses,
-            }
+            context = {}
+            cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+            context.update(cart_wishlist_address_order_data)
             return render(request, 'checkout.html', context)
         else:
             user_id = request.user.id
@@ -1170,6 +1046,7 @@ def checkout_page(request):
 
             
     
+    
 # -------------------------------------------------------------------------------- CC_PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
     
 
@@ -1179,105 +1056,104 @@ def checkout_page(request):
 
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
-from urllib.parse import urlencode
+
 
 @never_cache
 def place_order(request):
     if request.user.is_authenticated:
-        with transaction.atomic():
-            user = request.user
-            customer = Customer.objects.get(user=user)
-            cart = Cart.objects.get(customer=customer)
-            cart_items = CartProducts.objects.filter(cart=cart)
-            if cart_items:
-                item_count = 0
-                subtotal = 0
-                for items in cart_items:
-                    item_count += 1
-                    each_price = items.product.product_color_image.price * items.quantity
-                    subtotal = subtotal + each_price
-                if subtotal <= 2500:
-                    shipping_charge = 99
-                    total_charge = subtotal + shipping_charge
-                else:
-                    shipping_charge = 0
-                    total_charge = subtotal
+        try:
+            with transaction.atomic():
+                user = request.user
+                customer = Customer.objects.get(user=user)
+                cart = Cart.objects.get(customer=customer)
+                cart_items = CartProducts.objects.filter(cart=cart)
+                if cart_items:
+                    item_count = 0
+                    subtotal = 0
+                    for items in cart_items:
+                        item_count += 1
+                        each_price = items.product.product_color_image.price * items.quantity
+                        subtotal = subtotal + each_price
+                    if subtotal <= 2500:
+                        shipping_charge = 99
+                        total_charge = subtotal + shipping_charge
+                    else:
+                        shipping_charge = 0
+                        total_charge = subtotal
 
-                address_id = request.POST.get('delivery_address')
-                payment_method = request.POST.get('payment_method')
-                order_status = "Order Placed"
-                
-                address = Address.objects.get(pk=address_id)
-
-                razorpay = None
-                
-                if payment_method == 'Razorpay':
-                    try:
-                        callback_params = {
-                            'address_id': address_id,
-                        }
-                        callback_query_string = urlencode(callback_params)
-                        callback_url = request.build_absolute_uri(reverse('razorpay_payment', kwargs={'user_id': user.id})) + '?' + callback_query_string
-                        
-                        request.session['user_id'] = user.id
-                        request.session['address_id'] = address_id
-                        request.session['payment_method'] = payment_method
-                        currency = 'INR'
-                        amount_in_paise = int(total_charge * 100)
-                        razorpay_order = razorpay_client.order.create(dict(amount=amount_in_paise, currency=currency, payment_capture='0'))
-                        razorpay_order_id = razorpay_order['id']
-                        razorpay = {
-                            'shipping_charge' : shipping_charge,
-                            'address' : address,
-                            'total_charge' : total_charge,
-                            'subtotal' : subtotal,
-                            'razorpay_order_id' : razorpay_order_id,
-                            'total' : amount_in_paise,
-                            'currency' : currency,
-                            'user' : user,
-                            'callback_url' : callback_url,
-                            'customer' : customer,
-                            'settings' : settings,
-                        }
-                        return render(request, 'razorpay_test.html', razorpay)
-                    except Exception as e:
-                        return HttpResponseBadRequest("Razorpay Order Creation Failed: " + str(e))
-                else:
-                    payment = Payment.objects.create(
-                        method_name=payment_method,
-                        started_at=timezone.now()
-                    )
-                    order = Orders.objects.create(
-                    customer=customer,
-                    order_status=order_status,
-                    address=address,
-                    payment=payment,
-                    number_of_orders=item_count,
-                    subtotal=subtotal,
-                    shipping_charge=shipping_charge,
-                    total_charge=total_charge
-                    )
-                    order.save()
+                    address_id = request.POST.get('delivery_address')
+                    payment_method = request.POST.get('payment_method')
+                    order_status = "Order Placed"
                     
-                    for item in cart_items:
-                        order_item = OrderItem.objects.create(
-                            order=order,
-                            product=item.product,
-                            quantity=item.quantity,
-                            order_status="Order Placed",
-                            each_price=item.product.product_color_image.price,
+                    address = Address.objects.get(pk=address_id)
+
+                    razorpay = None
+                    
+                    if payment_method == 'Razorpay':
+                        try:
+                            callback_params = {
+                                'address_id': address_id,
+                            }
+                            callback_query_string = urlencode(callback_params)
+                            callback_url = request.build_absolute_uri(reverse('razorpay_payment', kwargs={'user_id': user.id})) + '?' + callback_query_string
+                            currency = 'INR'
+                            amount_in_paise = int(total_charge * 100)
+                            razorpay_order = razorpay_client.order.create(dict(amount=amount_in_paise, currency=currency, payment_capture='0'))
+                            razorpay_order_id = razorpay_order['id']
+                            razorpay = {
+                                'customer' : customer,
+                                'cart' : cart,
+                                'cart_items' : cart_items,
+                                'shipping_charge' : shipping_charge,
+                                'address' : address,
+                                'total_charge' : total_charge,
+                                'subtotal' : subtotal,
+                                'razorpay_order_id' : razorpay_order_id,
+                                'total' : amount_in_paise,
+                                'currency' : currency,
+                                'user' : user,
+                                'callback_url' : callback_url,
+                                'customer' : customer,
+                                'settings' : settings,
+                            }
+                            return render(request, 'razorpay_test.html', razorpay)
+                        except Exception as e:
+                            return HttpResponseBadRequest("Razorpay Order Creation Failed: " + str(e))
+                    else:
+                        payment = Payment.objects.create(method_name=payment_method)
+                        order = Orders.objects.create(
+                        customer=customer,
+                        order_status=order_status,
+                        address=address,
+                        payment=payment,
+                        number_of_orders=item_count,
+                        subtotal=subtotal,
+                        shipping_charge=shipping_charge,
+                        total_charge=total_charge
                         )
-                        order_item.save()
+                        order.save()
                         
-                        product_size_id = item.product.id
-                        product_size = ProductSize.objects.get(pk=product_size_id)
-                        product_size.quantity -= item.quantity
-                        product_size.save()
-                        cart_items.delete()
-                    return render(request, 'order_placed.html', {'order': order})
-        return redirect('index_page')
+                        for item in cart_items:
+                            order_item = OrderItem.objects.create(
+                                order=order,
+                                product=item.product,
+                                quantity=item.quantity,
+                                order_status="Order Placed",
+                                each_price=item.product.product_color_image.price,
+                            )
+                            order_item.save()
+                            
+                            product_size_id = item.product.id
+                            product_size = ProductSize.objects.get(pk=product_size_id)
+                            product_size.quantity -= item.quantity
+                            product_size.save()
+                            cart_items.delete()
+                        return render(request, 'order_placed.html', {'order': order})
+            return redirect('index_page')
+        except Exception as e:
+            return redirect('index_page')
     else:
-        return redirect('index_page')
+        return redirect('sign_in')
 
                 
                 
@@ -1288,6 +1164,8 @@ def place_order(request):
                 
 # ---------------------------------------------------------------------------------- CC_RAZORPAY PAYMENT FUNCTIONS ----------------------------------------------------------------------------------
 
+ 
+ 
  
 @csrf_exempt
 def razorpay_payment(request, user_id):

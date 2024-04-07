@@ -1,22 +1,32 @@
-<h1>Your Orders</h1>
-{% if orders %}
-  <div class="order-list">
-    {% for order in orders %}
-      <div class="order-item">
-        <h5>Order ID: {{ order.order_id }}</h5>
-        <p>Order Status: {{ order.order_status }}</p>
-        <p>Total Items: {{ order.number_of_orders }}</p>
-        <p>Subtotal: ₹{{ order.subtotal }}</p>
-        <p>Shipping Charge: ₹{{ order.shipping_charge }}</p>
-        <p>Total Charge: ₹{{ order.total_charge }}</p>
-        <a href="{% url 'order_detail' order.order_id %}" class="btn btn-primary">View Details</a>
-      </div>
+<h1 class="mb-4">Your Orders</h1>
+
+{% if order_items %}
+  <div class="list-group">
+    {% for item in order_items %}
+      <a href="{% url 'order_detail' item.order_id %}" class="list-group-item list-group-item-action">
+        <div class="d-flex flex-wrap align-items-center justify-content-between py-3">
+          <img src="{{ item.product.product_color_image.main_image.url }}" alt="Product Image" class="img-fluid rounded w-100 mb-3 mb-md-0" style="max-width: 150px;" />
+          <div class="flex-grow-1 ms-md-3">
+            <h4 class="mb-1">Order ID : {{ item.order_items_id }}</h4>
+            <p class="mb-1">
+              <strong>Order Status :</strong> {{ item.order_status }}
+            </p>
+            <p class="mb-1">
+              <strong>Product Name :</strong> {{ item.product.product_color_image.products.name }}
+            </p>
+            <p class="mb-1">
+              <strong>Price :</strong> ₹{{ item.each_price }}.00
+            </p>
+            <p class="mb-1">
+              <strong>Quantity :</strong> {{ item.quantity }}
+            </p>
+          </div>
+        </div>
+      </a>
+      <hr />
     {% endfor %}
   </div>
 {% else %}
   <p>No orders have been made yet.</p>
-  <a href="{% url 'shop_page_view' %}" class="btn btn-outline-primary-2"><span>Go Shopping</span><i class="icon-long-arrow-right"></i></a>
+  <a href="{% url 'shop_page_view' %}" class="btn btn-outline-primary mt-3"><span>Go Shopping</span><i class="fas fa-long-arrow-alt-right ms-2"></i></a>
 {% endif %}
-
-
-

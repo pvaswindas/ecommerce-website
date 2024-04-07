@@ -1,5 +1,5 @@
 .main-container {
-    max-width: 950px;
+    max-width: 100%;
     margin: 20px auto;
     background-color: #f9f9f9;
     border-radius: 10px;
@@ -9,13 +9,14 @@
 
 .messages-container {
     text-align: center;
-    max-width: 950px;
+    max-width: 100%;
     margin: 20px auto;
     padding: 20px;
 }
 
 .profile-info-item {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     margin-bottom: 20px;
 }
@@ -31,21 +32,17 @@
     color: #000000;
     cursor: pointer;
     margin-left: auto;
-    /* Push the edit action to the right */
 }
 
-/* Input styles */
 .edit-input {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
-    width: 60%;
-    /* Adjusted width for responsiveness */
+    width: 100%;
+    max-width: 100%;
     font-size: 14px;
-    /* Set font size */
     color: #333;
-    /* Text color */
 }
 
 .edit-action {
@@ -53,10 +50,8 @@
 }
 
 input {
-    max-width: 700px;
+    max-width: 100%;
 }
-
-
 
 /* Button styles */
 .save-button {
@@ -67,12 +62,9 @@ input {
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
-    /* Set font size */
     transition: background-color 0.3s ease;
-    /* Smooth transition */
 }
 
 .save-button:hover {
     background-color: #0056b3;
-    /* Darker shade on hover */
 }

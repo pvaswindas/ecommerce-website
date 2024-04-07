@@ -29,7 +29,7 @@
                 <p><strong>Address:</strong> {{ order.address.address_line1 }}</p>
                 <p><strong>City:</strong> {{ order.address.city }}</p>
                 <p><strong>State:</strong> {{ order.address.state }}</p>
-                <p><strong>Zip Code:</strong> {{ order.address.pin_code }}</p>
+                <p><strong>Pincode:</strong> {{ order.address.pin_code }}</p>
             </div>
         </div>
         <div class="col-lg-6">
@@ -63,8 +63,9 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
+            
+            <h3 class="order-items-title">Product</h3>
             <div class="order-items mb-5">
-                <h2 class="order-items-title">Order Items</h2>
                 <div class="table-responsive">
                     <table class="order-items-table">
                         <thead>

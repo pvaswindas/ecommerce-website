@@ -147,6 +147,8 @@ class OrderItem(models.Model):
     quantity = models.PositiveBigIntegerField(default=1)
     order_status = models.CharField(max_length=100)  
     each_price = models.PositiveBigIntegerField(default=0)
+    cancel = models.BooleanField(default=False)
+    return_product = models.BooleanField(default=False)
     
     def __str__(self):
         customer_name = f"{self.order.customer.user.first_name} {self.order.customer.user.last_name}"

@@ -47,7 +47,7 @@
                   <a href="#"><img src=" {{ item.product.main_image.url }} " alt="Product image" /></a>
                 </figure>
 
-                <h3 class="product-title"><a href="#">{{ item.product.products.name }} - {{ item.product.color }} Color </a></h3>
+                <h3 class="product-title"><a href="{% url 'product_single_view_page' item.product.products.name item.product.id %}">{{ item.product.products.name }} - {{ item.product.color }} Color </a></h3>
               </div>
             </td>
             <td class="price-col">₹{{ item.product.price }}.00</td>

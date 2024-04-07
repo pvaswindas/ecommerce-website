@@ -1,101 +1,109 @@
-{% extends 'main_base.html' %}
-
 {% load static %}
-
-{% block custom_styles %}
-  <link rel="stylesheet" href="{% static 'user/css/razorpay_styles.css' %}" />
-{% endblock %}
-
-{% block main_content %}
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="order-details-container">
-          <h2>Order Details</h2>
-          <div class="order-details">
-            <p>
-              <strong>Total Amount:</strong> ₹ {{ total_charge }}.00
-            </p>
-            <p>
-              <strong>Delivery Address:</strong>
-            </p>
-            <p>{{ address.street_address }}</p>
-            <p>{{ address.city }}, {{ address.state }}, {{ address.country }}, {{ address.pin_code }}</p>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Razorpay Payment</title>
+    <link rel="stylesheet" href="{% static 'user/css/razorpay_styles.css' %}" />
+    <link rel="icon" href ="{% static 'user/images/sneakerheads_logo/sh_round_red.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static 'user/css/custom.css' %}" />
+  </head>
+  <body class="bg-light">
+    <div class="container min-vh-100 py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="product-details-container p-4">
+            <h2>Product Details</h2>
+            {% for item in cart_items %}
+              <hr />
+              <div class="product-details">
+                <div class="product-image">
+                  <img class="w-75" src="{{ item.product.product_color_image.main_image.url }}" alt="Product Image" />
+                </div>
+                <div class="product-info">
+                  <p>
+                    <strong>{{ item.product.product_color_image.products.name }}</strong>
+                  </p>
+                  <p>Price: ₹{{ item.product.product_color_image.price }}.00</p>
+                  <p>Quantity: {{ item.quantity }}</p>
+                  <p>Size: {{ item.product.size }}</p>
+                </div>
+              </div>
+            {% endfor %}
           </div>
         </div>
+        <aside class="col-md-4">
+          <div class="order-details-container p-4">
+            <h2>Delivery Address</h2>
+            <div class="order-details">
+              <hr />
+              <p>
+                <strong>Delivery Address:</strong>
+              </p>
+              <p>{{ address.name }}: {{ address.street_address }}, {{ address.city }}, {{ address.state }}, {{ address.country }}, {{ address.pin_code }}</p>
+            </div>
+          </div>
+          <div class="summary p-4">
+            <h2 class="summary-title">Your Order</h2>
+            <hr>
+            <table class="table table-summary">
+              <tbody>
+                <tr>
+                  <td>Subtotal:</td>
+                  <td>₹ {{ subtotal }}.00</td>
+                </tr>
+                <tr>
+                  <td>Shipping:</td>
+                  <td>₹ {{ shipping_charge }}.00</td>
+                </tr>
+                <tr class="summary-total">
+                  <td>Total:</td>
+                  <td>₹ {{ total_charge }}.00</td>
+                </tr>
+              </tbody>
+            </table>
+            <button id="pay-btn" class="btn btn-primary w-100 btn-block">Pay Now</button>
+          </div>
+        </aside>
       </div>
-      <aside class="col-lg-3">
-        <div class="summary">
-          <h3 class="summary-title">Your Order</h3>
-
-          <table class="table table-summary">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Total</th>
-                <th></th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr class="summary-subtotal">
-                <td>Subtotal:</td>
-                <td>₹ {{ subtotal }}.00</td>
-              </tr>
-              <tr>
-                <td>Shipping:</td>
-                <td>₹ {{ shipping_charge }}.00</td>
-              </tr>
-              <tr class="summary-total">
-                <td>Total:</td>
-                <td>₹ {{ total_charge }}.00</td>
-              </tr>
-              <tr>
-                <button id="pay-btn" class="btn btn-primary">Pay Now</button>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </aside>
     </div>
-  </div>
-{% endblock %}
-
-{% block custom_scripts %}
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
-    var options = {
-      key: '{{ settings.RAZORPAY_KEY_ID }}',
-      amount: '{{ total }}',
-      currency: '{{ currency }}',
-      name: 'Razorpay',
-      order_id: '{{ razorpay_order_id }}',
-      callback_url: '{{ callback_url }}',
-      prefill: {
-        name: '{{ user.first_name }} {{ user.last_name }}',
-        email: '{{ user.email }}',
-        contact: '{{ customer.phone_number }}',
-        address_id: '{{ address.id }}'
-      },
-      theme: {
-        color: '#1F618D'
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+      var options = {
+        key: '{{ settings.RAZORPAY_KEY_ID }}',
+        amount: '{{ total }}',
+        currency: '{{ currency }}',
+        name: 'Razorpay',
+        order_id: '{{ razorpay_order_id }}',
+        callback_url: '{{ callback_url }}',
+        prefill: {
+          name: '{{ user.first_name }} {{ user.last_name }}',
+          email: '{{ user.email }}',
+          contact: '{{ customer.phone_number }}',
+          address_id: '{{ address.id }}'
+        },
+        theme: {
+          color: '#1F618D'
+        }
       }
-    }
-    
-    var rzp1 = new Razorpay(options)
-    
-    document.getElementById('pay-btn').onclick = function (e) {
-      rzp1.open()
-      e.preventDefault()
-    }
-    
-    options.handler = function (response) {
-      console.log(response)
-      var customerName = response.user.name
-      var customerEmail = response.user.email
-      var customerContact = response.user.contact
-    
-      alert('Payment Successful!\nCustomer Name: ' + customerName + '\nCustomer Email: ' + customerEmail + '\nCustomer Contact: ' + customerContact)
-    }
-  </script>
-{% endblock %}
+      
+      var rzp1 = new Razorpay(options)
+      
+      document.getElementById('pay-btn').onclick = function (e) {
+        rzp1.open()
+        e.preventDefault()
+      }
+      
+      options.handler = function (response) {
+        console.log(response)
+        var customerName = response.user.name
+        var customerEmail = response.user.email
+        var customerContact = response.user.contact
+      
+        alert('Payment Successful!\nCustomer Name: ' + customerName + '\nCustomer Email: ' + customerEmail + '\nCustomer Contact: ' + customerContact)
+      }
+    </script>
+  </body>
+</html>
