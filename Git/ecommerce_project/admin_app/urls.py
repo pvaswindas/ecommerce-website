@@ -78,6 +78,8 @@ urlpatterns = [
     path('sneakerheads/admin/orders/', views.orders_view_page, name='orders_view_page'),
     path('sneakerheads/admin/orders/detailed-view/<str:order_id>/', views.order_detailed_view, name='order_detailed_view'),
     path('sneakerheads/admin/change-order-status/<str:order_id>/', views.change_order_status, name='change_order_status'),
+    
+    path('sneakerheads/admin/order/return_product<str:order_items_id>/', views.return_product, name='return_product'),
 ]
 
 

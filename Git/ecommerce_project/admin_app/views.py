@@ -3,7 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from user_app.models import Customer
 from admin_app.models import *
-
+from datetime import datetime
+from datetime import timedelta
 from django.contrib.auth import authenticate
 from django.contrib import auth
 from django.contrib import messages
@@ -1086,7 +1087,9 @@ def un_list_the_brand(request, brand_id):
 def orders_view_page(request):
     if request.user.is_superuser:
         orders = Orders.objects.all().order_by('customer').values()
+        order_item = OrderItem.objects.all().order_by('order__customer__user__first_name')
         context = {
+            'order_item' : order_item,
             'orders' : orders,
             'is_active_order' : is_active_order,
         }
@@ -1099,12 +1102,10 @@ def orders_view_page(request):
 @never_cache
 def order_detailed_view(request, order_id):
     if request.user.is_superuser:
-        orders = Orders.objects.get(pk = order_id)
-        order_items = OrderItem.objects.filter(order = orders)
+        order_item = OrderItem.objects.get(pk = order_id)
         context = {
             'is_active_order' : is_active_order,
-            'orders' : orders,
-            'order_items' : order_items,
+            'order_item' : order_item,
         }
         return render(request, 'pages/orders/single order_view_page.html', context)
     else:
@@ -1120,13 +1121,32 @@ def change_order_status(request, order_id):
     print(order_id)
     if request.user.is_superuser:
         order_status = request.POST.get('order_status')
-        order = Orders.objects.get(pk = order_id)
+        order_item = OrderItem.objects.get(pk = order_id)
         
-        if order:
-            order.order_status = order_status
-            order.save()
+        if order_item:
+            order_item.order_status = order_status
+            order_item.save()
             messages.success(request, 'Order Status Updated')
             return redirect('orders_view_page')
     else:
         return redirect('admin_login_page')
         
+        
+        
+        
+
+
+
+@never_cache
+def return_product(request, order_items_id):
+    if request.user.is_superuser:
+        try:
+            order_items = OrderItem.objects.get(pk = order_items_id)
+            order_items.return_product = True
+            order_items.order_status = 'Returned'
+            order_items.save()
+            return redirect('order_detailed_view', order_items_id)
+        except Exception as e:
+            return redirect(admin_login_page)
+    else:
+        return redirect(admin_login_page)

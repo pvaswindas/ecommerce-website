@@ -93,7 +93,6 @@
       })
     
       $('#addVariantBtn').click(function () {
-        // Perform additional validation or submit form here
         $('#variantForm').submit()
       })
     })
@@ -101,7 +100,7 @@
     $(document).ready(function () {
       $('#productSelect').change(function () {
         var productId = $(this).val()
-        console.log('Product selected: ', productId) // Debug statement
+        console.log('Product selected: ', productId) 
     
         if (productId) {
           $.ajax({
@@ -109,7 +108,7 @@
             data: { product_id: productId },
             dataType: 'json',
             success: function (data) {
-              console.log('Colors data received: ', data) // Debug statement
+              console.log('Colors data received: ', data)
     
               var colorSelect = $('#colorSelect')
               colorSelect.empty().append('<option value="" disabled selected>Select Color</option>')

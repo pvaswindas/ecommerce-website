@@ -45,9 +45,12 @@ urlpatterns = [
     path('sneakerheads/user/add-to-cart/<int:product_id>/', add_to_cart, name='add_to_cart'),
     
     path('sneakerheads/user/checkout/', checkout_page, name='checkout_page'),
-    path('sneakerheads/user/order-details-page/<str:order_id>/', order_detail, name='order_detail'),
-    path('sneakerheads/user/razorpay_payment/<int:user_id>/', razorpay_payment, name='razorpay_payment'),
-    path('sneakerheads/user/place-order/', place_order, name='place_order'),
+    
+    path('sneakerheads/user/order/order-details-page/<str:order_id>/', order_detail, name='order_detail'),
+    path('sneakerheads/user/order/razorpay_payment/<int:user_id>/', razorpay_payment, name='razorpay_payment'),
+    path('sneakerheads/user/order/place-order/', place_order, name='place_order'),
+    path('sneakerheads/user/order/cancel_order/<str:order_items_id>/', cancel_order, name='cancel_order'),
+    path('sneakerheads/user/order/sent_return_request/<str:order_items_id>/', sent_return_request, name='sent_return_request'),
     
     
     

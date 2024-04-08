@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'user/css/detailed_order.css' %}" />
+  <link rel="stylesheet" href="{% static 'user/css/detailed_order.css' %}" />
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -11,85 +11,174 @@
 {% endblock %}
 
 {% block page_content %}
-<div class="container">
+  <div class="container">
     <h1 class="page-title">Order Details</h1>
     <div class="row">
-        <div class="col-lg-6">
-            <div class="order-details">
-                <h2>Order ID: {{ order.order_id }}</h2>
-                <p>Order Status: {{ order.order_status }}</p>
-                <p>Total Items: {{ order.number_of_orders }}</p>
-                <p>Subtotal: ₹{{ order.subtotal }}</p>
-                <p>Shipping Charge: ₹{{ order.shipping_charge }}</p>
-                <p>Total Charge: ₹{{ order.total_charge }}</p>
-            </div>
-            <div class="order-address">
-                <h2>Delivery Address</h2>
-                <p><strong>Name:</strong> {{ order.customer.user.first_name }} {{ order.customer.user.last_name }}</p>
-                <p><strong>Address:</strong> {{ order.address.address_line1 }}</p>
-                <p><strong>City:</strong> {{ order.address.city }}</p>
-                <p><strong>State:</strong> {{ order.address.state }}</p>
-                <p><strong>Pincode:</strong> {{ order.address.pin_code }}</p>
-            </div>
+      <div class="col-lg-6">
+        <div class="order-details">
+          <h2>Order ID : {{ order_items.order_items_id }}</h2>
+          <p>Order Status : {{ order_items.order_status }}</p>
+          <p>Total Quantity : {{ order_items.quantity }}</p>
+          <p>Price : ₹{{ order_items.each_price }}</p>
+          {% if order_items.order.shipping_charge > 0 %}
+            <p>Shipping Charge : ₹{{ order_items.order.shipping_charge }}.00</p>
+          {% endif %}
         </div>
-        <div class="col-lg-6">
+        <div class="order-address">
+          <h2>Delivery Address</h2>
+          <p>
+            <strong>Name:</strong> {{ order_items.order.customer.user.first_name }} {{ order_items.customer.user.last_name }}
+          </p>
+          <p>
+            <strong>Address:</strong> {{ order_items.order.address.street_address }}
+          </p>
+          <p>
+            <strong>City:</strong> {{ order_items.order.address.city }}
+          </p>
+          <p>
+            <strong>State:</strong> {{ order_items.order.address.state }}
+          </p>
+          <p>
+            <strong>Pincode:</strong> {{ order_items.order.address.pin_code }}
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        {% if not order_items.request_return %}
+          {% if not order_items.cancel_product %}
             <div class="order-status m-5">
-                <h2>Delivery Tracking</h2>
-                <div class="delivery-tracking">
-                    <div class="tracking-item {% if placed or shipped  or delivery or delivered %}active{% endif %}">
-                        <div class="tracking-icon"></div>
-                        <div class="tracking-text">Order Placed</div>
-                    </div>
-                    <div class="tracking-item {% if shipped or delivery or delivered %}active{% endif %}">
-                        <div class="tracking-icon"></div>
-                        <div class="tracking-text">Shipped</div>
-                    </div>
-                    <div class="tracking-item {% if delivery or delivered %}active{% endif %}">
-                        <div class="tracking-icon"></div>
-                        <div class="tracking-text">Out for Delivery</div>
-                    </div>
-                    <div class="tracking-item {% if order.order_status == 'Delivered' %}active{% endif %}">
-                        <div class="tracking-icon"></div>
-                        <div class="tracking-text">Delivered</div>
-                    </div>
+              <h2>Delivery Tracking</h2>
+              <div class="delivery-tracking">
+                <div class="tracking-item {% if placed or shipped or delivery or delivered %}active{% endif %}">
+                  <div class="tracking-icon"></div>
+                  <div class="tracking-text">
+                    Order Placed <br /> <small>{{ order_items.order.placed_at }}</small>
+                  </div>
                 </div>
-                {% if order.order_status == 'Delivered' %}
-                <button class="btn btn-primary">Return Order</button>
+                <div class="tracking-item {% if shipped or delivery or delivered %}active{% endif %}">
+                  <div class="tracking-icon"></div>
+                  <div class="tracking-text">Shipped</div>
+                </div>
+                <div class="tracking-item {% if delivery or delivered %}active{% endif %}">
+                  <div class="tracking-icon"></div>
+                  <div class="tracking-text">Out for Delivery</div>
+                </div>
+                <div class="tracking-item {% if order_items.order_status == 'Delivered' %}active{% endif %}">
+                  <div class="tracking-icon"></div>
+                  <div class="tracking-text">Delivered</div>
+                </div>
+              </div>
+              {% if order_items.order_status == 'Delivered' %}
+                {% if can_return_product %}
+                  <a href="{% url 'sent_return_request' order_items.order_items_id %}"><button class="btn btn-primary">Return Order</button></a>
                 {% else %}
-                <button class="btn btn-danger cancel-order-btn">Cancel Order</button>
+                  <span>Return policy ended on {{ return_end_date_only_date }}</span>
                 {% endif %}
+              {% else %}
+                <button id="cancelOrderBtn" class="btn btn-danger">Cancel Order</button>
+              {% endif %}
             </div>
-        </div>
+          {% else %}
+            <div class="order-status m-5">
+              <div class="tracking-item {% if placed or shipped or delivery or order_items.cancel_product %}active{% endif %}">
+                <div class="tracking-icon"></div>
+                <div class="tracking-text">Order Placed</div>
+              </div>
+              <div class="tracking-item {% if shipped or delivery or order_items.cancel_product %}active{% endif %}">
+                <div class="tracking-icon"></div>
+                <div class="tracking-text">Cancelled</div>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="order-status m-5">
+            <p><strong>Refund Status :</strong>
+                {% if not order_items.return_product %}
+                  Return requested
+                {% else %}
+                  The money was added to your wallet
+                {% endif %}
+            </p>
+            <div class="refund-tracking">
+              <div class="tracking-item {% if order_items.request_return %}active{% endif %}">
+                <div class="tracking-icon"></div>
+                <div class="tracking-text">
+                  Order Placed
+                </div>
+              </div>
+              <div class="tracking-item {% if order_items.request_return %}active{% endif %}">
+                <div class="tracking-icon"></div>
+                <div class="tracking-text">
+                  Delivered
+                </div>
+              </div>
+              <div class="tracking-item {% if order_items.request_return %}active{% endif %}">
+                <div class="tracking-icon"></div>
+                <div class="tracking-text">
+                  Return
+                </div>
+              </div>
+              <div class="tracking-item {% if order_items.return_product %}active{% endif %}">
+                <div class="tracking-icon"></div>
+                <div class="tracking-text">
+                  Refund
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
     </div>
     <div class="row">
-        <div class="col-lg-12">
-            
-            <h3 class="order-items-title">Product</h3>
-            <div class="order-items mb-5">
-                <div class="table-responsive">
-                    <table class="order-items-table">
-                        <thead>
-                            <tr>
-                                <th>Image</th>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in order_items %}
-                            <tr>
-                                <td><img src="{{ item.product.product_color_image.main_image.url }}" alt="{{ item.product.product_color_image.products.name }}" /></td>
-                                <td>{{ item.product.product_color_image.products.name }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>₹{{ item.each_price }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+      <div class="col-lg-12">
+        <h3 class="order-items-title">Product</h3>
+        <div class="order-items mb-5">
+          <div class="table-responsive">
+            <table class="order-items-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <img src="{{ order_items.product.product_color_image.main_image.url }}" alt="{{ item.product.product_color_image.products.name }}" />
+                  </td>
+                  <td>{{ order_items.product.product_color_image.products.name }}</td>
+                  <td>{{ order_items.quantity }}</td>
+                  <td>₹{{ order_items.each_price }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
+
+  <div id="cancelOrderModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Cancel Order</h2>
+      <p>Please select a reason for cancelling your order:</p>
+      <select id="cancelReasonSelect" required>
+        <option value="Item no longer needed">Item no longer needed</option>
+        <option value="Found a better price elsewhere">Found a better price elsewhere</option>
+        <option value="Ordered by mistake">Ordered by mistake</option>
+        <option value="Shipping time too long">Shipping time too long</option>
+        <option value="Other">Other</option>
+      </select>
+      <br /><br />
+      <a class="w-100 my-2" href="{% url 'cancel_order' order_items.order_items_id %}"><button class="btn btn-danger w-100">Cancel Order</button></a>
+      <button id="closeModalBtn" class="btn btn-secondary">Close</button>
+    </div>
+  </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script src="{% static 'user/js/cancel_modal.js' %}"></script>
 {% endblock %}

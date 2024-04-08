@@ -7,6 +7,7 @@ from datetime import datetime
 from user_app.models import *
 from admin_app.models import *
 from django.db.models import Q
+from datetime import timedelta
 from django.db.models import *
 from django.contrib import auth
 from django.urls import reverse
@@ -48,7 +49,7 @@ def get_cart_wishlist_address_order_data(request):
         wishlist_item_count = WishlistItem.objects.filter(wishlist=wishlist).count()
         addresses = Address.objects.filter(customer = customer)
         orders = Orders.objects.filter(customer = customer)
-        order_items = OrderItem.objects.filter(order__customer = customer)
+        order_items = OrderItem.objects.filter(order__customer=customer).order_by('-order__placed_at')
         
         data.update({
             'user': user,
@@ -856,23 +857,31 @@ def user_change_password(request, user_id):
 def order_detail(request, order_id):
     if request.user.is_authenticated:
         try:
-            order = Orders.objects.get(pk = order_id)
-            order_items = OrderItem.objects.filter(order = order)
+            seven_days_ago = timezone.now() - timedelta(days=7)
+            orders_placed_before_7_days = OrderItem.objects.filter(order__placed_at__gt = seven_days_ago)
+            order_items = OrderItem.objects.get(pk = order_id)
+            return_end_date = order_items.order.placed_at + timedelta(days=7)
+            return_end_date_local = return_end_date.astimezone(timezone.get_current_timezone())
+            return_end_date_only_date = return_end_date_local.date()
+            can_return_product = False
+            if order_items in orders_placed_before_7_days:
+                can_return_product = True
             placed = False
             shipped = False
             delivery = False
             delivered = False
-            if order.order_status == 'Order Placed':
+            if order_items.order_status == 'Order Placed':
                 placed = True
-            if order.order_status == 'Shipped':
+            if order_items.order_status == 'Shipped':
                 shipped = True
-            if order.order_status == 'Out for delivery':
+            if order_items.order_status == 'Out for Delivery':
                 delivery = True
-            if order.order_status == 'Delivered':
+            if order_items.order_status == 'Delivered':
                 delivered = True
             
             context = {
-                'order' : order,
+                'return_end_date_only_date' : return_end_date_only_date,
+                'can_return_product' : can_return_product,
                 'order_items' : order_items,
                 'placed' : placed,
                 'shipped' : shipped,
@@ -887,6 +896,48 @@ def order_detail(request, order_id):
 
 
 
+
+# -------------------------------------------------------------------------------- CC_ORDER CANCEL FUNCTION --------------------------------------------------------------------------------
+
+
+
+
+@never_cache
+def cancel_order(request, order_items_id):
+    if request.user.is_authenticated:
+        try:
+            order_items = OrderItem.objects.get(pk = order_items_id)
+            order_items.cancel_product = True
+            order_items.order_status = 'Cancelled'
+            order_items.save()
+            return redirect('order_detail', order_items_id)
+        except Exception as e:
+            return redirect(index_page)
+    else:
+        return redirect(sign_in)
+
+
+
+# -------------------------------------------------------------------------------- CC_SENT RETURN REQUEST FUNCTION --------------------------------------------------------------------------------
+
+
+
+
+@never_cache
+def sent_return_request(request, order_items_id):
+    if request.user.is_authenticated:
+        try:
+            seven_days_ago = timezone.now() - timedelta(days=7)
+            orders_items_seven_days = OrderItem.objects.filter(order__placed_at__gt=seven_days_ago)
+            order_items = OrderItem.objects.get(pk = order_items_id)
+            if order_items in orders_items_seven_days:
+                order_items.request_return = True
+                order_items.save()
+            return redirect('order_detail', order_items_id)
+        except Exception as e:
+            return redirect(index_page)
+    else:
+        return redirect(sign_in)
 
 
 
@@ -1083,7 +1134,6 @@ def place_order(request):
 
                     address_id = request.POST.get('delivery_address')
                     payment_method = request.POST.get('payment_method')
-                    order_status = "Order Placed"
                     
                     address = Address.objects.get(pk=address_id)
 
@@ -1122,14 +1172,13 @@ def place_order(request):
                     else:
                         payment = Payment.objects.create(method_name=payment_method)
                         order = Orders.objects.create(
-                        customer=customer,
-                        order_status=order_status,
-                        address=address,
-                        payment=payment,
-                        number_of_orders=item_count,
-                        subtotal=subtotal,
-                        shipping_charge=shipping_charge,
-                        total_charge=total_charge
+                            customer=customer,
+                            address=address,
+                            payment=payment,
+                            number_of_orders=item_count,
+                            subtotal=subtotal,
+                            shipping_charge=shipping_charge,
+                            total_charge=total_charge
                         )
                         order.save()
                         
@@ -1202,7 +1251,6 @@ def razorpay_payment(request, user_id):
                     razorpay_client.payment.capture(payment_id, total)
                     order = Orders.objects.create(
                         customer=customer,
-                        order_status="Order Placed",
                         address=address,
                         payment=payment,
                         number_of_orders=len(cart_items),
@@ -1235,6 +1283,7 @@ def razorpay_payment(request, user_id):
                 payment.save()
                 return render(request, 'paymentfail.html')
         except Exception as e:
+            print(e)
             return HttpResponseBadRequest()
     else:
         return HttpResponseBadRequest()

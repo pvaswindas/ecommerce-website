@@ -1,10 +1,11 @@
-from django.db import models
-from django.dispatch import receiver
-from user_app.models import *
-from django.db.models import F
 import string
 import random
+from datetime import date
+from django.db import models
+from user_app.models import *
+from django.db.models import F
 from django.utils import timezone
+from django.dispatch import receiver
 
 
 
@@ -114,20 +115,20 @@ class Payment(models.Model):
 class Orders(models.Model):
     order_id = models.CharField(primary_key=True, max_length=12, unique=True)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
-    order_status = models.CharField(max_length=100)
     address = models.ForeignKey(Address, on_delete=models.PROTECT)
     payment = models.ForeignKey(Payment, on_delete=models.PROTECT)
     number_of_orders = models.PositiveBigIntegerField(default=1)
     subtotal = models.PositiveBigIntegerField(default=0)
     shipping_charge = models.PositiveBigIntegerField(default=0)
     total_charge = models.PositiveBigIntegerField(default=0)
-    razorpay_id = models.CharField(max_length=100, blank=True)
+    razorpay_id = models.CharField(max_length=100, blank=True, null = True)
     paid = models.BooleanField(default=False)
     placed_at = models.DateTimeField(default=timezone.now)
+    delivery_date = models.DateField(null=True)
 
     def __str__(self):
         paid_status = "- Paid" if self.paid else ""
-        return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.payment} - {self.order_status} {paid_status}"
+        return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.payment} {paid_status}"
     
     def save(self, *args, **kwargs):
         if not self.order_id:
@@ -147,8 +148,9 @@ class OrderItem(models.Model):
     quantity = models.PositiveBigIntegerField(default=1)
     order_status = models.CharField(max_length=100)  
     each_price = models.PositiveBigIntegerField(default=0)
-    cancel = models.BooleanField(default=False)
+    cancel_product = models.BooleanField(default=False)
     return_product = models.BooleanField(default=False)
+    request_return = models.BooleanField(default=False)
     
     def __str__(self):
         customer_name = f"{self.order.customer.user.first_name} {self.order.customer.user.last_name}"
@@ -161,10 +163,20 @@ class OrderItem(models.Model):
             random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
             random_numbers = ''.join(random.choices(string.digits, k=4))
             self.order_items_id = f"{first_part}{random_letters}{random_numbers}"
+            
+        if self.order_items_id:
+            if self.order_status == 'Delivered':
+                self.order.payment.success = True
+                self.order.payment.pending = False
+                self.order.payment.save()
+                
+                self.order.paid = True
+                self.order.save()
         super().save(*args, **kwargs)
         
+
         
-        
+
     
 
 

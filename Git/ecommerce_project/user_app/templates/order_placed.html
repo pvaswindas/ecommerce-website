@@ -20,10 +20,6 @@
           <td>{{ order.order_id }}</td>
         </tr>
         <tr>
-          <th>Order Status:</th>
-          <td>{{ order.order_status }}</td>
-        </tr>
-        <tr>
           <th>Payment Status:</th>
           <td>
             {% if order.payment.method_name == 'Razorpay' %}

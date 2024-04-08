@@ -16,21 +16,34 @@
     <table>
       <thead>
         <tr>
+          <th class="customer-column">Customer</th>
           <th class="order-id-column">Order ID</th>
           <th class="status-column">Status</th>
-          <th class="subtotal-column">Subtotal</th>
-          <th class="shipping-charge-column">Items</th>
-          <th class="total-charge-column">Total Charge</th>
+          <th class="price-column">Price</th>
+          <th class="quantity-column">Quantity</th>
+          <th class="size-column">Size</th>
         </tr>
       </thead>
       <tbody>
-        {% for order in orders %}
+        {% for item in order_item %}
           <tr>
-            <td> <a href="{% url 'order_detailed_view' order.order_id %}"> {{ order.order_id }} </a></td>
-            <td>{{ order.order_status }}</td>
-            <td>{{ order.subtotal }}</td>
-            <td>{{ order.number_of_orders }}</td>
-            <td>{{ order.total_charge }}</td>
+            <td>{{ item.order.customer.user.first_name }} {{ item.order.customer.user.last_name }}</td>
+            <td>
+              <a href="{% url 'order_detailed_view' item.order_items_id %}">{{ item.order_items_id }}</a>
+              {% if item.cancel_product %}
+                <span class="cancel-request">Cancelled</span>
+              {% elif item.request_return %}
+                {% if item.return_product %}
+                  <span class="return-request">Order Returned</span>
+                {% else %}
+                  <span class="return-request">Return Request</span>
+                {% endif %}
+              {% endif %}
+            </td>
+            <td>{{ item.order_status }}</td>
+            <td>{{ item.each_price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.product.size }}</td>
           </tr>
         {% endfor %}
       </tbody>

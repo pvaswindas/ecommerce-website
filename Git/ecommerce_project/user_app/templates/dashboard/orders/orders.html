@@ -3,7 +3,7 @@
 {% if order_items %}
   <div class="list-group">
     {% for item in order_items %}
-      <a href="{% url 'order_detail' item.order_id %}" class="list-group-item list-group-item-action">
+      <a href="{% url 'order_detail' item.order_items_id %}" class="list-group-item list-group-item-action">
         <div class="d-flex flex-wrap align-items-center justify-content-between py-3">
           <img src="{{ item.product.product_color_image.main_image.url }}" alt="Product Image" class="img-fluid rounded w-100 mb-3 mb-md-0" style="max-width: 150px;" />
           <div class="flex-grow-1 ms-md-3">
@@ -13,6 +13,9 @@
             </p>
             <p class="mb-1">
               <strong>Product Name :</strong> {{ item.product.product_color_image.products.name }}
+            </p>
+            <p class="mb-1">
+              <strong>Payment :</strong> {{ item.order.payment.method_name }}
             </p>
             <p class="mb-1">
               <strong>Price :</strong> ₹{{ item.each_price }}.00

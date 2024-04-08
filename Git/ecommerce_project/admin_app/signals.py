@@ -53,3 +53,5 @@ def update_product_color_in_stock_on_product_size_quantity_change(sender, instan
         ProductColorImage.objects.filter(pk=product_color_image.pk).update(in_stock=False)
     else:
         ProductColorImage.objects.filter(pk=product_color_image.pk).update(in_stock=True)
+
+
