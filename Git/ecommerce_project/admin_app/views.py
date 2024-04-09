@@ -5,6 +5,7 @@ from user_app.models import Customer
 from admin_app.models import *
 from datetime import datetime
 from datetime import timedelta
+from django.utils import timezone
 from django.contrib.auth import authenticate
 from django.contrib import auth
 from django.contrib import messages
@@ -32,6 +33,76 @@ is_active_coupon = True
 is_active_banner = True
 
 
+five_days_ago = timezone.now() - timedelta(days=5)
+
+
+# 5 DAYS CUSTOMERS-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+customers_last_5_days = User.objects.filter(date_joined__gte=five_days_ago).count()
+total_customers = Customer.objects.all().count()
+
+if total_customers > 0:
+    increase_of_customer_in_five_days = round((customers_last_5_days / total_customers) * 100, 2)
+else:
+    increase_of_customer_in_five_days = 0 
+
+
+
+# 5 DAYS ORDERS---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+orders_last_5_days = OrderItem.objects.filter(order__placed_at__gte = five_days_ago).count()
+total_orders = OrderItem.objects.all().count()
+
+if total_orders > 0:
+    increase_of_order_in_five_days = round((orders_last_5_days / total_orders ) * 100, 2)
+else:
+    increase_of_order_in_five_days = 0
+
+
+
+# TODAY'S ORDER---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+today = date.today()
+todays_order = OrderItem.objects.filter(order__placed_at__date = today).count()
+
+if orders_last_5_days > 0:
+    todays_order_vs_order_in_five_days = round(((todays_order - orders_last_5_days) / orders_last_5_days) * 100, 2)
+else:
+    todays_order_vs_order_in_five_days = 0
+
+
+
+# 5 DAYS PRODUCTS--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+products_last_5_days = ProductColorImage.objects.filter(created_at__gte=five_days_ago).count()
+total_products = ProductColorImage.objects.all().count()
+
+if total_products > 0:
+    increase_of_products_in_five_days = round((products_last_5_days / total_products) * 100, 2)
+else:
+    increase_of_products_in_five_days = 0
+
+
+
+
+def get_data(request):
+    data = {}
+    if request.user.is_superuser:
+        user = request.user
+        data.update({
+            'user' : user,
+            'total_customers' : total_customers,
+            'increase_of_customer_in_five_days' : increase_of_customer_in_five_days,
+            'total_orders' : total_orders,
+            'increase_of_order_in_five_days' : increase_of_order_in_five_days,
+            'today' : today,
+            'todays_order' : todays_order,
+            'todays_order_vs_order_in_five_days' : todays_order_vs_order_in_five_days,
+            'total_products' : total_products,
+            'products_last_5_days' : products_last_5_days,
+            'increase_of_products_in_five_days' : increase_of_products_in_five_days,
+        })
+        
+    return data
+
+
+
 
 # ---------------------------------------------------------------- ADMIN LOGIN FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
@@ -40,8 +111,10 @@ is_active_banner = True
 # ADMIN LOGIN PAGE
 def admin_login_page(request):
     if request.user.is_authenticated and request.user.is_superuser:
-            user_list = User.objects.all().order_by('username').values()
-            return render(request, 'admin_index.html', {'user_list': user_list, 'is_active_dashboard' : is_active_dashboard})
+            context = {}
+            collect_data = get_data(request)
+            context.update({**collect_data, 'is_active_dashboard': is_active_dashboard})
+            return render(request, 'admin_index.html', context)
     elif request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -49,8 +122,10 @@ def admin_login_page(request):
         
         if user is not None and user.is_superuser:
             auth.login(request, user)
-            user_list = User.objects.all().order_by('username').values()
-            return render(request, 'admin_index.html', {'user_list': user_list, 'is_active_dashboard' : is_active_dashboard})
+            context = {}
+            collect_data = get_data(request)
+            context.update(collect_data)
+            return render(request, 'admin_index.html', context)
         else:
             messages.error(request, 'Invalid credentials, please try logging in again.')
             return redirect('admin_login_page')

@@ -6,7 +6,7 @@
     </div>
 
     <div class="widget widget-collapsible">
-      <h3 class="widget-title"><a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">Category</a></h3><!-- End .widget-title -->
+      <h3 class="widget-title"><a data-toggle="collapse" href="#widget-1" role="button" aria-expanded="true" aria-controls="widget-1">Category</a></h3>
 
       <div class="collapse show" id="widget-1">
         <div class="widget-body">
@@ -14,8 +14,8 @@
             {% for category in category_list %}
               <div class="filter-item">
                 <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="cat" />
-                  <label class="custom-control-label" for="cat">{{ category.name }}</label>
+                  <input type="checkbox" class="custom-control-input" id="cat-{{ forloop.counter }}" />
+                  <label class="custom-control-label" for="cat-{{ forloop.counter }}">{{ category.name }}</label>
                 </div>
                 <span class="item-count">{{ category.product_count }}</span>
               </div>
@@ -53,8 +53,8 @@
             {% for brand in brand_list %}
               <div class="filter-item filter-items-count">
                 <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="brand" />
-                  <label class="custom-control-label" for="brand">{{ brand.name }}</label>
+                  <input type="checkbox" class="custom-control-input" id="brand-{{ forloop.counter }}" />
+                  <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
                 </div>
                 <span class="item-count">{{ brand.product_count }}</span>
               </div>
@@ -64,7 +64,7 @@
       </div>
     </div>
 
-    <div class="widget widget-collapsible">
+    {% comment %} <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-3" role="button" aria-expanded="true" aria-controls="widget-3">Colour</a></h3><!-- End .widget-title -->
 
       <div class="collapse show" id="widget-3">
@@ -81,7 +81,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> {% endcomment %}
 
     <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">Price</a></h3><!-- End .widget-title -->

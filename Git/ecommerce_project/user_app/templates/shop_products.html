@@ -1,13 +1,13 @@
 {% load static %}
 <div class="products mb-3">
-  <div class="row justify-content-center">
+  <div class="row">
     {% for product_color in product_color_list %}
       <div class="col-6 col-md-4 col-lg-4 col-xl-3">
         <div class="product product-7 text-center">
           <figure class="product-media">
             {% if not product_color.in_stock %}
               <span class="product-label bg-danger text-white">Out Of Stock</span>
-            {% elif latest_products %}
+            {% elif product_color in latest_products %}
               <span class="product-label label-new">New</span>
             {% endif %}
 
@@ -31,12 +31,6 @@
             </div>
             <h3 class="product-title"><a href="{% url 'product_single_view_page' product_color.products.name product_color.id %}">{{ product_color.products.name }}</a></h3>
             <div class="product-price">₹ {{ product_color.price }}.00</div>
-            <div class="ratings-container">
-              <div class="ratings">
-                <div class="ratings-val" style="width: 20%;"></div>
-              </div>
-              <span class="ratings-text">( 2 Reviews )</span>
-            </div>
           </div>
         </div>
       </div>

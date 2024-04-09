@@ -443,11 +443,72 @@ def logout(request):
 # ---------------------------------------------------------------------------------- CC_SHOP PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
+default = False
+a_z = False
+new_arrival = False
+low_to_high = False
+high_to_low = False
+
 
 
 @never_cache
+def get_product_sort(request):
+    global default, a_z, new_arrival, low_to_high, high_to_low
+
+    if request.method == 'POST':
+        sortby = request.POST.get('sortby')
+        
+        default = False
+        a_z = False
+        new_arrival = False
+        low_to_high = False
+        high_to_low = False
+            
+        if sortby == 'a_z':
+            a_z = True
+        elif sortby == 'new_arrival':
+            new_arrival = True
+        elif sortby == 'low_to_high':
+            low_to_high = True
+        elif sortby == 'high_to_low':
+            high_to_low = True
+        else:
+            default = True
+            
+    return redirect('shop_page_view')
+
+
+search = ""
+
+
+@never_cache
+def search_for_product(request):
+    global search      
+    
+    time.sleep(1)
+    
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')
+        
+        if not str(search_query) == "":
+            search = str(search_query)
+        return redirect('shop_page_view')
+    else:
+        return redirect('shop_page_view')
+        
+        
+    
+    
+    
+    
+      
+
+@never_cache
 def shop_page_view(request):
+    global search, default, a_z, new_arrival, low_to_high, high_to_low
     context = {}
+    
+    
     price_ranges = [
         {"min": 1000, "max": 1500},
         {"min": 1500, "max": 2500},
@@ -459,10 +520,32 @@ def shop_page_view(request):
     if request.user.is_authenticated:
         cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
         context.update(cart_wishlist_address_order_data)
-    product_color_list = list(ProductColorImage.objects.filter(is_deleted = False, is_listed = True))
-    shuffle(product_color_list)
-    latest_products = ProductColorImage.objects.all()[:10]
+        
+    product_color_list = ProductColorImage.objects.filter(is_deleted=False, is_listed=True)
+    
+    if not search == "":
+        product_color = product_color_list.filter(products__name__icontains = search)
+        if product_color:
+            product_color_list = product_color
+        
+        search = ""
+    
+    if a_z:
+        product_color_list = product_color_list.order_by('products__name')
+    elif new_arrival:
+        product_color_list = product_color_list.order_by('created_at')
+    elif low_to_high:
+        product_color_list = product_color_list.order_by('price')
+    elif high_to_low:
+        product_color_list = product_color_list.order_by('-price')
+        
+    
+        
+    latest_products = ProductColorImage.objects.filter(is_deleted=False, is_listed=True).order_by('-created_at')[:3]
+
+    
     category_list = Category.objects.annotate(product_count=Count('products'))
+    
     brand_list = Brand.objects.annotate(product_count=Count('products'))
     
     context.update({
@@ -471,13 +554,24 @@ def shop_page_view(request):
         'category_list': category_list,
         'price_ranges': price_ranges,
         'latest_products': latest_products,
+        'default' : default,
+        'a_z' : a_z,
+        'new_arrival' : new_arrival,
+        'low_to_high' : low_to_high,
+        'high_to_low' : high_to_low,
+        
     })
+    default = False
+    a_z = False
+    new_arrival = False
+    low_to_high = False
+    high_to_low = False
+    
         
     return render(request, 'shop_page.html', context)
+
+
     
-
-
-
 
 
 
@@ -858,7 +952,7 @@ def order_detail(request, order_id):
     if request.user.is_authenticated:
         try:
             seven_days_ago = timezone.now() - timedelta(days=7)
-            orders_placed_before_7_days = OrderItem.objects.filter(order__placed_at__gt = seven_days_ago)
+            orders_placed_before_7_days = OrderItem.objects.filter(order__placed_at__gte = seven_days_ago)
             order_items = OrderItem.objects.get(pk = order_id)
             return_end_date = order_items.order.placed_at + timedelta(days=7)
             return_end_date_local = return_end_date.astimezone(timezone.get_current_timezone())
@@ -1197,8 +1291,10 @@ def place_order(request):
                             product_size.quantity -= item.quantity
                             product_size.save()
                             cart_items.delete()
-                        return render(request, 'order_placed.html', {'order': order})
-            return redirect('index_page')
+                            
+                            time.sleep(2)
+                            return render(request, 'order_placed.html', {'order': order})
+                return redirect('index_page')
         except Exception as e:
             return redirect('index_page')
     else:
@@ -1277,13 +1373,15 @@ def razorpay_payment(request, user_id):
                         cart_items.delete()
                     
                     return render(request, 'order_placed.html', {'order': order})
+                return redirect('index_page')
             else:
                 payment.failed = True
                 payment.pending = False
                 payment.save()
+                
+                time.sleep(1)
                 return render(request, 'paymentfail.html')
         except Exception as e:
-            print(e)
-            return HttpResponseBadRequest()
+            return redirect('index_page')
     else:
-        return HttpResponseBadRequest()
+        return redirect('index_page')

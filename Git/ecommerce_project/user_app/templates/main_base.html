@@ -136,10 +136,11 @@
 
                     <div class="header-search">
                       <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
-                      <form action="#" method="get">
+                      <form action="{% url 'search_for_product' %}" method="post">
+                        {% csrf_token %}
                         <div class="header-search-wrapper">
-                          <label for="q" class="sr-only">Search</label>
-                          <input type="search" class="form-control" name="q" id="q" placeholder="Search in..." required />
+                          <label for="search_query" class="sr-only">Search</label>
+                          <input type="search" class="form-control" name="search_query" id="q" placeholder="Search in..." required />
                         </div>
                       </form>
                     </div>

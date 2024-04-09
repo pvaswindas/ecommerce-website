@@ -11,19 +11,12 @@
     <div class="col-md-12 grid-margin">
       <div class="row">
         <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-          <h3 class="font-weight-bold">{{ user.first_name }} {{ user.last_name }}</h3>
-          <h6 class="font-weight-normal mb-0">All systems are running smoothly! You have <span class="text-primary">3 unread alerts!</span></h6>
+          <h3 class="font-weight-bold">Hello {{ user.username }} {{ user.last_name }}</h3>
         </div>
         <div class="col-12 col-xl-4">
           <div class="justify-content-end d-flex">
             <div class="dropdown flex-md-grow-1 flex-xl-grow-0">
-              <button class="btn btn-sm btn-light bg-white dropdown-toggle" type="button" id="dropdownMenuDate2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"><i class="mdi mdi-calendar"></i> Today (10 Jan 2021)</button>
-              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuDate2">
-                <a class="dropdown-item" href="#">January - March</a>
-                <a class="dropdown-item" href="#">March - June</a>
-                <a class="dropdown-item" href="#">June - August</a>
-                <a class="dropdown-item" href="#">August - November</a>
-              </div>
+               <span> {{ today }} </span>
             </div>
           </div>
         </div>
@@ -37,8 +30,8 @@
           <div class="card card-tale pb-2">
             <div class="card-body">
               <p class="mb-4">Today’s Orders</p>
-              <p class="fs-30 mb-2">4006</p>
-              <p>10.00% (30 days)</p>
+              <p class="fs-30 mb-2"> {{ todays_order }} </p>
+              <p> {{ todays_order_vs_order_in_five_days }}% (5 days)</p>
             </div>
           </div>
         </div>
@@ -46,8 +39,8 @@
           <div class="card card-dark-blue">
             <div class="card-body">
               <p class="mb-4">Total Orders</p>
-              <p class="fs-30 mb-2">61344</p>
-              <p>22.00% (30 days)</p>
+              <p class="fs-30 mb-2"> {{ total_orders }} </p>
+              <p>{{ increase_of_order_in_five_days }}% (5 days)</p>
             </div>
           </div>
         </div>
@@ -55,8 +48,8 @@
           <div class="card card-light-blue pb-0">
             <div class="card-body">
               <p class="mb-4">Number of Products</p>
-              <p class="fs-30 mb-2">34040</p>
-              <p>2.00% (30 days)</p>
+              <p class="fs-30 mb-2"> {{ total_products }} </p>
+              <p>{{ increase_of_products_in_five_days }}% (5 days)</p>
             </div>
           </div>
         </div>
@@ -64,8 +57,8 @@
           <div class="card card-light-danger">
             <div class="card-body">
               <p class="mb-4">Number of Customers</p>
-              <p class="fs-30 mb-2">47033</p>
-              <p>0.22% (30 days)</p>
+              <p class="fs-30 mb-2"> {{ total_customers }} </p>
+              <p>{{ increase_of_customer_in_five_days }}% (5 days)</p>
             </div>
           </div>
         </div>
@@ -73,43 +66,61 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-6 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body">
-          <p class="card-title">Order Details</p>
-          <p class="font-weight-500">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
-          <div class="d-flex flex-wrap mb-5">
-            <div class="mr-5 mt-3">
-              <p class="text-muted">Order value</p>
-              <h3 class="text-primary fs-30 font-weight-medium">12.3k</h3>
-            </div>
-            <div class="mr-5 mt-3">
-              <p class="text-muted">Orders</p>
-              <h3 class="text-primary fs-30 font-weight-medium">14k</h3>
-            </div>
-            <div class="mr-5 mt-3">
-              <p class="text-muted">Users</p>
-              <h3 class="text-primary fs-30 font-weight-medium">71.56%</h3>
-            </div>
-            <div class="mt-3">
-              <p class="text-muted">Downloads</p>
-              <h3 class="text-primary fs-30 font-weight-medium">34040</h3>
-            </div>
+    <div class="container sales-report-container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="sales-report-section">
+            <h2>Sales Report</h2>
+            <form method="post" class="update-report-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary btn-update rounded-1">Update Report</button>
+            </form>
+
+            <table class="table sales-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Discount Deduction</th>
+                  <th>Total Amount</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sale in sales_data %}
+                  <tr>
+                    <td>{{ sale.product }}</td>
+                    <td>{{ sale.quantity }}</td>
+                    <td>{{ sale.price }}</td>
+                    <td>{{ sale.discount_deduction }}</td>
+                    <td>{{ sale.total_amount }}</td>
+                    <td>{{ sale.date }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="8" class="no-data">No sales data available.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
-          <canvas id="order-chart"></canvas>
         </div>
       </div>
-    </div>
-    <div class="col-md-6 grid-margin stretch-card">
-      <div class="card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between">
-            <p class="card-title">Sales Report</p>
-            <a href="#" class="text-info">View all</a>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="download-report-section">
+            <h2>Download Report</h2>
+            <form method="post" action="" class="download-report-form">
+              {% csrf_token %}
+              <label for="report_format">Format:</label>
+              <select name="report_format" id="report_format" class="form-control">
+                <option value="pdf">PDF</option>
+                <option value="excel">Excel</option>
+              </select>
+              <button type="submit" class="btn btn-success btn-download">Download Report</button>
+            </form>
           </div>
-          <p class="font-weight-500">The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc</p>
-          <div id="sales-legend" class="chartjs-legend mt-4 mb-2"></div>
-          <canvas id="sales-chart"></canvas>
         </div>
       </div>
     </div>

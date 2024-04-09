@@ -62,6 +62,7 @@ class ProductColorImage(models.Model):
     is_deleted = models.BooleanField(default = False)
     is_listed = models.BooleanField(default = True)
     in_stock = models.BooleanField(default = True)
+    created_at = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
         return f"{self.color} - {self.products.name}"

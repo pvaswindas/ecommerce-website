@@ -22,7 +22,7 @@
             </div>
           {% endfor %}
         {% endif %}
-        <form action="{% url 'edit_product_color' product_color_image.id %}" method="post" ddenctype="multipart/form-data">
+        <form action="{% url 'edit_product_color' product_color_image.id %}" method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="accordion">
             <div class="accordion-item">
