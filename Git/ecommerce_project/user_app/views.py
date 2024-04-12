@@ -21,12 +21,12 @@ from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.utils.html import format_html
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
 from django.shortcuts import redirect, render
 from django.http import HttpResponseBadRequest
 from django.utils.text import normalize_newlines
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.hashers import check_password
@@ -434,7 +434,7 @@ def logout(request):
     
     
     else:
-        return render(request, '404.html')
+        return redirect('sign_in')
     
 
 
@@ -497,6 +497,19 @@ def search_for_product(request):
         return redirect('shop_page_view')
         
         
+
+kids = False   
+
+@never_cache
+def kids_products(request):
+    global kids
+    
+    
+    if request.method == 'POST':
+        global_checked = request.POST.get('global_checked')
+        
+        if not str(global_checked):
+            pass
     
     
     
@@ -523,6 +536,10 @@ def shop_page_view(request):
         
     product_color_list = ProductColorImage.objects.filter(is_deleted=False, is_listed=True)
     
+    selected_category = request.GET.get('category')
+    if selected_category:
+        product_color_list = product_color_list.filter(products__category__name=selected_category)
+    
     if not search == "":
         product_color = product_color_list.filter(products__name__icontains = search)
         if product_color:
@@ -533,7 +550,7 @@ def shop_page_view(request):
     if a_z:
         product_color_list = product_color_list.order_by('products__name')
     elif new_arrival:
-        product_color_list = product_color_list.order_by('created_at')
+        product_color_list = product_color_list.order_by('-created_at')
     elif low_to_high:
         product_color_list = product_color_list.order_by('price')
     elif high_to_low:
@@ -559,6 +576,7 @@ def shop_page_view(request):
         'new_arrival' : new_arrival,
         'low_to_high' : low_to_high,
         'high_to_low' : high_to_low,
+        'selected_category' : selected_category,
         
     })
     default = False
@@ -625,11 +643,15 @@ def wishlist_view(request):
     if request.user.is_authenticated:
         user = request.user
         customer = Customer.objects.get(user = user)
+        cart = Cart.objects.get(customer=customer)
+        cart_items = CartProducts.objects.filter(cart=cart)
         wishlist = Wishlist.objects.get(customer = customer)
         wishlist_items = WishlistItem.objects.filter(wishlist = wishlist)
         wishlist_item_count = WishlistItem.objects.filter(wishlist = wishlist).count()
         
         context = {
+            'cart' : cart,
+            'cart_items' : cart_items,
             'wishlist' : wishlist,
             'wishlist_items' : wishlist_items,
             'wishlist_item_count' : wishlist_item_count,
@@ -1293,6 +1315,7 @@ def place_order(request):
                             cart_items.delete()
                             
                             time.sleep(2)
+                            
                             return render(request, 'order_placed.html', {'order': order})
                 return redirect('index_page')
         except Exception as e:
@@ -1312,6 +1335,7 @@ def place_order(request):
  
  
  
+
 @csrf_exempt
 def razorpay_payment(request, user_id):
     if request.method == "POST":
@@ -1371,9 +1395,7 @@ def razorpay_payment(request, user_id):
                         product_size.quantity -= item.quantity
                         product_size.save()
                         cart_items.delete()
-                    
                     return render(request, 'order_placed.html', {'order': order})
-                return redirect('index_page')
             else:
                 payment.failed = True
                 payment.pending = False

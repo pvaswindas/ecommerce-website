@@ -12,13 +12,15 @@
         <div class="widget-body">
           <div class="filter-items filter-items-count">
             {% for category in category_list %}
-              <div class="filter-item">
-                <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="cat-{{ forloop.counter }}" />
-                  <label class="custom-control-label" for="cat-{{ forloop.counter }}">{{ category.name }}</label>
-                </div>
-                <span class="item-count">{{ category.product_count }}</span>
-              </div>
+                <form method="GET" action="">
+                    <div class="filter-item">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="cat-{{ forloop.counter }}" name="category" value="{{ category.name }}" {% if request.GET.category == category.name %}checked{% endif %} onchange="this.form.submit()" />
+                            <label class="custom-control-label" for="cat-{{ forloop.counter }}">{{ category.name }}</label>
+                        </div>
+                        <span class="item-count">{{ category.product_count }}</span>
+                    </div>
+                </form>
             {% endfor %}
           </div>
         </div>
@@ -51,13 +53,15 @@
         <div class="widget-body">
           <div class="filter-items">
             {% for brand in brand_list %}
-              <div class="filter-item filter-items-count">
-                <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="brand-{{ forloop.counter }}" />
-                  <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
+              <form action="" method="get">
+                <div class="filter-item filter-items-count">
+                  <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="brand-{{ forloop.counter }}" />
+                    <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
+                  </div>
+                  <span class="item-count">{{ brand.product_count }}</span>
                 </div>
-                <span class="item-count">{{ brand.product_count }}</span>
-              </div>
+              </form>
             {% endfor %}
           </div>
         </div>
@@ -83,7 +87,7 @@
       </div>
     </div> {% endcomment %}
 
-    <div class="widget widget-collapsible">
+    {% comment %} <div class="widget widget-collapsible">
       <h3 class="widget-title"><a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">Price</a></h3><!-- End .widget-title -->
 
       <div class="collapse show" id="widget-5">
@@ -104,6 +108,6 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> {% endcomment %}
   </div>
 </aside>

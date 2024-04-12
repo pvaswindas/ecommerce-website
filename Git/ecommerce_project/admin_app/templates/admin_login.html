@@ -10,7 +10,7 @@
   <body>
     <div class="login-container">
       <h2>Admin Login</h2>
-      <form action="" method="post">
+      <form action="{% url 'admin_check_login' %}" method="post">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username" required />
         <br />
@@ -23,11 +23,6 @@
             {% endfor %}
           </div>
         {% endif %}
-        <div class="remember-me-forgot-password">
-          <div class="forgot-password">
-            <a href="/forgot-password" class="text">Forgot Password?</a>
-          </div>
-        </div>
         <input type="submit" value="Login"/>
       </form>
     </div>

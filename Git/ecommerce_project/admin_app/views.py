@@ -109,35 +109,51 @@ def get_data(request):
 
 
 # ADMIN LOGIN PAGE
+@never_cache
 def admin_login_page(request):
-    if request.user.is_authenticated and request.user.is_superuser:
-            context = {}
-            collect_data = get_data(request)
-            context.update({**collect_data, 'is_active_dashboard': is_active_dashboard})
-            return render(request, 'admin_index.html', context)
-    elif request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None and user.is_superuser:
-            auth.login(request, user)
-            context = {}
-            collect_data = get_data(request)
-            context.update(collect_data)
-            return render(request, 'admin_index.html', context)
-        else:
-            messages.error(request, 'Invalid credentials, please try logging in again.')
-            return redirect('admin_login_page')
- 
-    return render(request, 'admin_login.html')
+    if request.user.is_superuser:
+        return redirect('admin_dashboard')
+    else:
+        return render(request, 'admin_login.html')
+    
+    
+# ADMIN LOGIN CREDENTIALS CHECKING FUNCTION
+@never_cache
+def admin_check_login(request):
+    try:
+        if request.method == 'POST':
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None and user.is_superuser:
+                auth.login(request, user)
+                return redirect('admin_dashboard')
+            else:
+                messages.error(request, 'Invalid credentials, please try logging in again.')
+                return redirect('admin_login_page')
+    except Exception:
+        return redirect('admin_login_page')
+    
 
+
+
+# ADMIN DASHBOARD PAGE
+@never_cache
+def admin_dashboard(request):
+    if request.user.is_superuser:
+        context = {}
+        collect_data = get_data(request)
+        context.update({**collect_data, 'is_active_dashboard': is_active_dashboard})
+        return render(request, 'admin_index.html', context)
+    else:
+        return redirect('admin_login_page')
 
 
 
 
 # ADMIN LOGOUT FUNCTION
-@login_required
+
 @never_cache     
 def admin_logout(request):
     if request.method == 'POST' :
@@ -152,7 +168,7 @@ def admin_logout(request):
 
 
 # PAGE NOT FOUND   
-@login_required
+
 @never_cache
 def page_not_found(request):
     if request.user.is_superuser:
@@ -169,7 +185,7 @@ def page_not_found(request):
 
 
 # CUSTOMER SHOW FUNCTION
-@login_required
+
 @never_cache
 def admin_customers(request):
     if request.user.is_superuser:
@@ -184,7 +200,7 @@ def admin_customers(request):
  
  
 # BLOCK CUSTOMER FUNCTION    
-@login_required
+
 @never_cache       
 def block_user(request, user_id):
     if request.user.is_superuser:
@@ -204,7 +220,7 @@ def block_user(request, user_id):
 
 
 # UNBLOCK CUSTOMER FUNCTION
-@login_required
+
 @never_cache
 def unblock_user(request, user_id):
     if request.user.is_superuser:
@@ -223,7 +239,7 @@ def unblock_user(request, user_id):
 
 
 # SEARCH CUSTOMER FUNCTION    
-@login_required
+
 @never_cache
 def search_user(request):
     if request.user.is_superuser:
@@ -235,6 +251,8 @@ def search_user(request):
             user_list = User.objects.all().order_by('username').values()
         
         return render(request,'pages/customers/customers.html' ,{'user_list' : user_list, 'is_active_customer' : is_active_customer})
+    else:
+        return redirect('admin_login_page')
     
     
     
@@ -246,7 +264,7 @@ def search_user(request):
     
     
 # CATEGORIES PAGES FUNCTION
-@login_required
+
 @never_cache
 def admin_categories(request):
     if request.user.is_superuser:
@@ -260,7 +278,7 @@ def admin_categories(request):
     
     
 # ADD CATEGORY PAGE FUNCTION   
-@login_required
+
 @never_cache
 def admin_add_category_page(request):
     if request.user.is_superuser:
@@ -273,7 +291,7 @@ def admin_add_category_page(request):
     
 
 # ADD CATEGORY FUNCTION 
-@login_required
+
 @never_cache
 def add_categories(request):
     if request.user.is_superuser:
@@ -295,7 +313,7 @@ def add_categories(request):
 
 
 # EDIT BRAND PAGE FUNCTION 
-@login_required
+
 @never_cache
 def edit_category_page(request, cat_id):
     if request.user.is_superuser:
@@ -306,7 +324,7 @@ def edit_category_page(request, cat_id):
 
 
 # EDIT CATEGORIES FUNCTION   
-@login_required
+
 @never_cache
 def edit_category(request, cat_id):
     if request.user.is_superuser:
@@ -331,7 +349,7 @@ def edit_category(request, cat_id):
 
 
 # DELETE CATEGORY FUNCTION 
-@login_required
+
 @never_cache    
 def delete_category(request, cat_id):
     if request.user.is_superuser:
@@ -352,7 +370,7 @@ def delete_category(request, cat_id):
 
    
 # LIST CATEGORY FUNCTION 
-@login_required
+
 @never_cache   
 def list_category(request, cat_id):
     if request.user.is_superuser:
@@ -372,7 +390,7 @@ def list_category(request, cat_id):
 
 
 # UNLIST CATEGORY FUNCTION
-@login_required
+
 @never_cache
 def un_list_category(request, cat_id):
     if request.user.is_superuser:
@@ -393,7 +411,7 @@ def un_list_category(request, cat_id):
     
     
 # DELETED CATEGORIES VIEW PAGE FUNCTION
-@login_required
+
 @never_cache
 def deleted_cat_view(request):
     if request.user.is_superuser:
@@ -406,7 +424,7 @@ def deleted_cat_view(request):
 
 
 # RESTORE CATEGORIES FUNCTION
-@login_required
+
 @never_cache
 def restore_categories(request, cat_id):
     if request.user.is_superuser:
@@ -429,7 +447,7 @@ def restore_categories(request, cat_id):
 
 
 # PRODUCTS VIEW PAGE FUNCTION
-@login_required
+
 @never_cache
 def list_product_page(request):
     if request.user.is_superuser:
@@ -439,7 +457,7 @@ def list_product_page(request):
         return redirect('admin_login_page')
 
 
-@login_required
+
 @never_cache
 def get_quantity(request, size):
     try:
@@ -450,7 +468,7 @@ def get_quantity(request, size):
 
 
 # ADD PRODUCT PAGE FUNCTION
-@login_required
+
 @never_cache
 def admin_add_product(request):
     if request.user.is_superuser:
@@ -463,7 +481,7 @@ def admin_add_product(request):
 
 
 # ADD PRODUCT FUNCTION
-@login_required
+
 @never_cache
 def add_products(request):
     if request.user.is_superuser:
@@ -501,7 +519,7 @@ def add_products(request):
     
 
 # EDIT PRODUCT VIEW PAGE FUNCTION
-@login_required
+
 @never_cache
 def edit_product_page(request, p_id):
     if request.user.is_superuser:
@@ -535,7 +553,7 @@ def edit_product_page(request, p_id):
 
 
 # EDIT PRODUCT VIEW FUNCTION
-@login_required
+
 @never_cache
 def edit_product_update(request, p_id):
     if request.user.is_superuser:
@@ -568,7 +586,7 @@ def edit_product_update(request, p_id):
 
 
 # DELETED PRODUCTS VIEW PAGE FUNCTION   
-@login_required
+
 @never_cache
 def deleted_product_page(request):
     if request.user.is_superuser:
@@ -581,7 +599,7 @@ def deleted_product_page(request):
 
     
 # RESTORE PRODUCT FUNCTION
-@login_required
+
 @never_cache
 def restore_product(request, pdt_id):
     if request.user.is_superuser:
@@ -606,7 +624,7 @@ def restore_product(request, pdt_id):
 
 
 # EDIT PRODUCT COLOR PAGE VIEW FUNCTION
-@login_required
+
 @never_cache
 def edit_product_color_page(request, p_id):
     if request.user.is_superuser:
@@ -635,7 +653,7 @@ def edit_product_color_page(request, p_id):
 
 
 # EDIT PRODUCT COLOR FUNCTION
-@login_required
+
 @never_cache
 def edit_product_color(request, p_id):
     if request.user.is_superuser:
@@ -672,7 +690,7 @@ def edit_product_color(request, p_id):
 
 
 # For list_product function
-@login_required
+
 @never_cache
 def list_product(request, pdt_id):
     if request.user.is_superuser:
@@ -698,7 +716,7 @@ def list_product(request, pdt_id):
 
 
 # For un_list_product function
-@login_required
+
 @never_cache
 def un_list_product(request, pdt_id):
     if request.user.is_superuser:
@@ -717,7 +735,7 @@ def un_list_product(request, pdt_id):
     
 
 # DELETE PRODUCT FUNCTION
-@login_required
+
 @never_cache
 def delete_product(request, pdt_id):
     if request.user.is_superuser:
@@ -738,7 +756,7 @@ def delete_product(request, pdt_id):
 
 
 # EDIT PRODUCT SIZE PAGE VIEW FUNCTION
-@login_required
+
 @never_cache
 def edit_product_size_page(request, p_id):
     if request.user.is_superuser:
@@ -766,7 +784,7 @@ def edit_product_size_page(request, p_id):
 
 
 # EDIT PRODUCT SIZE FUNCTION
-@login_required
+
 @never_cache
 def edit_product_size(request, p_id):
     if request.user.is_superuser:
@@ -795,7 +813,7 @@ def edit_product_size(request, p_id):
 
 
 # ADD PRODUCT IMAGE PAGE VIEW FUNCTION
-@login_required
+
 @never_cache
 def admin_add_image_page(request):
     if request.user.is_superuser:
@@ -807,7 +825,7 @@ def admin_add_image_page(request):
 
 
 # ADD PRODUCT IMAGE FUNCTION
-@login_required
+
 @never_cache
 def add_product_image(request):
     if request.user.is_superuser:
@@ -852,7 +870,7 @@ adult_sizes = [6, 7, 8, 9, 10, 11, 12]
 kids_sizes = ['8C', '9C', '10C', '11C', '12C', '13C']
 
 # PRODUCT SIZE ADD PAGE VIEW PAGE FUNCTION
-@login_required
+
 @never_cache
 def admin_add_variants(request):
     if request.user.is_superuser:
@@ -865,7 +883,7 @@ def admin_add_variants(request):
 
 
 # GET COLOR FUNCTION
-@login_required
+
 @never_cache
 def get_colors(request):
     if request.user.is_superuser:
@@ -880,7 +898,7 @@ def get_colors(request):
 
 
 # GET SIZES FUNCTION
-@login_required
+
 @never_cache
 @require_GET
 def get_sizes_view(request):
@@ -902,7 +920,7 @@ def get_sizes_view(request):
 
 
 # ADD PRODUCT SIZE FUNCTION
-@login_required
+
 @never_cache
 def add_size(request):
     if request.user.is_superuser:
@@ -938,7 +956,7 @@ def add_size(request):
 # ---------------------------------------------------------------- ADMIN BRAND PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 # BRAND PAGE FUNCTION
-@login_required
+
 @never_cache
 def list_brand_page(request):
     if request.user.is_superuser:
@@ -981,7 +999,7 @@ countries = [
         
         
 # ADD BRAND PAGE FUNCTION
-@login_required
+
 @never_cache
 def admin_add_brand(request):
     if request.user.is_superuser:
@@ -992,7 +1010,7 @@ def admin_add_brand(request):
 
 
 # ADD BRAND FUNCTION
-@login_required
+
 @never_cache
 def add_brand(request):
     if request.user.is_superuser:
@@ -1023,7 +1041,7 @@ def add_brand(request):
 
 
 # EDIT BRAND PAGE FUNCTION 
-@login_required
+
 @never_cache
 def edit_brand_page(request, brand_id):
     if request.user.is_superuser:
@@ -1038,7 +1056,7 @@ def edit_brand_page(request, brand_id):
 
 
 # EDIT BRAND FUNCTION   
-@login_required
+
 @never_cache
 def edit_brand(request, brand_id):
     if request.user.is_superuser:
@@ -1061,7 +1079,7 @@ def edit_brand(request, brand_id):
 
 
 # DELETE BRAND FUNCTION
-@login_required
+
 @never_cache
 def delete_brand(request, brand_id):
     if request.user.is_superuser:
@@ -1080,7 +1098,7 @@ def delete_brand(request, brand_id):
 
 
 #  RESTORE BRAND FUNCTION
-@login_required
+
 @never_cache
 def restore_brand(request, brand_id):
     if request.user.is_superuser:
@@ -1099,7 +1117,7 @@ def restore_brand(request, brand_id):
     
 
 #  DELETED BRAND VIEW PAGE
-@login_required
+
 @never_cache
 def deleted_brand_view(request):
     if request.user.is_superuser:
@@ -1112,7 +1130,7 @@ def deleted_brand_view(request):
 
     
 # LIST BRAND FUNCTION
-@login_required
+
 @never_cache
 def list_the_brand(request, brand_id):
     if request.user.is_superuser:
@@ -1133,7 +1151,7 @@ def list_the_brand(request, brand_id):
     
 
 # UNLIST BRAND FUNCTION   
-@login_required
+
 @never_cache
 def un_list_the_brand(request, brand_id):
     if request.user.is_superuser:
@@ -1157,23 +1175,25 @@ def un_list_the_brand(request, brand_id):
 
 
 
-@login_required
+
 @never_cache
 def orders_view_page(request):
     if request.user.is_superuser:
         orders = Orders.objects.all().order_by('customer').values()
-        order_item = OrderItem.objects.all().order_by('order__customer__user__first_name')
+        order_item = OrderItem.objects.all().order_by('-order__placed_at')
         context = {
             'order_item' : order_item,
             'orders' : orders,
             'is_active_order' : is_active_order,
         }
         return render(request, 'pages/orders/orders_view_page.html', context)
+    else:
+        return redirect('admin_login_page')
     
     
 
 
-@login_required
+
 @never_cache
 def order_detailed_view(request, order_id):
     if request.user.is_superuser:
@@ -1190,10 +1210,9 @@ def order_detailed_view(request, order_id):
 
 
 
-@login_required
+
 @never_cache
 def change_order_status(request, order_id):
-    print(order_id)
     if request.user.is_superuser:
         order_status = request.POST.get('order_status')
         order_item = OrderItem.objects.get(pk = order_id)

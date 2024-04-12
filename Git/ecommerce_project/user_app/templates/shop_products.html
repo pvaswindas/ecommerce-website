@@ -17,7 +17,7 @@
               {% if wishlist_items %}
                 {% for item in wishlist_items %}
                   {% if product_color == item.product %}
-                  
+
                   {% endif %}
                 {% endfor %}
                 <a href="{% url 'add_to_wishlist_shop' product_color.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
