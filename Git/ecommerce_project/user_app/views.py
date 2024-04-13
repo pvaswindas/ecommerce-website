@@ -28,6 +28,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.hashers import check_password
 
@@ -50,7 +51,6 @@ def get_cart_wishlist_address_order_data(request):
         addresses = Address.objects.filter(customer = customer)
         orders = Orders.objects.filter(customer = customer)
         order_items = OrderItem.objects.filter(order__customer=customer).order_by('-order__placed_at')
-        
         data.update({
             'user': user,
             'customer': customer,
@@ -66,9 +66,13 @@ def get_cart_wishlist_address_order_data(request):
         if cart_items:
             item_count = 0
             subtotal = 0
-            for items in cart_items:
+            for item in cart_items:
                 item_count += 1
-                each_price = items.product.product_color_image.price * items.quantity
+                if item.product.product_color_image.productoffer.exists():
+                    offer = item.product.product_color_image.productoffer.first()
+                    each_price = offer.offer_price
+                else:
+                    each_price = item.product.product_color_image.price
                 subtotal = subtotal + each_price
             shipping_charge = 99 if subtotal <= 2500 else 0
             total_charge = subtotal + shipping_charge
@@ -279,7 +283,7 @@ def resend_otp(request):
             user = user_data
             email = user_data['email']
             
-            otp = generate_otp(user)
+            otp = generate_otp()
             
             send_otp_email(email, otp)
             
@@ -557,6 +561,10 @@ def shop_page_view(request):
         product_color_list = product_color_list.order_by('-price')
         
     
+    active_offers = ProductOffer.objects.filter(
+        Q(end_date__gte=timezone.now()) | Q(end_date=None),
+        product_color_image__in=product_color_list
+    )
         
     latest_products = ProductColorImage.objects.filter(is_deleted=False, is_listed=True).order_by('-created_at')[:3]
 
@@ -577,6 +585,7 @@ def shop_page_view(request):
         'low_to_high' : low_to_high,
         'high_to_low' : high_to_low,
         'selected_category' : selected_category,
+        'active_offers' : active_offers,
         
     })
     default = False
@@ -602,7 +611,12 @@ def shop_page_view(request):
 def product_single_view_page(request, product_name, pdt_id):
     context = {}
     product_color = ProductColorImage.objects.get(pk=pdt_id)
-
+    
+    try:
+        product_offer = ProductOffer.objects.get(product_color_image=product_color)
+        context['product_offer'] = product_offer
+    except ObjectDoesNotExist:
+        pass
     if request.user.is_authenticated:
         cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
         context.update(cart_wishlist_address_order_data)
@@ -1144,7 +1158,12 @@ def update_total_price(request):
                 available_quantity = product.quantity
 
                 if quantity <= available_quantity:
-                    total_price = product.product_color_image.price * quantity
+                    if product.product_color_image.productoffer.exists():
+                        offer = product.product_color_image.productoffer.first()
+                        total_price = offer.offer_price * quantity
+                    else:
+                        total_price = product.product_color_image.price * quantity
+                    print(total_price)
                     return JsonResponse({'total_price': total_price})
                 else:
                     return JsonResponse({'error': f'Only {available_quantity} units available'})
@@ -1171,7 +1190,12 @@ def update_quantity(request):
                 cart_item.quantity = new_quantity
                 cart_item.save()
                 
-                total_price = cart_item.product.product_color_image.price * new_quantity
+                if cart_item.product.product_color_image.productoffer.exists():
+                    offer = cart_item.product.product_color_image.productoffer.first()
+                    total_price = offer.offer_price * new_quantity
+                else:
+                    total_price = cart_item.product.product_color_image.price * new_quantity
+                
                 return JsonResponse({'total_price': total_price})
             except CartProducts.DoesNotExist:
                 return JsonResponse({'error': 'Product not found'})
@@ -1239,7 +1263,11 @@ def place_order(request):
                     subtotal = 0
                     for items in cart_items:
                         item_count += 1
-                        each_price = items.product.product_color_image.price * items.quantity
+                        if items.product.product_color_image.productoffer.exists():
+                            offer = items.product.product_color_image.productoffer.first()
+                            each_price = offer.offer_price
+                        else:
+                            each_price = item.product.product_color_image.price
                         subtotal = subtotal + each_price
                     if subtotal <= 2500:
                         shipping_charge = 99
@@ -1299,12 +1327,17 @@ def place_order(request):
                         order.save()
                         
                         for item in cart_items:
+                            if item.product.product_color_image.productoffer.exists():
+                                offer = item.product.product_color_image.productoffer.first()
+                                price_of_each = offer.offer_price
+                            else:
+                                price_of_each = item.product.product_color_image.price
                             order_item = OrderItem.objects.create(
                                 order=order,
                                 product=item.product,
                                 quantity=item.quantity,
                                 order_status="Order Placed",
-                                each_price=item.product.product_color_image.price,
+                                each_price=price_of_each,
                             )
                             order_item.save()
                             
@@ -1349,7 +1382,19 @@ def razorpay_payment(request, user_id):
             
             cart = Cart.objects.get(customer=customer)
             cart_items = CartProducts.objects.filter(cart=cart)
-            subtotal = sum(item.product.product_color_image.price * item.quantity for item in cart_items)
+            
+            subtotal_with_offer = 0
+            subtotal_without_offer = 0
+
+            for item in cart_items:
+                if item.product.product_color_image.productoffer.exists():
+                    offer = item.product.product_color_image.productoffer.first()
+                    subtotal_with_offer += offer.offer_price * item.quantity
+                else:
+                    subtotal_without_offer += item.product.product_color_image.price * item.quantity
+
+            subtotal = subtotal_with_offer + subtotal_without_offer
+                        
             shipping_charge = 99 if subtotal <= 2500 else 0
             
             address_id = request.GET.get('address_id')
@@ -1382,12 +1427,17 @@ def razorpay_payment(request, user_id):
                     )
                     order.save()
                     for item in cart_items:
+                        if item.product.product_color_image.productoffer.exists():
+                            offer = item.product.product_color_image.productoffer.first()
+                            price_of_each = offer.offer_price
+                        else:
+                            price_of_each = item.product.product_color_image.price
                         order_item = OrderItem.objects.create(
                             order=order,
                             product=item.product,
                             quantity=item.quantity,
                             order_status="Order Placed",
-                            each_price=item.product.product_color_image.price,
+                            each_price=price_of_each,
                         )
                         order_item.save()
                         product_size_id = item.product.id

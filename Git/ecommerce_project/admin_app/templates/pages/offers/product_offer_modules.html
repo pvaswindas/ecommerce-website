@@ -1,0 +1,46 @@
+{% extends 'admin_base.html' %}
+
+{% load static %}
+
+{% block title %}
+  <title>Sneakerheads Manage Offer</title>
+{% endblock %}
+
+{% block custom_css %}
+  <link rel="stylesheet" href="{% static 'admin_css/orders.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="orders">
+    <h1>Manage Product Offer</h1>
+    {% if messages %}
+      <div class="text-center py-2 mb-4">
+        {% for message in messages %}
+          <h4>{{ message }}</h4>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <table>
+      <thead>
+        <tr>
+          <th class="product-column">Product</th>
+          <th class="discount-column">Discount Percentage</th>
+          <th class="start-column">Start Date</th>
+          <th class="end-column">End Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for offer in product_offer %}
+          <tr>
+            <td>
+              <a href="{% url 'product_offer_edit_page' offer.id %}">{{ offer.product_color_image.products.name }}</a>
+            </td>
+            <td>{{ offer.discount_percentage }}</td>
+            <td>{{ offer.start_date }}</td>
+            <td>{{ offer.end_date }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

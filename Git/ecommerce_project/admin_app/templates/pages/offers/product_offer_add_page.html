@@ -1,0 +1,48 @@
+{% extends 'admin_base.html' %}
+
+{% block custom_css %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'admin_css/add_product_variants.css' %}" />
+{% endblock %}
+
+{% block title %}
+  <title>SneakerHeads Add Product Offer</title>
+{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <h2 class="text-center mt-2 mb-4">Add Product Offer</h2>
+    <form action="" method="post">
+      {% csrf_token %}
+      <label for="product">Product</label>
+      <select name="offer_name" id="productSelect">
+        <option selected disabled>Select any of the product</option>
+        {% for product in product_color %}
+          <option value="{{ product.id }}">{{ product.products.name }} - {{ product.color }}</option>
+        {% endfor %}
+      </select>
+      <div class="form-group">
+        <label for="offer_discount">Discount Percentage</label>
+        <input type="number" class="form-control" id="offer_discount" name="offer_discount" required />
+      </div>
+      <div class="form-group">
+        <label for="offer_start_date">Start Date</label>
+        <input type="date" class="form-control" id="offer_start_date" name="offer_start_date" required />
+      </div>
+      <div class="form-group">
+        <label for="offer_end_date">End Date</label>
+        <input type="date" class="form-control" id="offer_end_date" name="offer_end_date" required />
+      </div>
+      {% if messages %}
+        <div class="text-center py-2 mb-4">
+          {% for message in messages %}
+            <h4>{{ message }}</h4>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary w-100">SAVE</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

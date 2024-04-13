@@ -100,7 +100,13 @@
                       <td>
                         <a href="#">{{ item.product.product_color_image.products.name }}</a>
                       </td>
-                      <td>₹{{ item.product.product_color_image.price }}.00</td>
+                      <td>
+                        {% if item.product.product_color_image.productoffer.exists %}
+                          ₹{{ item.product.product_color_image.productoffer.first.offer_price }}.00
+                        {% else %}
+                          ₹{{ item.product.product_color_image.price }}.00
+                        {% endif %}
+                      </td>
                     </tr>
                   {% endfor %}
 

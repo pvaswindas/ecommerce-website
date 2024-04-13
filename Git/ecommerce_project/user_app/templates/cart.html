@@ -61,7 +61,7 @@
                           </div>
                         </td>
                         <td class="total-col">{{ item.product.size }}</td>
-                        <td class="price-col">₹{{ item.product.product_color_image.price }}.00</td>
+                        <td class="price-col">₹{{ item.total_price }}.00</td>
                         <td class="quantity-col">
                           <div class="cart-product-quantity">
                             {% if item.product.quantity > 10 %}
@@ -187,7 +187,12 @@
         var productId = $(this).find('.quantity-col input').attr('id').split('-')[1]
         var quantity = $('#quantity-' + productId).val()
         var price = parseFloat($(this).find('.price-col').text().replace('₹', ''))
-        subtotal += parseFloat(quantity) * price
+        var total_price = parseFloat(
+          $('#total-price-' + productId)
+            .text()
+            .replace('₹', '')
+        )
+        subtotal += total_price
       })
     
       var shippingCharge = 0

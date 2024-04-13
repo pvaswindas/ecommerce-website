@@ -28,7 +28,7 @@ is_active_product = True
 is_active_brand = True
 is_active_category = True
 is_active_order = True
-is_active_return = True
+is_active_product_offer = True
 is_active_coupon = True
 is_active_banner = True
 
@@ -1220,8 +1220,17 @@ def change_order_status(request, order_id):
         if order_item:
             order_item.order_status = order_status
             order_item.save()
+            
+            today = date.today()
+            
+            if order_status == 'Delivered':
+                order_item.delivery_date = today
+                order_item.save()
             messages.success(request, 'Order Status Updated')
             return redirect('orders_view_page')
+        
+        
+        
     else:
         return redirect('admin_login_page')
         
@@ -1244,3 +1253,92 @@ def return_product(request, order_items_id):
             return redirect(admin_login_page)
     else:
         return redirect(admin_login_page)
+    
+    
+    
+# ---------------------------------------------------------------- ADMIN ORDER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+
+
+
+
+@never_cache
+def product_offer_module_view(request):
+    if request.user.is_superuser:
+        product_offer = ProductOffer.objects.all().order_by('-start_date')
+        context = {
+            'product_offer' : product_offer,
+            'is_active_product_offer' : is_active_product_offer,
+        }
+        return render(request, 'pages/offers/product_offer_modules.html', context)
+    else:
+        return redirect('admin_login_page')
+    
+    
+    
+
+@never_cache
+def product_offer_edit_page(request, product_offer_id):
+    if request.user.is_superuser:
+        try:
+            product_offer = ProductOffer.objects.get(pk = product_offer_id)
+            product_color = ProductColorImage.objects.all()
+            context = {
+                'product_offer' : product_offer,
+                'product_color' : product_color,
+                'is_active_product_offer' : is_active_product_offer,
+            }
+            return render(request, 'pages/offers/product_offer_edit_page.html', context)
+        except Exception as e:
+            return redirect('admin_dashboard')
+    else:
+        return redirect('admin_login_page')
+        
+        
+        
+
+
+
+@never_cache
+def product_offer_update(request, product_offer_id):
+    if request.user.is_superuser:
+        product_offer = ProductOffer.objects.get(pk = product_offer_id)
+        if request.method == 'POST':
+            product_color_image_id = request.POST.get('offer_name')
+            discount_percentage = request.POST.get('offer_discount')
+            start_date = request.POST.get('offer_start_date')
+            end_date = request.POST.get('offer_end_date')
+            
+            product_color_image = ProductColorImage.objects.get(pk = product_color_image_id)
+            
+            if end_date > start_date:
+                product_offer.product_color_image = product_color_image
+                product_offer.discount_percentage = discount_percentage
+                product_offer.start_date = start_date
+                product_offer.end_date = end_date
+                product_offer.save()
+                
+                messages.success(request, 'Product Offer Updated Successfully')
+                return redirect('product_offer_module_view')
+            else:
+                messages.error(request, 'Date is not in range')
+                return redirect('product_offer_edit_page', product_offer_id)
+        else:
+            return redirect('product_offer_module_view')
+    else:
+        return redirect('product_offer_module_view')
+    
+    
+    
+
+
+@never_cache
+def product_offer_add_page(request):
+    if request.user.is_superuser:
+        product_color = ProductColorImage.objects.all()
+        context = {
+            'product_color' : product_color,
+            'is_active_product_offer' : is_active_product_offer,
+        }
+        return render(request, 'pages/offers/product_offer_add_page.html', context)
+    else:
+        return redirect('admin_login_page')

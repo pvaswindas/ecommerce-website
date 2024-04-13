@@ -89,6 +89,23 @@ class ProductSize(models.Model):
         super(ProductSize, self).save(*args, **kwargs)
 
  
+
+class ProductOffer(models.Model):
+    product_color_image = models.ForeignKey(ProductColorImage, on_delete=models.CASCADE, related_name='productoffer')
+    discount_percentage = models.PositiveBigIntegerField()
+    offer_price = models.PositiveBigIntegerField(blank = True, null=True)
+    start_date = models.DateField(default=timezone.now)
+    end_date = models.DateField()
+    
+    
+    def save(self, *args, **kwargs):
+        if self.product_color_image and self.discount_percentage:
+            discount_price = round((self.product_color_image.price * self.discount_percentage) / 100)
+            self.offer_price = (self.product_color_image.price - discount_price)
+        super(ProductOffer, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.product_color_image.products.name} - {self.product_color_image.color} : {self.discount_percentage} % Offer | Offer Price : {self.offer_price}"
  
   
 class Payment(models.Model):
@@ -125,7 +142,6 @@ class Orders(models.Model):
     razorpay_id = models.CharField(max_length=100, blank=True, null = True)
     paid = models.BooleanField(default=False)
     placed_at = models.DateTimeField(default=timezone.now)
-    delivery_date = models.DateField(null=True)
 
     def __str__(self):
         paid_status = "- Paid" if self.paid else ""
@@ -152,6 +168,8 @@ class OrderItem(models.Model):
     cancel_product = models.BooleanField(default=False)
     return_product = models.BooleanField(default=False)
     request_return = models.BooleanField(default=False)
+    delivery_date = models.DateField(null=True)
+    
     
     def __str__(self):
         customer_name = f"{self.order.customer.user.first_name} {self.order.customer.user.last_name}"
@@ -244,4 +262,8 @@ class CartProducts(models.Model):
     
     @property
     def total_price(self):
-        return self.quantity * self.product.product_color_image.price
+        if self.product.product_color_image.productoffer.exists():
+            offer = self.product.product_color_image.productoffer.first()
+            return self.quantity * offer.offer_price
+        else:
+            return self.quantity * self.product.product_color_image.price
