@@ -70,6 +70,21 @@
                   </div>
                 </div>
               </div>
+
+              {% if applied_coupon %}
+                <div class="applied-coupon">
+                  <p>Coupon Applied: {{ applied_coupon }}</p>
+                </div>
+                {% if total_charge_discounted %}
+                  <div class="updated-prices">
+                    <p>Total (After Discount): ₹ {{ total_charge_discounted }}.00</p>
+                  </div>
+                {% endif %}
+  
+              {% endif %}
+              
+              <input type="hidden" name="applied_coupon" value="{{ applied_coupon }}">
+              
               <button type="submit" class="btn btn-outline-primary-2 rounded-2 my-4 btn-order btn-block" id="place_order_button" style="display: none;">
                 <span class="btn-text">Place Order</span>
                 <span class="btn-hover-text">Proceed to Checkout</span>
@@ -80,6 +95,24 @@
                 <span class="btn-hover-text">Proceed to Payment</span>
               </button>
             </form>
+            <div class="cart-discount">
+              <form action="{% url 'apply_coupon' %}" method="post">
+                {% csrf_token %}
+                 <div class="input-group">
+                    <select class="form-control" id="coupon_code" name="coupon_code">
+                      <option selected disabled value="">Select a coupon</option>
+                      {% for coupon in available_coupons %}
+                        <option value="{{ coupon.coupon_code }}">{{ coupon.coupon_code }}</option>
+                      {% endfor %}
+                    </select>                    
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-primary-2 pe-5 ps-3" type="submit" id="apply_coupon_button">
+                        <i class="icon-long-arrow-right"></i> Apply
+                      </button>
+                    </div>
+                 </div>
+              </form>
+            </div>
           </div>
 
           <aside class="col-lg-3">
@@ -137,7 +170,6 @@
   <script src="{% static 'user/assets/js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'user/assets/js/jquery.hoverIntent.min.js' %}"></script>
   <script src="{% static 'user/assets/js/jquery.waypoints.min.js' %}"></script>
-  <script src="{% static 'user/assets/js/superfish.min.js' %}"></script>
   <script src="{% static 'user/assets/js/owl.carousel.min.js' %}"></script>
   <script src="{% static 'user/assets/js/main.js' %}"></script>
   <script>
@@ -158,5 +190,17 @@
         document.getElementById('razorpay_button').style.display = 'none'
       }
     })
+  </script>
+
+  <script>
+    document.getElementById('apply_coupon_button').addEventListener('click', function() {
+      var couponCode = document.getElementById('coupon_code').value;
+    });
+  </script>
+  
+  <script>
+    document.getElementById('inner_form').addEventListener('submit', function (event) {
+      event.stopPropagation();
+    });
   </script>
 {% endblock %}

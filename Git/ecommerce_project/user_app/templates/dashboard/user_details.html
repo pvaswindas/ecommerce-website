@@ -8,39 +8,39 @@
     </div>
   {% endif %}
   <div class="profile-info">
-    <form action="{% url 'user_details_edit' user.id %}" method="post" id="customer-profile-form">
+    <form action="{% url 'user_details_edit' %}" method="post" id="customer-profile-form">
       {% csrf_token %}
       <div class="container profile-container">
         <div class="profile-info-item">
           <label for="first-name">First Name</label>
           <span id="first-name-value">{{ user.first_name }}</span>
           <br />
-          <input type="text" name="first_name" value="{{ user.first_name }}" id="first-name-input" class="edit-input" style="display: none;" />
+          <input type="text" name="first_name" value="{{ user.first_name }}" id="first-name-input" class="edit-input form-control" style="display: none;" />
         </div>
         <div class="profile-info-item">
           <label for="last-name">Last Name</label>
           <span id="last-name-value">{{ user.last_name }}</span>
           <br />
-          <input type="text" name="last_name" value="{{ user.last_name }}" id="last-name-input" class="edit-input" style="display: none;" />
+          <input type="text" name="last_name" value="{{ user.last_name }}" id="last-name-input" class="edit-input form-control" style="display: none;" />
         </div>
         <div class="profile-info-item">
           <label for="email">Email Address</label>
           <span id="email-value">{{ user.email }}</span>
           <br />
-          <input type="text" name="email" value="{{ user.email }}" id="email-input" class="edit-input" style="display: none;" />
+          <input type="text" name="email" value="{{ user.email }}" id="email-input" class="edit-input form-control" style="display: none;" />
         </div>
         <div class="profile-info-item">
           <label for="phone">Phone Number</label>
           <span id="phone-value">{{ customer.phone_number }}</span>
           <br />
-          <input type="text" name="phone" value="{{ customer.phone_number }}" id="phone-input" class="edit-input" style="display: none;" />
+          <input type="text" name="phone" value="{{ customer.phone_number }}" id="phone-input" class="edit-input form-control" style="display: none;" />
         </div>
         <div class="profile-info-item">
           <label for="dob">Date of Birth</label>
           <span id="dob-value">{{ customer.dob }}</span>
           <br />
-          <input type="date" name="dob" value="{{ customer.dob|date:'Y-m-d' }}" id="dob" class="edit-input" style="display: none;" />
-      </div>      
+          <input type="date" name="dob" value="{{ customer.dob|date:'Y-m-d' }}" id="dob" class="edit-input form-control" style="display: none;" />
+        </div>      
         <div class="profile-info-item">
           <label>Gender:</label>
           <span id="gender-value">{{ customer.get_gender_display }}</span>
@@ -56,10 +56,11 @@
         </div>
         <div class="profile-info-item">
           <button type="submit" form="customer-profile-form" class="save-button btn btn-primary" style="display: none;">Save</button>
+          <button type="button" class="cancel-button btn btn-secondary" style="display: none;" onclick="cancelEdit()">Cancel</button>
         </div>
         <div class="profile-info-item">
           <span class="edit-action" onclick="toggleEdit1()">Edit <i class="icon-edit"></i></span>
-      </div>      
+        </div>
       </div>
     </form>
   </div>

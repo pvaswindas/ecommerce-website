@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.contrib.auth import authenticate
 from django.contrib import auth
 from django.contrib import messages
-
+from django.utils.timezone import make_aware
 from django.contrib.auth.decorators import login_required 
 from django.views.decorators.cache import never_cache
 
@@ -143,11 +143,18 @@ def admin_check_login(request):
 def admin_dashboard(request):
     if request.user.is_superuser:
         context = {}
+        
+        sales_data = OrderItem.objects.all() 
+        
+        context['sales_data'] = sales_data
+        
         collect_data = get_data(request)
         context.update({**collect_data, 'is_active_dashboard': is_active_dashboard})
+        
         return render(request, 'admin_index.html', context)
     else:
         return redirect('admin_login_page')
+
 
 
 
@@ -1256,7 +1263,7 @@ def return_product(request, order_items_id):
     
     
     
-# ---------------------------------------------------------------- ADMIN ORDER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- PRODUCT OFFER MODULE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 
@@ -1298,38 +1305,52 @@ def product_offer_edit_page(request, product_offer_id):
 
 
 
+
+
 @never_cache
 def product_offer_update(request, product_offer_id):
     if request.user.is_superuser:
-        product_offer = ProductOffer.objects.get(pk = product_offer_id)
-        if request.method == 'POST':
-            product_color_image_id = request.POST.get('offer_name')
-            discount_percentage = request.POST.get('offer_discount')
-            start_date = request.POST.get('offer_start_date')
-            end_date = request.POST.get('offer_end_date')
+        try:
+            product_offer = ProductOffer.objects.get(pk=product_offer_id)
             
-            product_color_image = ProductColorImage.objects.get(pk = product_color_image_id)
-            
-            if end_date > start_date:
-                product_offer.product_color_image = product_color_image
-                product_offer.discount_percentage = discount_percentage
-                product_offer.start_date = start_date
-                product_offer.end_date = end_date
-                product_offer.save()
+            if request.method == 'POST':
+                product_color_image_id = request.POST.get('offer_name')
+                discount_percentage = request.POST.get('offer_discount')
+                start_date = request.POST.get('offer_start_date')
+                end_date = request.POST.get('offer_end_date')
                 
-                messages.success(request, 'Product Offer Updated Successfully')
-                return redirect('product_offer_module_view')
+                product_color_image = ProductColorImage.objects.get(pk=product_color_image_id)
+                
+                start_date = make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
+                end_date = make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
+                
+                if end_date > start_date:
+                    product_offer.product_color_image = product_color_image
+                    product_offer.discount_percentage = int(float(discount_percentage))
+                    product_offer.start_date = start_date
+                    product_offer.end_date = end_date
+                    product_offer.save()
+                    
+                    messages.success(request, 'Product Offer Updated Successfully')
+                    return redirect('product_offer_module_view')
+                else:
+                    messages.error(request, 'End date must be after start date')
+                    return redirect('product_offer_edit_page', product_offer_id)
             else:
-                messages.error(request, 'Date is not in range')
-                return redirect('product_offer_edit_page', product_offer_id)
-        else:
+                return redirect('product_offer_module_view')
+        except ProductOffer.DoesNotExist:
+            messages.error(request, 'Product Offer not found')
+        except ProductColorImage.DoesNotExist:
+            messages.error(request, 'Product color image not found')
+        except Exception as e:
+            messages.error(request, f'An error occurred: {e}')
             return redirect('product_offer_module_view')
     else:
         return redirect('product_offer_module_view')
-    
-    
-    
 
+    
+    
+    
 
 @never_cache
 def product_offer_add_page(request):
@@ -1342,3 +1363,180 @@ def product_offer_add_page(request):
         return render(request, 'pages/offers/product_offer_add_page.html', context)
     else:
         return redirect('admin_login_page')
+    
+    
+    
+    
+@never_cache
+def add_product_offer(request):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            product_color_image_id = request.POST.get('offer_name')
+            discount_percentage = request.POST.get('offer_discount')
+            end_date = request.POST.get('offer_end_date')
+            
+            if product_color_image_id and discount_percentage and end_date:
+                try:
+                    product_color_image = ProductColorImage.objects.get(pk=product_color_image_id)
+                    ProductOffer.objects.create(
+                        product_color_image=product_color_image,
+                        discount_percentage=int(discount_percentage),
+                        end_date=end_date
+                    )
+                    messages.success(request, 'Offer Module Added Successfully')
+                except ProductColorImage.DoesNotExist:
+                    messages.error(request, 'Selected product not found')
+                except ValueError:
+                    messages.error(request, 'Invalid discount percentage')
+                except Exception as e:
+                    messages.error(request, f'An error occurred : {e}')
+            else:
+                messages.error(request, 'Please fill in all required fields')
+        else:
+            return redirect('admin_dashboard')
+    else:
+        return redirect('admin_login_page')
+
+    return redirect('product_offer_module_view')
+    
+    
+    
+    
+# ----------------------------------------------------------------  COUPON PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+
+
+
+
+@never_cache
+def coupon_page_view(request):
+    if request.user.is_superuser:
+        coupons = Coupon.objects.all().order_by('-start_date')
+        context = {
+            'coupons' : coupons,
+            'is_active_coupon' : is_active_coupon
+        }
+        return render(request, 'pages/coupons/coupon.html', context)
+    else:
+        return redirect('admin_login_page')
+    
+    
+
+
+@never_cache
+def add_coupon_page(request):
+    if request.user.is_superuser:
+        product_color = ProductColorImage.objects.all()
+        context = {
+            'product_color' : product_color,
+            'is_active_coupon' : is_active_coupon
+        }
+        return render(request, 'pages/coupons/add_coupon.html', context)
+    else:
+        return redirect('admin_login_page')
+    
+    
+    
+    
+@never_cache
+def add_coupon(request):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            name = request.POST.get('coupon_name')
+            product_color_image_id = request.POST.get('offer_name')
+            discount_percentage = request.POST.get('offer_discount')
+            end_date = request.POST.get('offer_end_date')
+            
+            if name and product_color_image_id and discount_percentage and end_date:
+                try:
+                    product_color_image = ProductColorImage.objects.get(pk = product_color_image_id)
+                    Coupon.objects.create(
+                        name = name,
+                        product_color_image = product_color_image,
+                        discount_percentage = int(discount_percentage),
+                        end_date = end_date,
+                    )
+                    messages.success(request, 'Coupon Added Successfully')
+                except ProductColorImage.DoesNotExist:
+                    messages.error(request, 'Invalid discount percentage')
+                except ValueError:
+                    messages.error(request, 'Please fill in all required fields')
+                except Exception as e:
+                    messages.error(request, f"An error occurred : {e}")
+            else:
+                messages.error(request, 'Please fill in all the required fields')
+        else:
+            return redirect('admin_dashboard')
+    else:
+        return redirect('admin_login_page')
+    
+    return redirect('coupon_page_view')
+
+
+
+@never_cache
+def coupon_edit_page(request, coupon_id):
+    if request.user.is_superuser:
+        try:
+            coupon = Coupon.objects.get(pk=coupon_id)
+            product_color = ProductColorImage.objects.all()
+            context = {
+                'product_color': product_color,
+                'coupon': coupon,
+            }
+            return render(request, 'pages/coupons/coupon_edit_page.html', context)
+        except Coupon.DoesNotExist:
+            messages.error(request, 'Coupon not found')
+            return redirect('admin_dashboard')
+        except Exception as e:
+            messages.error(request, f'An error occurred: {e}')
+            return redirect('admin_dashboard')
+    else:
+        return redirect('admin_login_page')
+
+
+
+
+
+
+@never_cache
+def update_coupon(request, coupon_id):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            try:
+                coupon = Coupon.objects.get(pk=coupon_id)
+
+                name = request.POST.get('coupon_name')
+                product_color_image_id = request.POST.get('offer_name')
+                discount_percentage = request.POST.get('offer_discount')
+                start_date = request.POST.get('offer_start_date')
+                end_date = request.POST.get('offer_end_date')
+
+                start_date = make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
+                end_date = make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
+
+                product_color_image = ProductColorImage.objects.get(pk=product_color_image_id)
+
+                if start_date < end_date:
+                    coupon.name = name
+                    coupon.product_color_image = product_color_image
+                    coupon.discount_percentage = int(float(discount_percentage))
+                    coupon.start_date = start_date
+                    coupon.end_date = end_date
+                    coupon.save()
+                    messages.success(request, 'Coupon has been updated successfully')
+                    return redirect('coupon_page_view')
+                else:
+                    messages.error(request, 'End date must be after start date')
+            except Coupon.DoesNotExist:
+                messages.error(request, 'Coupon not found')
+            except ProductColorImage.DoesNotExist:
+                messages.error(request, 'Product color image not found')
+            except Exception as e:
+                messages.error(request, f'An error occurred: {e}')
+        return redirect('coupon_page_view')
+    else:
+        return redirect('admin_login_page')
+        
+            
+        
+        

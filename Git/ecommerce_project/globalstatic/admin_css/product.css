@@ -1,0 +1,198 @@
+.main-container {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    /* Enable horizontal scrolling on small screens */
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+/* Center align the content */
+.text-center {
+    text-align: center;
+}
+
+.search-bar {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 2px solid #ced4da;
+    border-radius: 1.5rem;
+    transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.search-button {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ffd900;
+    border: none;
+    color: rgb(58, 58, 58);
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+    background-color: #ffbb00;
+}
+
+.search-button:focus {
+    outline: none;
+}
+
+/* Center align the table */
+table {
+    margin: 0 auto;
+    /* Center the table horizontally */
+}
+
+.align-middle {
+    vertical-align: middle;
+}
+
+.rounded-start {
+    border-top-left-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.rounded-end {
+    border-top-right-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+}
+
+th {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f2f2f2;
+    text-align: center;
+    /* Center the text within table headers */
+}
+
+td {
+    padding: 12px 15px;
+    text-align: center;
+    /* Align the text in the center */
+    vertical-align: middle;
+    /* Vertically align the content in the middle */
+    border-bottom: 1px solid #ddd;
+}
+
+/* Center align the table */
+table {
+    margin: 0 auto;
+    /* Center the table horizontally */
+    text-align: center;
+}
+
+.size {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 10px;
+    margin: 2px;
+}
+
+
+
+.quantity {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 10px;
+    margin: 2px;
+}
+
+/* Ensure the text within these classes is bold and dark */
+.quantity {
+    color: #333;
+}
+
+/* Define styles for the table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Center align text within table cells */
+th,
+td {
+    text-align: center;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+@media screen and (max-width: 768px) {
+    table {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+
+    th,
+    td {
+        padding: 8px 10px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+}

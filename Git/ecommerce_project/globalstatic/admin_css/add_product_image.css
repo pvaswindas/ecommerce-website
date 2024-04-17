@@ -1,0 +1,265 @@
+/* Container styles */
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fcfeff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .container:hover {
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Heading styles */
+  .heading {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 24px;
+    animation: slideInDown 1s ease;
+  }
+  
+  /* Label styles */
+.label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Price input styles */
+#price {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Style for when the input is focused */
+#price:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+
+/* Color input styles */
+#color {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Style for when the input is focused */
+#color:focus {
+  border-color: #007bff; /* Adjust to your preferred focus color */
+  outline: none; /* Remove default focus outline */
+}
+
+/* Animation for form elements */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+  
+  /* File input styles */
+  input[type="file"] {
+    display: none;
+  }
+  
+  .upload-btn {
+    cursor: pointer;
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    transition: background-color 0.3s ease;
+    animation: fadeIn 1s ease;
+  }
+  
+  .upload-btn:hover {
+    background-color: #45a049; /* Darker Green */
+  }
+  
+/* Preview image styles */
+.preview {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px; /* Added border radius */
+    background-color: #fff; /* Added background color */
+    animation: slideInUp 1s ease;
+  }
+  
+  .preview img {
+    max-width: 150px; /* Increased max-width */
+    height: auto;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    animation: fadeIn 1s ease;
+  }
+  
+  
+  .preview img:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Remove button styles */
+  .remove-btn {
+    cursor: pointer;
+    display: inline-block;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f44336; /* Red */
+    color: white;
+    transition: background-color 0.3s ease;
+    animation: pulse 1.5s infinite ease-in-out;
+  }
+  
+  .remove-btn:hover {
+    background-color: #c82333; /* Darker Red */
+    animation: none;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  /* Submit button styles */
+  .submit-btn {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    border-radius: 5px;
+    background-color: #008CBA; /* Blue */
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    animation: bounce 1s infinite alternate;
+  }
+  
+  .submit-btn:hover {
+    background-color: #0056b3; /* Darker Blue */
+  }
+  
+  @keyframes bounce {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-5px);
+    }
+  }
+  
+  /* Animation for form elements */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+
+
+  /* Select wrapper styles */
+.select-wrapper {
+  margin-bottom: 20px;
+}
+
+/* Label styles */
+.label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Select product styles */
+#product {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+/* Style for when the select product is focused */
+#product:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Animation for form elements */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

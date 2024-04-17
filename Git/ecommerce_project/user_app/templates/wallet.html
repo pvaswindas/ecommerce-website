@@ -1,0 +1,64 @@
+{% extends 'main_base.html' %}
+{% load static %}
+
+{% block page_header %}
+  <div class="page-header text-center" style="background-image: url('{% static 'user/assets/images/page-header-bg.jpg' %}')">
+    <div class="container">
+      <h1 class="page-title">Wallet</h1>
+    </div>
+  </div>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+    <div class="container">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{% url 'index_page' %}">Home</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Wallet</li>
+      </ol>
+    </div>
+  </nav>
+{% endblock %}
+
+{% block page_content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="text-left">
+          <h2>Wallet Balance</h2>
+          <div class="bg-light p-4 rounded">
+            <h3 class="text-primary">₹{{ wallet.balance }}</h3>
+            <p>Current sneakerheads wallet balance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-md-10">
+        <h2>Transactions</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Date</th>
+              <th scope="col">Transaction Id</th>
+              <th scope="col">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for transaction in wallet.transactions.all %}
+            <tr>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td>{{ transaction.date }}</td>
+              <td>{{ transaction.description }}</td>
+              <td>{{ transaction.amount }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

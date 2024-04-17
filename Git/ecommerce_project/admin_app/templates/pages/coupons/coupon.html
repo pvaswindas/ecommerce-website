@@ -1,0 +1,50 @@
+{% extends 'admin_base.html' %}
+
+{% load static %}
+
+{% block title %}
+  <title>Sneakerheads Manage Coupon</title>
+{% endblock %}
+
+{% block custom_css %}
+  <link rel="stylesheet" href="{% static 'admin_css/orders.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="orders">
+    <h1>Manage Coupon</h1>
+    {% if messages %}
+      <div class="text-center py-2 mb-4">
+        {% for message in messages %}
+          <h4>{{ message }}</h4>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <table>
+      <thead>
+        <tr>
+          <th class="coupon-name-column">Name</th>
+          <th class="coupon-code-column">Coupon Code</th>
+          <th class="product-column">Product</th>
+          <th class="discount-column">Discount Percentage</th>
+          <th class="start-column">Start Date</th>
+          <th class="end-column">End Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for coupon in coupons %}
+          <tr>
+            <td>{{coupon.name}}</td>
+            <td>
+              <a href="{% url 'coupon_edit_page' coupon.coupon_code %}">{{ coupon.coupon_code }}</a>
+            </td>
+            <td>{{ coupon.product_color_image.products.name }}</td>
+            <td>{{ coupon.discount_percentage }}%</td>
+            <td>{{ coupon.start_date }}</td>
+            <td>{{ coupon.end_date }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -88,22 +88,27 @@
             <a class="nav-link" href="{% url 'product_offer_module_view' %}">Product Offers</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="">Category Offers</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="{% url 'product_offer_add_page' %}">Add Product Offer</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="">Add Category Offer</a>
           </li>
         </ul>
       </div>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="">
+    <li class="nav-item {% if is_active_coupon %}active{% endif %}">
+      <a class="nav-link" data-toggle="collapse" href="#coupons" aria-expanded="false" aria-controls="coupons">
         <i class="bi bi-cash"></i>
         <span class="menu-title px-3">Coupons</span>
+        <i class="menu-arrow"></i>
       </a>
+      <div class="collapse" id="coupons">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'coupon_page_view' %}">Coupons</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'add_coupon_page' %}">Add Coupon</a>
+          </li>
+        </ul>
+      </div>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="">

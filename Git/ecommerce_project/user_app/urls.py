@@ -33,7 +33,7 @@ urlpatterns = [
     
     
     path('sneakerheads/user/dashboard/<int:user_id>/', user_dashboard, name='user_dashboard'),
-    path('sneakerheads/user/details-update/<int:user_id>/', user_details_edit, name='user_details_edit'),
+    path('sneakerheads/user/details-update/', user_details_edit, name='user_details_edit'),
     
     path('sneakerheads/user/manage-address/update/<int:address_id>/', update_address, name='update_address'),
     path('sneakerheads/user/manage-address/add-address/<int:customer_id>/', add_new_address, name='add_new_address'),
@@ -50,6 +50,7 @@ urlpatterns = [
     path('sneakerheads/user/add-to-cart/<int:product_id>/', add_to_cart, name='add_to_cart'),
     
     path('sneakerheads/user/checkout/', checkout_page, name='checkout_page'),
+    path('sneakerheads/user/apply-coupon', apply_coupon, name='apply_coupon'),
     
     path('sneakerheads/user/order/order-details-page/<str:order_id>/', order_detail, name='order_detail'),
     path('sneakerheads/user/order/razorpay_payment/<int:user_id>/', razorpay_payment, name='razorpay_payment'),
@@ -64,6 +65,9 @@ urlpatterns = [
     path('sneakerheads/user/remove-from-wishlist/<int:product_color_id>/', remove_from_wishlist, name='remove_from_wishlist'),
     path('sneakerheads/user/remove-in-wishlist/<int:product_color_id>', remove_in_wishlist, name='remove_in_wishlist'),
     
+    
+    
+    path('sneakerheads/user/wallet/<int:user_id>/', wallet_page_view, name='wallet_page_view'),
     
 ]
 

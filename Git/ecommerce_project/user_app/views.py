@@ -1,6 +1,7 @@
 import re
 import time
 import random
+import logging
 import razorpay # type: ignore
 from random import shuffle
 from datetime import datetime
@@ -775,10 +776,11 @@ def user_dashboard(request, user_id):
 
 
 @never_cache
-def user_details_edit(request, user_id):
+def user_details_edit(request):
     if request.user.is_authenticated:
-        if user_id:
-            user = User.objects.get(pk = user_id)
+        user = request.user
+        user_id = user.id
+        if user:
             customer = Customer.objects.get(user = user)
             
             first_name = request.POST.get('first_name')
@@ -831,7 +833,34 @@ def user_details_edit(request, user_id):
 
             
         
+# -------------------------------------------------------------------------------- CC_WALLET DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
+       
+
+
+
+@never_cache
+def wallet_page_view(request, user_id):
+    if request.user.is_authenticated:
+        try:
+            context = {}
+            user = request.user
+            if user.id == user_id:
+                wallet = Wallet.objects.get(user=user)
+                cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+                context.update(cart_wishlist_address_order_data)
+                context.update({'wallet': wallet})
+                return render(request, 'wallet.html', context)
+            else:
+                return redirect('index_page')
+        except Wallet.DoesNotExist:
+            return redirect('index_page')
+    else:
+        return redirect('sign_in_page')
         
+
+
+
+
 
 
 # -------------------------------------------------------------------------------- CC_ADDRESS DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
@@ -996,10 +1025,10 @@ def order_detail(request, order_id):
             can_return_product = False
             if order_items in orders_placed_before_7_days:
                 can_return_product = True
-            placed = False
-            shipped = False
-            delivery = False
-            delivered = False
+                placed = False
+                shipped = False
+                delivery = False
+                delivered = False
             if order_items.order_status == 'Order Placed':
                 placed = True
             if order_items.order_status == 'Shipped':
@@ -1212,6 +1241,7 @@ def update_quantity(request):
    
    
    
+   
         
 @never_cache
 def checkout_page(request):
@@ -1222,7 +1252,27 @@ def checkout_page(request):
         cart_items = CartProducts.objects.filter(cart=cart, in_stock=True)
 
         if cart_items:
-            context = {}
+            applied_coupon = request.session.get('applied_coupon')
+            if applied_coupon:
+                try:
+                    coupon = Coupon.objects.get(coupon_code=applied_coupon)
+                    product_id = coupon.product_color_image.id
+                    coupon_product = ProductColorImage.objects.get(pk=product_id)
+                    if not any(item.product.product_color_image == coupon_product for item in cart_items):
+                        applied_coupon = None
+                        request.session.pop('applied_coupon', None)
+                except Coupon.DoesNotExist:
+                    applied_coupon = None
+                    request.session.pop('applied_coupon', None)
+
+            total_charge_discounted = calculate_total_charge_discounted(cart_items, applied_coupon)
+
+            available_coupons = Coupon.objects.filter(product_color_image__in=[item.product.product_color_image for item in cart_items])
+            context = {
+                'available_coupons': available_coupons,
+                'applied_coupon': applied_coupon,
+                'total_charge_discounted': total_charge_discounted,
+            }
             cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
             context.update(cart_wishlist_address_order_data)
             return render(request, 'checkout.html', context)
@@ -1232,6 +1282,72 @@ def checkout_page(request):
     else:
         return redirect('index_page')
 
+
+def calculate_total_charge_discounted(cart_items, applied_coupon):
+    if applied_coupon:
+        try:
+            coupon = Coupon.objects.get(coupon_code=applied_coupon)
+            total_charge_discounted = calculate_discounted_total_charge(cart_items, coupon)
+        except Coupon.DoesNotExist:
+            total_charge_discounted = None
+    else:
+        total_charge_discounted = None
+    return total_charge_discounted
+
+
+
+
+
+def calculate_discounted_total_charge(cart_items, coupon):
+    cart_total = 0
+    product_offer = ProductOffer.objects.filter(product_color_image__in=[item.product.product_color_image for item in cart_items]).first()
+    
+    if product_offer:
+        for item in cart_items:
+            if not item.product.product_color_image == product_offer.product_color_image:
+                cart_total += item.product.product_color_image.price
+        if coupon:
+            discount_amount = round((product_offer.offer_price * coupon.discount_percentage) / 100 )
+            discount_amount = product_offer.offer_price - discount_amount
+        total_charge_discounted = cart_total + discount_amount
+    else:
+        for item in cart_items:
+            if not item.product.product_color_image == coupon.product_color_image:
+                cart_total += item.product.product_color_image.price
+        if coupon:
+            discount_amount = coupon.coupon_price
+            total_charge_discounted = cart_total + discount_amount
+            
+    return total_charge_discounted
+
+
+
+   
+    
+@never_cache
+def apply_coupon(request):
+    if request.user.is_authenticated:
+        try:
+            if request.method == 'POST':
+                coupon_code = request.POST.get('coupon_code')
+                user = request.user
+                customer = Customer.objects.get(user=user)
+                cart = Cart.objects.get(customer=customer)
+                cart_items = CartProducts.objects.filter(cart=cart)
+                coupon = Coupon.objects.get(pk = coupon_code)
+                product_id = coupon.product_color_image.id
+                coupon_products = ProductColorImage.objects.get(pk=product_id)
+                if any(item.product.product_color_image == coupon_products for item in cart_items):
+                    request.session['applied_coupon'] = coupon_code
+                else:
+                    request.session.pop('applied_coupon', None)
+                return redirect('checkout_page')
+        except Exception as e:
+            return redirect('checkout_page')
+    else:
+        return redirect('sign_in')
+
+    
             
             
 
@@ -1267,7 +1383,7 @@ def place_order(request):
                             offer = items.product.product_color_image.productoffer.first()
                             each_price = offer.offer_price
                         else:
-                            each_price = item.product.product_color_image.price
+                            each_price = items.product.product_color_image.price
                         subtotal = subtotal + each_price
                     if subtotal <= 2500:
                         shipping_charge = 99
@@ -1275,7 +1391,9 @@ def place_order(request):
                     else:
                         shipping_charge = 0
                         total_charge = subtotal
-
+                    
+                    applied_coupon = request.POST.get('applied_coupon')
+                    print(applied_coupon)
                     address_id = request.POST.get('delivery_address')
                     payment_method = request.POST.get('payment_method')
                     
@@ -1352,6 +1470,7 @@ def place_order(request):
                             return render(request, 'order_placed.html', {'order': order})
                 return redirect('index_page')
         except Exception as e:
+            logging.error("An error occurred: %s", str(e))
             return redirect('index_page')
     else:
         return redirect('sign_in')

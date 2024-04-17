@@ -89,6 +89,16 @@ urlpatterns = [
     path('sneakerheads/admin/offer/product_offer_edit_page/<int:product_offer_id>/', product_offer_edit_page, name='product_offer_edit_page'),
     path('sneakerheads/admin/offer/product_offer_update/<int:product_offer_id>/', product_offer_update, name='product_offer_update'),
     path('sneakerheads/admin/offer/product_offer_add_page', product_offer_add_page, name='product_offer_add_page'),
+    path('sneakerheads/admin/offer/add-product-offer', add_product_offer, name='add_product_offer'),
+    
+    
+    
+    path('sneakerheads/admin/coupon/', coupon_page_view, name='coupon_page_view'),
+    path('sneakerheads/admin/add-coupon-page/', add_coupon_page, name='add_coupon_page'),
+    path('sneakerheads/admin/coupon/add-coupon/', add_coupon, name='add_coupon'),
+    path('sneakerheads/admin/coupon_edit_page/<str:coupon_id>/', coupon_edit_page, name='coupon_edit_page'),
+    path('sneakerheads/admin/coupon/update_coupon/<str:coupon_id>/', update_coupon, name='update_coupon'),
+    
 ]
 
 

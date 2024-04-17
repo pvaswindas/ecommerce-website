@@ -94,19 +94,54 @@ class ProductOffer(models.Model):
     product_color_image = models.ForeignKey(ProductColorImage, on_delete=models.CASCADE, related_name='productoffer')
     discount_percentage = models.PositiveBigIntegerField()
     offer_price = models.PositiveBigIntegerField(blank = True, null=True)
-    start_date = models.DateField(default=timezone.now)
+    start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField()
     
     
     def save(self, *args, **kwargs):
         if self.product_color_image and self.discount_percentage:
-            discount_price = round((self.product_color_image.price * self.discount_percentage) / 100)
+            discount_price = int(round((self.product_color_image.price * self.discount_percentage) / 100))
             self.offer_price = (self.product_color_image.price - discount_price)
         super(ProductOffer, self).save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.product_color_image.products.name} - {self.product_color_image.color} : {self.discount_percentage} % Offer | Offer Price : {self.offer_price}"
  
+
+
+
+
+
+class Coupon(models.Model):
+    coupon_code = models.CharField(primary_key=True, unique=True, max_length=12)
+    name = models.CharField(max_length=100)
+    product_color_image = models.ForeignKey(ProductColorImage, on_delete=models.CASCADE)
+    discount_percentage = models.PositiveBigIntegerField()
+    coupon_price = models.PositiveBigIntegerField(blank=True)
+    start_date = models.DateField(auto_now_add=True)
+    end_date = models.DateField() 
+    
+    
+    def save(self, *args, **kwargs):
+        if not self.coupon_code:
+            first_part = 'SNKHS'
+            name = self.product_color_image.products.name.replace(' ', '').upper()
+            second_part = name[:5]
+            third_part = self.discount_percentage
+            self.coupon_code = f"{first_part}{second_part}{third_part}"
+            
+        if self.product_color_image and self.discount_percentage:
+            discount_price = round((self.product_color_image.price * self.discount_percentage) / 100)
+            self.coupon_price = (self.product_color_image.price - discount_price)
+        super(Coupon, self).save(*args, **kwargs)
+        
+        
+    def __str__(self):
+        return f"{self.coupon_code} - {self.name} : {self.discount_percentage}% off for {self.product_color_image.products.name} | Price after applying coupon : {self.coupon_price}"
+ 
+ 
+
+
   
 class Payment(models.Model):
     method_name = models.CharField(max_length = 100)
@@ -194,9 +229,46 @@ class OrderItem(models.Model):
         super().save(*args, **kwargs)
         
 
-        
+
+class Wallet(models.Model):
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    balance = models.PositiveBigIntegerField(blank=True, default=0)
+    
+    
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name} - {self.user.email} | Balance : {self.balance}"
+
+@receiver(post_save, sender=User)
+def create_wallet(sender, instance, created, **kwargs):
+    if created:
+        Wallet.objects.create(user=instance)
+    
+    
 
     
+        
+class WalletTransaction(models.Model):
+    wallet = models.ForeignKey(Wallet, on_delete = models.CASCADE)
+    transaction_id = models.CharField(primary_key=True, max_length=12,unique=True)
+    money_deposit = models.PositiveBigIntegerField(blank=True)
+    money_withdrawn = models.PositiveBigIntegerField(blank=True)
+    time_of_transaction = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        if self.money_deposit:
+            money = "+{}".format(self.money_deposit)
+        elif self.money_withdrawn:
+            money = "-{}".format(self.money_deposit)
+            
+        return f"{self.transaction_id} - {self.wallet.user.first_name} {self.wallet.user.last_name} : {self.time_of_transaction} | {money}"
+    
+    def save(self, *args, **kwargs):
+        if not self.transaction_id:
+            first_part = 'TRNSCT'
+            random_numbers = ''.join(random.choices(string.digits, k=6))
+            self.transaction_id = f"{first_part}{random_numbers}"
+        super.save(*args, **kwargs)
+
 
 
 

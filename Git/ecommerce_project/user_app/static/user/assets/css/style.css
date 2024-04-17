@@ -1,4 +1,4 @@
-﻿@import url("https://fonts.googleapis.com/css?family=Poppins:200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800");
+﻿@import url(https://fonts.googleapis.com/css?family=Poppins:200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800);
 
 html {
     font-size: 62.5%;
@@ -7,13 +7,13 @@ html {
     font-size-adjust: 100%
 }
 
-html,
-body {
+body,
+html {
     height: 100%
 }
 
 body {
-    font: normal 300 1.4rem/1.86 "Poppins", sans-serif;
+    font: normal 300 1.4rem/1.86 Poppins, sans-serif;
     color: #666;
     background-color: #fff;
     -webkit-font-smoothing: antialiased;
@@ -35,8 +35,8 @@ p {
     margin-bottom: 1.5rem
 }
 
-ul,
-ol {
+ol,
+ul {
     list-style: none;
     padding: 0;
     margin: 0 0 1.5rem
@@ -136,7 +136,7 @@ img {
 
 @keyframes rotating {
     from {
-        transform: rotate(0deg)
+        transform: rotate(0)
     }
 
     to {
@@ -144,18 +144,18 @@ img {
     }
 }
 
-h1,
 .h1,
-h2,
 .h2,
-h3,
 .h3,
-h4,
 .h4,
-h5,
 .h5,
-h6,
-.h6 {
+.h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 500;
     line-height: 1.1;
     margin-bottom: 1.4rem;
@@ -163,34 +163,34 @@ h6,
     letter-spacing: -.03em
 }
 
-h1,
-.h1 {
+.h1,
+h1 {
     font-size: 4rem
 }
 
-h2,
-.h2 {
+.h2,
+h2 {
     font-size: 3.6rem
 }
 
-h3,
-.h3 {
+.h3,
+h3 {
     font-size: 2.6rem
 }
 
-h4,
-.h4 {
+.h4,
+h4 {
     font-size: 2.2rem
 }
 
-h5,
-.h5 {
+.h5,
+h5 {
     font-size: 2rem;
     letter-spacing: -.025em
 }
 
-h6,
-.h6 {
+.h6,
+h6 {
     font-size: 1.6rem;
     letter-spacing: -.01em
 }
@@ -198,11 +198,11 @@ h6,
 a {
     color: #c96;
     text-decoration: none;
-    transition: color 0.3s ease
+    transition: color .3s ease
 }
 
-a:hover,
-a:focus {
+a:focus,
+a:hover {
     color: #bf8040;
     text-decoration: none
 }
@@ -256,7 +256,7 @@ blockquote.text-center p {
 blockquote cite {
     font-style: normal;
     font-weight: 500;
-    color: #333333;
+    color: #333;
     letter-spacing: -.01em;
     line-height: 1
 }
@@ -268,32 +268,32 @@ blockquote cite span {
 }
 
 blockquote.text-white cite {
-    color: #cccccc
+    color: #ccc
 }
 
 blockquote.text-white cite span {
     color: #777
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
 
-    h1,
-    .h1 {
+    .h1,
+    h1 {
         font-size: 5rem
     }
 
-    h2,
-    .h2 {
+    .h2,
+    h2 {
         font-size: 4rem
     }
 
-    h3,
-    .h3 {
+    .h3,
+    h3 {
         font-size: 3rem
     }
 
-    h4,
-    .h4 {
+    .h4,
+    h4 {
         font-size: 2.4rem
     }
 }
@@ -303,7 +303,11 @@ blockquote.text-white cite span {
     margin-right: -10px
 }
 
+.col,
 .col-1,
+.col-10,
+.col-11,
+.col-12,
 .col-2,
 .col-3,
 .col-4,
@@ -312,40 +316,12 @@ blockquote.text-white cite span {
 .col-7,
 .col-8,
 .col-9,
-.col-10,
-.col-11,
-.col-12,
-.col,
 .col-auto,
-.col-sm-1,
-.col-sm-2,
-.col-sm-3,
-.col-sm-4,
-.col-sm-5,
-.col-sm-6,
-.col-sm-7,
-.col-sm-8,
-.col-sm-9,
-.col-sm-10,
-.col-sm-11,
-.col-sm-12,
-.col-sm,
-.col-sm-auto,
-.col-md-1,
-.col-md-2,
-.col-md-3,
-.col-md-4,
-.col-md-5,
-.col-md-6,
-.col-md-7,
-.col-md-8,
-.col-md-9,
-.col-md-10,
-.col-md-11,
-.col-md-12,
-.col-md,
-.col-md-auto,
+.col-lg,
 .col-lg-1,
+.col-lg-10,
+.col-lg-11,
+.col-lg-12,
 .col-lg-2,
 .col-lg-3,
 .col-lg-4,
@@ -354,12 +330,40 @@ blockquote.text-white cite span {
 .col-lg-7,
 .col-lg-8,
 .col-lg-9,
-.col-lg-10,
-.col-lg-11,
-.col-lg-12,
-.col-lg,
 .col-lg-auto,
+.col-md,
+.col-md-1,
+.col-md-10,
+.col-md-11,
+.col-md-12,
+.col-md-2,
+.col-md-3,
+.col-md-4,
+.col-md-5,
+.col-md-6,
+.col-md-7,
+.col-md-8,
+.col-md-9,
+.col-md-auto,
+.col-sm,
+.col-sm-1,
+.col-sm-10,
+.col-sm-11,
+.col-sm-12,
+.col-sm-2,
+.col-sm-3,
+.col-sm-4,
+.col-sm-5,
+.col-sm-6,
+.col-sm-7,
+.col-sm-8,
+.col-sm-9,
+.col-sm-auto,
+.col-xl,
 .col-xl-1,
+.col-xl-10,
+.col-xl-11,
+.col-xl-12,
 .col-xl-2,
 .col-xl-3,
 .col-xl-4,
@@ -368,10 +372,6 @@ blockquote.text-white cite span {
 .col-xl-7,
 .col-xl-8,
 .col-xl-9,
-.col-xl-10,
-.col-xl-11,
-.col-xl-12,
-.col-xl,
 .col-xl-auto {
     padding-right: 10px;
     padding-left: 10px
@@ -400,15 +400,15 @@ blockquote.text-white cite span {
     display: flex;
     flex-direction: column;
     min-height: 100%;
-    transition: transform 0.4s ease
+    transition: transform .4s ease
 }
 
 .mmenu-active .page-wrapper {
     transform: translateX(200px)
 }
 
-@media all and (-ms-high-contrast: none),
-(-ms-high-contrast: active) {
+@media all and (-ms-high-contrast:none),
+(-ms-high-contrast:active) {
     .page-wrapper {
         display: block
     }
@@ -423,7 +423,7 @@ blockquote.text-white cite span {
     padding-bottom: 5rem
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .col-5col {
         -ms-flex: 0 0 20%;
         flex: 0 0 20%;
@@ -455,7 +455,7 @@ blockquote.text-white cite span {
     padding-right: 10px
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .container-fluid {
         padding-left: 30px;
         padding-right: 30px
@@ -498,13 +498,13 @@ blockquote.text-white cite span {
     }
 }
 
-@media screen and (min-width: 1280px) {
+@media screen and (min-width:1280px) {
     .container {
         max-width: 1200px
     }
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width:1600px) {
     .container-fluid {
         padding-left: 70px;
         padding-right: 70px
@@ -622,7 +622,7 @@ blockquote.text-white cite span {
     }
 }
 
-@media screen and (min-width: 1920px) {
+@media screen and (min-width:1920px) {
     .container-fluid {
         max-width: 1920px;
         margin-left: auto;
@@ -642,8 +642,8 @@ blockquote.text-white cite span {
     align-items: center
 }
 
-.header-left,
 .header-center,
+.header-left,
 .header-right {
     display: flex;
     align-items: center
@@ -686,8 +686,8 @@ blockquote.text-white cite span {
     color: inherit
 }
 
-.header-top a:hover,
-.header-top a:focus {
+.header-top a:focus,
+.header-top a:hover {
     color: #c96
 }
 
@@ -696,8 +696,8 @@ blockquote.text-white cite span {
     position: relative
 }
 
-.header-top .container:after,
-.header-top .container-fluid:after {
+.header-top .container-fluid:after,
+.header-top .container:after {
     content: '';
     display: block;
     height: 1px;
@@ -712,14 +712,14 @@ blockquote.text-white cite span {
     margin-left: 2.6rem
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-top .container-fluid:after {
         left: 30px;
         right: 30px
     }
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width:1600px) {
     .header-top .container-fluid:after {
         left: 70px;
         right: 70px
@@ -792,7 +792,7 @@ blockquote.text-white cite span {
 
 .header-dropdown>a::after,
 .header-dropdown>span::after {
-    font-family: "molla";
+    font-family: molla;
     content: '\f110';
     position: absolute;
     right: 0;
@@ -803,8 +803,8 @@ blockquote.text-white cite span {
     margin-top: -.7rem
 }
 
-.header-dropdown a:hover,
-.header-dropdown a:focus {
+.header-dropdown a:focus,
+.header-dropdown a:hover {
     text-decoration: none
 }
 
@@ -819,7 +819,7 @@ blockquote.text-white cite span {
     visibility: hidden;
     opacity: 0;
     background-color: #fff;
-    box-shadow: 2px 5px 8px rgba(51, 51, 51, 0.05), -2px 5px 8px rgba(51, 51, 51, 0.05);
+    box-shadow: 2px 5px 8px rgba(51, 51, 51, .05), -2px 5px 8px rgba(51, 51, 51, .05);
     transition: all .25s;
     margin-top: 1px
 }
@@ -838,8 +838,8 @@ blockquote.text-white cite span {
     left: 0
 }
 
-.header-dropdown:hover>.header-menu,
-.header-dropdown:focus>.header-menu {
+.header-dropdown:focus>.header-menu,
+.header-dropdown:hover>.header-menu {
     visibility: visible;
     opacity: 1
 }
@@ -865,13 +865,13 @@ blockquote.text-white cite span {
     color: inherit
 }
 
-.header-menu a:hover,
-.header-menu a:focus {
+.header-menu a:focus,
+.header-menu a:hover {
     color: #c96
 }
 
-.header-right .header-menu,
-.header-right .header-dropdown:first-child .header-menu {
+.header-right .header-dropdown:first-child .header-menu,
+.header-right .header-menu {
     left: auto;
     right: 0
 }
@@ -918,20 +918,24 @@ blockquote.text-white cite span {
 .compare-dropdown .dropdown-menu {
     display: block;
     width: 300px;
-    z-index: 100;
+    z-index: 1001; /* Increase z-index */
     font-size: 1.3rem;
-    z-index: 1001;
     border: none;
     margin: 1px 0 0;
     padding: 2.2rem 3rem 2.5rem;
     border-radius: 0;
     border: none;
-    box-shadow: 5px 10px 16px rgba(51, 51, 51, 0.05), -5px 10px 16px rgba(51, 51, 51, 0.05);
+    box-shadow: 5px 10px 16px rgba(51, 51, 51, .05), -5px 10px 16px rgba(51, 51, 51, .05);
     background-color: #fff;
     visibility: hidden;
     opacity: 0;
-    transition: all .25s
+    transition: all .25s;
+    position: absolute; /* Change position to absolute */
+    top: calc(100% + 10px); /* Adjust the top position to open downwards */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Center horizontally */
 }
+
 
 .cart-dropdown .dropdown-menu:before,
 .compare-dropdown .dropdown-menu:before {
@@ -959,31 +963,31 @@ blockquote.text-white cite span {
     justify-content: center;
     width: 2.4rem;
     height: 2.4rem;
-    color: #cccccc;
+    color: #ccc;
     font-size: 1.3rem;
     line-height: 1;
     text-align: center;
     margin-top: -1.2rem
 }
 
-.cart-dropdown .btn-remove:hover,
 .cart-dropdown .btn-remove:focus,
-.compare-dropdown .btn-remove:hover,
-.compare-dropdown .btn-remove:focus {
+.cart-dropdown .btn-remove:hover,
+.compare-dropdown .btn-remove:focus,
+.compare-dropdown .btn-remove:hover {
     color: #333
 }
 
-.cart-dropdown:hover .dropdown-toggle,
 .cart-dropdown.show .dropdown-toggle,
-.compare-dropdown:hover .dropdown-toggle,
-.compare-dropdown.show .dropdown-toggle {
+.cart-dropdown:hover .dropdown-toggle,
+.compare-dropdown.show .dropdown-toggle,
+.compare-dropdown:hover .dropdown-toggle {
     color: #c96
 }
 
-.cart-dropdown:hover .dropdown-menu,
 .cart-dropdown.show .dropdown-menu,
-.compare-dropdown:hover .dropdown-menu,
-.compare-dropdown.show .dropdown-menu {
+.cart-dropdown:hover .dropdown-menu,
+.compare-dropdown.show .dropdown-menu,
+.compare-dropdown:hover .dropdown-menu {
     visibility: visible;
     opacity: 1
 }
@@ -1026,8 +1030,8 @@ blockquote.text-white cite span {
     color: inherit
 }
 
-.compare-product-title a:hover,
-.compare-product-title a:focus {
+.compare-product-title a:focus,
+.compare-product-title a:hover {
     color: #c96
 }
 
@@ -1042,8 +1046,8 @@ blockquote.text-white cite span {
     color: #666
 }
 
-.compare-actions .action-link:hover,
-.compare-actions .action-link:focus {
+.compare-actions .action-link:focus,
+.compare-actions .action-link:hover {
     color: #c96;
     text-decoration: underline
 }
@@ -1121,8 +1125,8 @@ blockquote.text-white cite span {
     color: inherit
 }
 
-.cart-dropdown .product-title a:hover,
-.cart-dropdown .product-title a:focus {
+.cart-dropdown .product-title a:focus,
+.cart-dropdown .product-title a:hover {
     color: #c96
 }
 
@@ -1195,8 +1199,8 @@ blockquote.text-white cite span {
     background-color: #c96
 }
 
-.wishlist-link:hover,
-.wishlist-link:focus {
+.wishlist-link:focus,
+.wishlist-link:hover {
     color: #c96
 }
 
@@ -1213,11 +1217,11 @@ blockquote.text-white cite span {
     z-index: 11
 }
 
-.search-toggle:hover,
+.search-toggle.active,
 .search-toggle:focus,
-.search-toggle.active {
+.search-toggle:hover {
     color: #c96;
-    outline: none !important
+    outline: 0 !important
 }
 
 .header-search {
@@ -1319,7 +1323,7 @@ blockquote.text-white cite span {
 }
 
 .header-search select:focus {
-    outline: none !important
+    outline: 0 !important
 }
 
 .header-search option {
@@ -1401,9 +1405,9 @@ blockquote.text-white cite span {
     display: flex
 }
 
-.header-search-no-radius .header-search-wrapper,
+.header-search-no-radius .btn,
 .header-search-no-radius .form-control,
-.header-search-no-radius .btn {
+.header-search-no-radius .header-search-wrapper {
     border-radius: 0
 }
 
@@ -1421,7 +1425,7 @@ blockquote.text-white cite span {
 
 .mobile-menu-toggler {
     border: none;
-    background: transparent;
+    background: 0 0;
     color: #666;
     padding: .2rem .25rem;
     font-size: 2.8rem;
@@ -1469,7 +1473,7 @@ blockquote.text-white cite span {
     padding-bottom: 0;
     overflow: hidden;
     transform: translateY(50px);
-    transition: all 0.5s
+    transition: all .5s
 }
 
 .menu .megamenu.demo .demo-item.show {
@@ -1487,22 +1491,22 @@ blockquote.text-white cite span {
     overflow: hidden
 }
 
-.header-intro-clearance .header-middle .header-left,
-.header-intro-clearance .header-bottom .header-left {
-    flex: 0 0 calc((100% + 20px) / 4);
-    max-width: calc((100% + 20px) / 4);
+.header-intro-clearance .header-bottom .header-left,
+.header-intro-clearance .header-middle .header-left {
+    flex: 0 0 calc((100% + 20px)/ 4);
+    max-width: calc((100% + 20px)/ 4);
     margin: 0
 }
 
-.header-intro-clearance .header-middle .header-center,
-.header-intro-clearance .header-bottom .header-center {
-    flex: 0 0 calc((100% + 20px) / 2 - 20px);
-    max-width: calc((100% + 20px) / 2 - 20px);
+.header-intro-clearance .header-bottom .header-center,
+.header-intro-clearance .header-middle .header-center {
+    flex: 0 0 calc((100% + 20px)/ 2 - 20px);
+    max-width: calc((100% + 20px)/ 2 - 20px);
     margin: 0
 }
 
-.header-intro-clearance .header-middle .header-right,
-.header-intro-clearance .header-bottom .header-right {
+.header-intro-clearance .header-bottom .header-right,
+.header-intro-clearance .header-middle .header-right {
     margin-left: auto
 }
 
@@ -1626,18 +1630,18 @@ blockquote.text-white cite span {
 }
 
 .header-intro-clearance .account,
-.header-intro-clearance .wishlist,
+.header-intro-clearance .cart-dropdown,
 .header-intro-clearance .compare-dropdown,
-.header-intro-clearance .cart-dropdown {
+.header-intro-clearance .wishlist {
     display: flex;
     align-self: stretch;
     align-items: initial
 }
 
 .header-intro-clearance .account>a,
-.header-intro-clearance .wishlist>a,
+.header-intro-clearance .cart-dropdown>a,
 .header-intro-clearance .compare-dropdown>a,
-.header-intro-clearance .cart-dropdown>a {
+.header-intro-clearance .wishlist>a {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1690,25 +1694,25 @@ blockquote.text-white cite span {
     right: -.3rem
 }
 
+.header-intro-clearance .account,
 .header-intro-clearance .cart-dropdown,
-.header-intro-clearance .wishlist,
-.header-intro-clearance .account {
+.header-intro-clearance .wishlist {
     padding-left: 3rem
 }
 
+.header-intro-clearance .account .dropdown-toggle,
 .header-intro-clearance .cart-dropdown .dropdown-toggle,
-.header-intro-clearance .wishlist .dropdown-toggle,
-.header-intro-clearance .account .dropdown-toggle {
+.header-intro-clearance .wishlist .dropdown-toggle {
     color: #333
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .mobile-menu-toggler {
         display: none
     }
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width:1600px) {
     .header .container-fluid .megamenu-container {
         position: relative
     }
@@ -1719,7 +1723,7 @@ blockquote.text-white cite span {
     }
 }
 
-@media screen and (max-width: 1199px) {
+@media screen and (max-width:1199px) {
     .header-search .search-wrapper-wide {
         width: 480px
     }
@@ -1734,7 +1738,7 @@ blockquote.text-white cite span {
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .top-menu:not(.top-link-menu) {
         display: flex;
         align-items: center;
@@ -1755,7 +1759,7 @@ blockquote.text-white cite span {
     }
 
     .top-menu:not(.top-link-menu)>li::after {
-        font-family: "molla";
+        font-family: molla;
         content: '\f110';
         position: absolute;
         right: 0;
@@ -1779,7 +1783,7 @@ blockquote.text-white cite span {
         opacity: 0;
         margin-top: 1px;
         background-color: #fff;
-        box-shadow: 2px 5px 8px rgba(51, 51, 51, 0.05), -2px 5px 8px rgba(51, 51, 51, 0.05);
+        box-shadow: 2px 5px 8px rgba(51, 51, 51, .05), -2px 5px 8px rgba(51, 51, 51, .05);
         text-transform: capitalize
     }
 
@@ -1793,8 +1797,8 @@ blockquote.text-white cite span {
         left: 0
     }
 
-    .top-menu:not(.top-link-menu):hover ul,
-    .top-menu:not(.top-link-menu):focus ul {
+    .top-menu:not(.top-link-menu):focus ul,
+    .top-menu:not(.top-link-menu):hover ul {
         visibility: visible;
         opacity: 1
     }
@@ -1866,7 +1870,7 @@ blockquote.text-white cite span {
     }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width:767px) {
     .header-search .search-wrapper-wide {
         width: 420px
     }
@@ -1877,7 +1881,7 @@ blockquote.text-white cite span {
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
     .header-search .search-wrapper-wide {
         width: 300px
     }
@@ -1896,14 +1900,14 @@ blockquote.text-white cite span {
     }
 }
 
-@media (max-width: 340px) {
+@media (max-width:340px) {
     .header-search .search-wrapper-wide {
         width: 260px
     }
 
+    .account,
     .compare-dropdown,
     .wishlist,
-    .account,
     .wishlist-link {
         display: none !important
     }
@@ -1930,10 +1934,10 @@ blockquote.text-white cite span {
     position: relative
 }
 
-.menu li:hover>ul,
-.menu li:hover>.megamenu,
+.menu li.show>.megamenu,
 .menu li.show>ul,
-.menu li.show>.megamenu {
+.menu li:hover>.megamenu,
+.menu li:hover>ul {
     display: block
 }
 
@@ -1975,8 +1979,8 @@ blockquote.text-white cite span {
     width: 694px
 }
 
-.menu .megamenu>ul,
-.menu .megamenu div>ul {
+.menu .megamenu div>ul,
+.menu .megamenu>ul {
     display: block;
     position: static;
     left: auto;
@@ -1989,13 +1993,13 @@ blockquote.text-white cite span {
     min-width: 0
 }
 
-.menu ul,
-.menu .megamenu {
+.menu .megamenu,
+.menu ul {
     margin-top: 1px
 }
 
-.menu ul:before,
-.menu .megamenu:before {
+.menu .megamenu:before,
+.menu ul:before {
     content: '';
     display: block;
     position: absolute;
@@ -2005,8 +2009,8 @@ blockquote.text-white cite span {
     right: 0
 }
 
-.menu ul ul,
-.menu .megamenu ul {
+.menu .megamenu ul,
+.menu ul ul {
     margin-top: 0
 }
 
@@ -2017,7 +2021,7 @@ blockquote.text-white cite span {
 }
 
 .menu a:not(.btn):focus {
-    outline: none !important
+    outline: 0 !important
 }
 
 .menu {
@@ -2025,7 +2029,7 @@ blockquote.text-white cite span {
 }
 
 .menu li>a {
-    color: #999999;
+    color: #999;
     font-weight: 300;
     font-size: 1.3rem;
     letter-spacing: 0;
@@ -2061,7 +2065,7 @@ blockquote.text-white cite span {
 }
 
 .menu.sf-arrows .sf-with-ul::after {
-    font-family: 'molla';
+    font-family: molla;
     content: '\f110';
     position: absolute;
     right: 0;
@@ -2084,7 +2088,7 @@ blockquote.text-white cite span {
 .menu .megamenu,
 .menu ul {
     background-color: #fff;
-    box-shadow: 5px 10px 16px rgba(51, 51, 51, 0.05), -5px 10px 16px rgba(51, 51, 51, 0.05)
+    box-shadow: 5px 10px 16px rgba(51, 51, 51, .05), -5px 10px 16px rgba(51, 51, 51, .05)
 }
 
 .menu ul {
@@ -2172,9 +2176,9 @@ blockquote.text-white cite span {
     font-size: 3.1rem
 }
 
-.menu li:hover>a,
+.menu li.active>a,
 .menu li.show>a,
-.menu li.active>a {
+.menu li:hover>a {
     color: #c96
 }
 
@@ -2186,7 +2190,7 @@ blockquote.text-white cite span {
 }
 
 .demo-item {
-    color: #999999;
+    color: #999;
     flex: 0 0 20%;
     max-width: 20%;
     padding: 0 10px;
@@ -2199,14 +2203,14 @@ blockquote.text-white cite span {
     color: inherit
 }
 
-.demo-item a:hover,
-.demo-item a:focus {
+.demo-item a:focus,
+.demo-item a:hover {
     color: #c96
 }
 
-.demo-item a:hover .demo-bg,
-.demo-item a:focus .demo-bg {
-    box-shadow: 3px 10px 16px rgba(51, 51, 51, 0.05), -3px 10px 16px rgba(51, 51, 51, 0.05);
+.demo-item a:focus .demo-bg,
+.demo-item a:hover .demo-bg {
+    box-shadow: 3px 10px 16px rgba(51, 51, 51, .05), -3px 10px 16px rgba(51, 51, 51, .05);
     background-position: center bottom;
     transition: background-position 2s linear, box-shadow .3s
 }
@@ -2291,9 +2295,9 @@ blockquote.text-white cite span {
     transition: transform .3s ease
 }
 
-.header-bottom .menu li:hover>a:before,
+.header-bottom .menu li.active>a:before,
 .header-bottom .menu li.show>a:before,
-.header-bottom .menu li.active>a:before {
+.header-bottom .menu li:hover>a:before {
     transform-origin: left center;
     transform: scale(1, 1)
 }
@@ -2302,7 +2306,7 @@ blockquote.text-white cite span {
     right: 1rem
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .main-nav {
         display: block
     }
@@ -2335,7 +2339,7 @@ blockquote.text-white cite span {
     display: flex;
     align-items: center;
     align-self: stretch;
-    color: #333333;
+    color: #333;
     font-weight: 500;
     font-size: 1.4rem;
     line-height: 1.5;
@@ -2348,7 +2352,7 @@ blockquote.text-white cite span {
 
 .category-dropdown .dropdown-toggle:after {
     content: '\f131';
-    font-family: 'molla';
+    font-family: molla;
     border: none;
     font-size: 2.3rem;
     line-height: 1;
@@ -2367,11 +2371,11 @@ blockquote.text-white cite span {
     transition: all .35s
 }
 
-.category-dropdown .dropdown-toggle:hover,
-.category-dropdown .dropdown-toggle:focus {
+.category-dropdown .dropdown-toggle:focus,
+.category-dropdown .dropdown-toggle:hover {
     color: #fff;
     background-color: #c96;
-    outline: none !important
+    outline: 0 !important
 }
 
 .category-dropdown:not(.is-on):hover .dropdown-menu {
@@ -2403,7 +2407,7 @@ blockquote.text-white cite span {
     border-radius: 0;
     border: none;
     padding: 0;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05)
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .05)
 }
 
 .category-dropdown .dropdown-item {
@@ -2427,15 +2431,15 @@ blockquote.text-white cite span {
     background-color: #f9f9f9
 }
 
-.category-dropdown .dropdown-item:hover,
-.category-dropdown .dropdown-item:focus {
+.category-dropdown .dropdown-item:focus,
+.category-dropdown .dropdown-item:hover {
     color: #c96;
     background-color: #fff;
-    outline: none !important
+    outline: 0 !important
 }
 
-.category-dropdown .dropdown-item:hover.dropdown-item-lead,
-.category-dropdown .dropdown-item:focus.dropdown-item-lead {
+.category-dropdown .dropdown-item:focus.dropdown-item-lead,
+.category-dropdown .dropdown-item:hover.dropdown-item-lead {
     background-color: #f9f9f9
 }
 
@@ -2458,10 +2462,10 @@ blockquote.text-white cite span {
     position: relative
 }
 
-.menu-vertical li:hover>ul,
-.menu-vertical li:hover>.megamenu,
+.menu-vertical li.show>.megamenu,
 .menu-vertical li.show>ul,
-.menu-vertical li.show>.megamenu {
+.menu-vertical li:hover>.megamenu,
+.menu-vertical li:hover>ul {
     display: block
 }
 
@@ -2472,7 +2476,7 @@ blockquote.text-white cite span {
 }
 
 .menu-vertical a:not(.btn):focus {
-    outline: none !important
+    outline: 0 !important
 }
 
 .menu-vertical .megamenu-container {
@@ -2484,8 +2488,8 @@ blockquote.text-white cite span {
     padding: 1.6rem 0 2rem
 }
 
-.menu-vertical ul,
-.menu-vertical .megamenu {
+.menu-vertical .megamenu,
+.menu-vertical ul {
     display: none;
     position: absolute;
     top: 0;
@@ -2493,11 +2497,11 @@ blockquote.text-white cite span {
     z-index: 1002;
     margin-top: 0;
     background-color: #fff;
-    box-shadow: 5px 10px 16px rgba(51, 51, 51, 0.05), -5px 10px 16px rgba(51, 51, 51, 0.05)
+    box-shadow: 5px 10px 16px rgba(51, 51, 51, .05), -5px 10px 16px rgba(51, 51, 51, .05)
 }
 
-.menu-vertical ul:before,
-.menu-vertical .megamenu:before {
+.menu-vertical .megamenu:before,
+.menu-vertical ul:before {
     display: none
 }
 
@@ -2513,15 +2517,15 @@ blockquote.text-white cite span {
     width: 694px
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .menu-vertical .megamenu:not(.megamenu-sm):not(.megamenu-md) {
         width: 893px;
         min-height: 100%
     }
 }
 
-.menu-vertical .megamenu>ul,
-.menu-vertical .megamenu div>ul {
+.menu-vertical .megamenu div>ul,
+.menu-vertical .megamenu>ul {
     display: block;
     position: static;
     left: auto;
@@ -2564,7 +2568,7 @@ blockquote.text-white cite span {
 
 .menu-vertical.sf-arrows .sf-with-ul::after {
     display: block;
-    font-family: 'molla';
+    font-family: molla;
     content: '\f112';
     position: absolute;
     right: 1.8rem;
@@ -2627,7 +2631,7 @@ blockquote.text-white cite span {
     letter-spacing: -.01em;
     text-transform: capitalize;
     padding-bottom: 1rem;
-    border-bottom: .1rem solid #eeeeee;
+    border-bottom: .1rem solid #eee;
     margin-bottom: .7rem
 }
 
@@ -2653,15 +2657,15 @@ blockquote.text-white cite span {
     padding-right: 0
 }
 
-.menu-vertical li:hover>a,
+.menu-vertical li.active>a,
 .menu-vertical li.show>a,
-.menu-vertical li.active>a {
+.menu-vertical li:hover>a {
     color: #c96
 }
 
-.menu-vertical>li:hover>a,
+.menu-vertical>li.active>a,
 .menu-vertical>li.show>a,
-.menu-vertical>li.active>a {
+.menu-vertical>li:hover>a {
     color: #c96
 }
 
@@ -2694,7 +2698,7 @@ blockquote.text-white cite span {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .sticky-header.fixed {
         position: fixed;
         left: 0;
@@ -2704,7 +2708,7 @@ blockquote.text-white cite span {
         animation-name: fixedHeader;
         animation-duration: .4s;
         background-color: #fff;
-        box-shadow: 0 3px 6px rgba(51, 51, 51, 0.05)
+        box-shadow: 0 3px 6px rgba(51, 51, 51, .05)
     }
 
     .sticky-header.fixed .logo {
@@ -2728,12 +2732,12 @@ blockquote.text-white cite span {
     width: 100%;
     max-width: 280px;
     overflow-y: scroll;
-    box-shadow: 0.1rem 0 0.6rem 0 rgba(51, 51, 51, 0.5);
+    box-shadow: .1rem 0 .6rem 0 rgba(51, 51, 51, .5);
     will-change: transform;
     visibility: hidden;
     font-size: 1.2rem;
     line-height: 1.5;
-    transition: all 0.4s ease
+    transition: all .4s ease
 }
 
 .mmenu-active .mobile-menu-container {
@@ -2752,16 +2756,16 @@ blockquote.text-white cite span {
     font-size: 1.2rem;
     background-color: transparent;
     margin-bottom: 0;
-    color: rgba(255, 255, 255, 0.45);
-    border-color: rgba(255, 255, 255, 0.45)
+    color: rgba(255, 255, 255, .45);
+    border-color: rgba(255, 255, 255, .45)
 }
 
 .mobile-menu-container .social-icon+.social-icon {
     margin-left: .8rem
 }
 
-.mobile-menu-container .social-icon:hover,
-.mobile-menu-container .social-icon:focus {
+.mobile-menu-container .social-icon:focus,
+.mobile-menu-container .social-icon:hover {
     background-color: transparent
 }
 
@@ -2788,8 +2792,8 @@ blockquote.text-white cite span {
     transition: color .35s
 }
 
-.mobile-menu-close:hover,
-.mobile-menu-close:focus {
+.mobile-menu-close:focus,
+.mobile-menu-close:hover {
     color: #c96
 }
 
@@ -2800,9 +2804,9 @@ blockquote.text-white cite span {
     top: 0;
     bottom: 0;
     right: 0;
-    background-color: rgba(25, 25, 25, 0.25);
+    background-color: rgba(25, 25, 25, .25);
     z-index: 1000;
-    transition: all 0.4s;
+    transition: all .4s;
     visibility: hidden;
     opacity: 0
 }
@@ -2837,18 +2841,18 @@ blockquote.text-white cite span {
     display: block;
     padding: 1rem 4.5rem 1rem 2rem;
     color: #fff;
-    border-bottom: 0.1rem solid rgba(255, 255, 255, 0.08)
+    border-bottom: .1rem solid rgba(255, 255, 255, .08)
 }
 
-.mobile-menu li a:hover,
-.mobile-menu li a:focus {
+.mobile-menu li a:focus,
+.mobile-menu li a:hover {
     color: #c96;
     text-decoration: none;
-    outline: none !important
+    outline: 0 !important
 }
 
-.mobile-menu li.open>a,
-.mobile-menu li.active>a {
+.mobile-menu li.active>a,
+.mobile-menu li.open>a {
     color: #c96
 }
 
@@ -2857,7 +2861,7 @@ blockquote.text-white cite span {
     padding: .7rem 0 .9rem;
     display: none;
     margin-bottom: 0;
-    border-bottom: 0.1rem solid rgba(255, 255, 255, 0.08)
+    border-bottom: .1rem solid rgba(255, 255, 255, .08)
 }
 
 .mobile-menu li ul li a {
@@ -2868,7 +2872,7 @@ blockquote.text-white cite span {
 }
 
 .mobile-menu li ul li a:not(:hover):not(:focus) {
-    color: rgba(255, 255, 255, 0.8)
+    color: rgba(255, 255, 255, .8)
 }
 
 .mobile-menu li ul li:last-child ul {
@@ -2877,7 +2881,7 @@ blockquote.text-white cite span {
 }
 
 .mobile-menu li ul ul {
-    border-top: 0.1rem solid rgba(255, 255, 255, 0.08)
+    border-top: .1rem solid rgba(255, 255, 255, .08)
 }
 
 .mobile-menu li ul ul li a {
@@ -2908,18 +2912,18 @@ blockquote.text-white cite span {
     border-radius: 0;
     background-color: transparent;
     cursor: pointer;
-    outline: none;
-    transition: color 0.35s
+    outline: 0;
+    transition: color .35s
 }
 
 .mmenu-btn::after {
-    font-family: "molla";
+    font-family: molla;
     content: '\f110';
     display: inline-block
 }
 
-.mmenu-btn:hover,
-.mmenu-btn:focus {
+.mmenu-btn:focus,
+.mmenu-btn:hover {
     color: #c96
 }
 
@@ -2943,12 +2947,12 @@ blockquote.text-white cite span {
     padding: .8rem 1.5rem;
     max-width: calc(100% - 36px);
     background-color: #333;
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, .1);
     border-right-width: 0
 }
 
 .mobile-search .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.45)
+    color: rgba(255, 255, 255, .45)
 }
 
 .mobile-search .form-control:focus {
@@ -2969,8 +2973,8 @@ blockquote.text-white cite span {
     border: none
 }
 
-.mobile-menu-container .tab-content .mobile-nav,
-.mobile-menu-container .tab-content .mobile-cats-nav {
+.mobile-menu-container .tab-content .mobile-cats-nav,
+.mobile-menu-container .tab-content .mobile-nav {
     margin-bottom: 0
 }
 
@@ -2981,7 +2985,7 @@ blockquote.text-white cite span {
 .nav.nav-pills-mobile {
     display: flex;
     align-items: center;
-    border-bottom: 0.1rem solid rgba(255, 255, 255, 0.1);
+    border-bottom: .1rem solid rgba(255, 255, 255, .1);
     margin: 0 0 .2rem
 }
 
@@ -2998,14 +3002,14 @@ blockquote.text-white cite span {
     line-height: 1.5;
     text-transform: uppercase;
     border-bottom: .2rem solid transparent;
-    background: none;
+    background: 0 0;
     padding: .8rem 2rem;
     transition: all .35s ease
 }
 
 .nav.nav-pills-mobile .nav-link.active,
-.nav.nav-pills-mobile .nav-link:hover,
-.nav.nav-pills-mobile .nav-link:focus {
+.nav.nav-pills-mobile .nav-link:focus,
+.nav.nav-pills-mobile .nav-link:hover {
     color: #c96;
     border-bottom-color: #c96
 }
@@ -3018,8 +3022,8 @@ blockquote.text-white cite span {
     position: relative;
     display: block;
     padding: 1rem 4.5rem 1rem 2rem;
-    color: rgba(255, 255, 255, 0.8);
-    border-bottom: 0.1rem solid rgba(255, 255, 255, 0.08)
+    color: rgba(255, 255, 255, .8);
+    border-bottom: .1rem solid rgba(255, 255, 255, .08)
 }
 
 .mobile-cats-menu li a.mobile-cats-lead {
@@ -3027,11 +3031,11 @@ blockquote.text-white cite span {
     color: #fff
 }
 
-.mobile-cats-menu li a:hover,
-.mobile-cats-menu li a:focus {
+.mobile-cats-menu li a:focus,
+.mobile-cats-menu li a:hover {
     color: #c96;
     text-decoration: none;
-    outline: none !important
+    outline: 0 !important
 }
 
 .mobile-menu-light {
@@ -3055,8 +3059,8 @@ blockquote.text-white cite span {
     color: #666
 }
 
-.mobile-menu-light .mobile-menu li.open>a,
-.mobile-menu-light .mobile-menu li.active>a {
+.mobile-menu-light .mobile-menu li.active>a,
+.mobile-menu-light .mobile-menu li.open>a {
     color: #c96
 }
 
@@ -3113,14 +3117,14 @@ blockquote.text-white cite span {
 }
 
 a {
-    font-family: 'Poppins'
+    font-family: Poppins
 }
 
 p {
     margin-bottom: 0;
     font-size: 1.4rem;
     font-weight: 300;
-    font-family: 'Poppins';
+    font-family: Poppins;
     letter-spacing: 0;
     color: #777
 }
@@ -3139,14 +3143,14 @@ p {
     max-width: none
 }
 
-.header-2 .header-search-extended select,
-.header-2 .header-search-extended .form-control {
+.header-2 .header-search-extended .form-control,
+.header-2 .header-search-extended select {
     height: 38px
 }
 
 .header-2 .header-search-extended .form-control {
     padding: 1.2rem 2.4rem 1rem 2rem;
-    font-family: 'Poppins';
+    font-family: Poppins;
     letter-spacing: -.01em
 }
 
@@ -3157,15 +3161,15 @@ p {
     max-width: 60px
 }
 
-.header-2 .header-search-extended .btn:hover,
+.header-2 .header-search-extended .btn:active,
 .header-2 .header-search-extended .btn:focus,
-.header-2 .header-search-extended .btn:active {
+.header-2 .header-search-extended .btn:hover {
     color: #a6c76c;
     background-color: transparent
 }
 
-.header-2 .btn-primary:not(:disabled):not(.disabled):active,
 .header-2 .btn-primary:not(:disabled):not(.disabled).active,
+.header-2 .btn-primary:not(:disabled):not(.disabled):active,
 .header-2 .show>.btn-primary.dropdown-toggle {
     color: #c96;
     background-color: transparent
@@ -3186,8 +3190,8 @@ p {
     align-items: center
 }
 
-.header-2 .header-top .container::after,
-.header-2 .header-top .container-fluid::after {
+.header-2 .header-top .container-fluid::after,
+.header-2 .header-top .container::after {
     height: 0
 }
 
@@ -3259,8 +3263,8 @@ p {
     margin-left: 0
 }
 
-.header-2 .header-bottom .menu ul,
-.header-2 .header-bottom .menu .megamenu {
+.header-2 .header-bottom .menu .megamenu,
+.header-2 .header-bottom .menu ul {
     margin-top: 0
 }
 
@@ -3272,13 +3276,13 @@ p {
     color: #fff
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-2 .header-search-visible .header-search-wrapper:before {
         border-bottom-color: #dadada
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-middle .header-center {
         display: none
     }
@@ -3308,17 +3312,17 @@ p {
 
 .header-3 {
     color: #fff;
-    background-color: #333333
+    background-color: #333
 }
 
 .header-3 .header-top {
     background-color: #333
 }
 
-.header-3 .header-top .container::after,
-.header-3 .header-top .container-fluid::after {
+.header-3 .header-top .container-fluid::after,
+.header-3 .header-top .container::after {
     height: .1rem;
-    background-color: #444444
+    background-color: #444
 }
 
 .header-3 .header-top .header-left i {
@@ -3356,8 +3360,8 @@ p {
     color: #fff
 }
 
-.header-3 .wishlist .wishlist-count,
-.header-3 .cart-count {
+.header-3 .cart-count,
+.header-3 .wishlist .wishlist-count {
     color: #333
 }
 
@@ -3391,17 +3395,17 @@ p {
     padding: 1rem 2.4rem 1rem .5rem
 }
 
-.header-3 .btn-primary:hover,
-.header-3 .btn-primary:focus,
 .header-3 .btn-primary.focus,
-.header-3 .btn-primary:not(:disabled):not(.disabled):active,
+.header-3 .btn-primary:focus,
+.header-3 .btn-primary:hover,
 .header-3 .btn-primary:not(:disabled):not(.disabled).active,
+.header-3 .btn-primary:not(:disabled):not(.disabled):active,
 .header-3 .show>.btn-primary.dropdown-toggle {
     color: #c96;
     background-color: transparent
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-3 .header-search-visible .header-search-wrapper {
         border-color: #dadada
     }
@@ -3411,7 +3415,7 @@ p {
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
 
     .header-3 .cart-dropdown,
     .header-3 .compare-dropdown,
@@ -3420,21 +3424,21 @@ p {
     }
 }
 
-@media screen and (max-width: 1119px) {
+@media screen and (max-width:1119px) {
 
-    .header-intro-clearance .header-bottom .container::before,
-    .header-intro-clearance .header-bottom .container::after {
+    .header-intro-clearance .header-bottom .container::after,
+    .header-intro-clearance .header-bottom .container::before {
         visibility: hidden
     }
 }
 
-@media screen and (max-width: 1100px) {
+@media screen and (max-width:1100px) {
     .header-intro-clearance .header-bottom .header-right i {
         visibility: hidden
     }
 }
 
-@media screen and (max-width: 399px) {
+@media screen and (max-width:399px) {
 
     .header-intro-clearance .account,
     .wishlist {
@@ -3518,9 +3522,9 @@ p {
     color: #333
 }
 
-.header-4 .wishlist-link:not(:hover):not(:focus),
+.header-4 .mobile-menu-toggler,
 .header-4 .search-toggle:not(:hover):not(:focus),
-.header-4 .mobile-menu-toggler {
+.header-4 .wishlist-link:not(:hover):not(:focus) {
     color: #333
 }
 
@@ -3536,8 +3540,8 @@ p {
     height: 0
 }
 
-.header-4 .menu ul,
-.header-4 .menu .megamenu {
+.header-4 .menu .megamenu,
+.header-4 .menu ul {
     margin-top: 0
 }
 
@@ -3564,11 +3568,11 @@ p {
     padding: 1rem 2.4rem 1rem .5rem
 }
 
-.header-4 .btn-primary:hover,
-.header-4 .btn-primary:focus,
 .header-4 .btn-primary.focus,
-.header-4 .btn-primary:not(:disabled):not(.disabled):active,
+.header-4 .btn-primary:focus,
+.header-4 .btn-primary:hover,
 .header-4 .btn-primary:not(:disabled):not(.disabled).active,
+.header-4 .btn-primary:not(:disabled):not(.disabled):active,
 .header-4 .show>.btn-primary.dropdown-toggle {
     color: #c96;
     background-color: transparent
@@ -3578,25 +3582,25 @@ p {
     color: #333 !important
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .header-4 .header-search-extended {
         margin-right: 7rem
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-4 .header-search-extended {
         margin-right: 15rem
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-4 .header-search-visible .header-search-wrapper:before {
         border-bottom-color: #c96
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
 
     .header-4 .cart-dropdown,
     .header-4 .compare-dropdown,
@@ -3672,12 +3676,10 @@ p {
     margin-left: 3rem
 }
 
-.header-5 .wishlist-link:not(:hover):not(:focus),
-.header-5 .search-toggle:not(:hover):not(:focus):not(.active),
-.header-5 .mobile-menu-toggler,
-.header-5 .wishlist-link:not(:hover):not(:focus),
 .header-5 .menu>li:not(:hover):not(.active):not(.show)>a,
-.header-5 .mobile-menu-toggler {
+.header-5 .mobile-menu-toggler,
+.header-5 .search-toggle:not(:hover):not(:focus):not(.active),
+.header-5 .wishlist-link:not(:hover):not(:focus) {
     color: #fff
 }
 
@@ -3686,8 +3688,8 @@ p {
     margin-bottom: 0
 }
 
-.header-5 .menu ul,
-.header-5 .menu .megamenu {
+.header-5 .menu .megamenu,
+.header-5 .menu ul {
     margin-top: 0
 }
 
@@ -3712,15 +3714,15 @@ p {
     transition: transform .3s
 }
 
-.header-5 .menu>li:hover>a,
+.header-5 .menu>li.active>a,
 .header-5 .menu>li:focus>a,
-.header-5 .menu>li.active>a {
+.header-5 .menu>li:hover>a {
     color: #fff
 }
 
-.header-5 .menu>li:hover>a::before,
+.header-5 .menu>li.active>a::before,
 .header-5 .menu>li:focus>a::before,
-.header-5 .menu>li.active>a::before {
+.header-5 .menu>li:hover>a::before {
     transform-origin: left center;
     transform: scale(1, 1)
 }
@@ -3729,14 +3731,14 @@ p {
     background-color: #333
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-5 .container-fluid {
         padding-left: 3rem;
         padding-right: 3rem
     }
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width:1600px) {
     .header-5 .container-fluid {
         padding-left: 6rem;
         padding-right: 6rem
@@ -3752,7 +3754,7 @@ p {
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
 
     .header-5 .cart-dropdown,
     .header-5 .compare-dropdown {
@@ -3760,7 +3762,7 @@ p {
     }
 }
 
-@media screen and (max-width: 1149px) {
+@media screen and (max-width:1149px) {
     .header-5 .header-search-extended {
         display: none
     }
@@ -3819,8 +3821,8 @@ p {
     color: #666
 }
 
-.header-6 .header-middle a:hover,
-.header-6 .header-middle a:focus {
+.header-6 .header-middle a:focus,
+.header-6 .header-middle a:hover {
     color: #c96
 }
 
@@ -3844,10 +3846,10 @@ p {
     margin-top: 0
 }
 
-.header-6 .cart-dropdown:hover .cart-txt,
 .header-6 .cart-dropdown:focus .cart-txt,
-.header-6 .compare-dropdown:hover .cart-txt,
-.header-6 .compare-dropdown:focus .cart-txt {
+.header-6 .cart-dropdown:hover .cart-txt,
+.header-6 .compare-dropdown:focus .cart-txt,
+.header-6 .compare-dropdown:hover .cart-txt {
     color: #c96
 }
 
@@ -3885,8 +3887,8 @@ p {
     text-transform: uppercase
 }
 
-.header-6 .menu ul,
-.header-6 .menu .megamenu {
+.header-6 .menu .megamenu,
+.header-6 .menu ul {
     margin-top: 0
 }
 
@@ -3939,21 +3941,21 @@ p {
     font-size: 2.8rem
 }
 
-.header-6 .wishlist-link:hover .wishlist-txt,
-.header-6 .wishlist-link:focus .wishlist-txt {
+.header-6 .wishlist-link:focus .wishlist-txt,
+.header-6 .wishlist-link:hover .wishlist-txt {
     color: #c96
 }
 
-.header-6 .wishlist-link .wishlist-count,
-.header-6 .cart-dropdown .cart-count {
+.header-6 .cart-dropdown .cart-count,
+.header-6 .wishlist-link .wishlist-count {
     min-width: 1.7rem;
     height: 1.7rem;
     margin-bottom: 1.5rem;
     margin-left: -1.2rem
 }
 
-.header-6 .wishlist-txt,
-.header-6 .cart-txt {
+.header-6 .cart-txt,
+.header-6 .wishlist-txt {
     font-size: 1.3rem;
     font-weight: 400;
     letter-spacing: 0;
@@ -3971,22 +3973,22 @@ p {
     letter-spacing: -.01em
 }
 
-.header-6 .header-middle a.btn:hover,
-.header-6 .header-middle a.btn:focus {
+.header-6 .header-middle a.btn:focus,
+.header-6 .header-middle a.btn:hover {
     color: #fff
 }
 
-.header-6 .btn-primary:hover,
-.header-6 .btn-primary:focus,
 .header-6 .btn-primary.focus,
-.header-6 .btn-primary:not(:disabled):not(.disabled):active,
+.header-6 .btn-primary:focus,
+.header-6 .btn-primary:hover,
 .header-6 .btn-primary:not(:disabled):not(.disabled).active,
+.header-6 .btn-primary:not(:disabled):not(.disabled):active,
 .header-6 .show>.btn-primary.dropdown-toggle {
     color: #c15454;
     background-color: transparent
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .header-6 .logo {
         position: absolute;
         left: 50%;
@@ -3996,13 +3998,13 @@ p {
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-6 .header-bottom {
         display: block
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
     .header-6 .header-dropdown {
         display: none
     }
@@ -4022,7 +4024,7 @@ p {
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-6 .header-middle .header-left {
         display: none
     }
@@ -4078,8 +4080,8 @@ p {
     margin-left: 2.5rem
 }
 
-.header-7 .menu ul,
-.header-7 .menu .megamenu {
+.header-7 .menu .megamenu,
+.header-7 .menu ul {
     margin-top: 0
 }
 
@@ -4121,15 +4123,15 @@ p {
     padding-bottom: 1rem
 }
 
-.header-7 .btn-primary:hover,
-.header-7 .btn-primary:focus,
 .header-7 .btn-primary.focus,
-.header-7 .btn-primary:not(:disabled):not(.disabled):active,
+.header-7 .btn-primary:focus,
+.header-7 .btn-primary:hover,
 .header-7 .btn-primary:not(:disabled):not(.disabled).active,
+.header-7 .btn-primary:not(:disabled):not(.disabled):active,
 .header-7 .show>.btn-primary.dropdown-toggle {
     color: #fff;
-    background-color: #cc6666;
-    border-color: #cc6666;
+    background-color: #c66;
+    border-color: #c66;
     box-shadow: none
 }
 
@@ -4137,7 +4139,7 @@ p {
     min-width: 180px
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
 
     .header-7 .cart-dropdown,
     .header-7 .compare-dropdown {
@@ -4149,7 +4151,7 @@ p {
     }
 }
 
-@media screen and (max-width: 1079px) {
+@media screen and (max-width:1079px) {
     .header.header-7 .header-search-extended {
         display: none
     }
@@ -4163,15 +4165,15 @@ p {
     margin-bottom: 0
 }
 
-.header-8 .header-top .container:after,
-.header-8 .header-top .container-fluid:after {
+.header-8 .header-top .container-fluid:after,
+.header-8 .header-top .container:after {
     display: none
 }
 
-.header-8 .header-top .header-dropdown>a:hover,
 .header-8 .header-top .header-dropdown>a:focus,
-.header-8 .header-top .top-menu>li>a:hover,
-.header-8 .header-top .top-menu>li>a:focus {
+.header-8 .header-top .header-dropdown>a:hover,
+.header-8 .header-top .top-menu>li>a:focus,
+.header-8 .header-top .top-menu>li>a:hover {
     color: #fff
 }
 
@@ -4183,6 +4185,8 @@ p {
     color: #666
 }
 
+
+
 .header-8 .header-dropdown {
     padding-top: .75rem;
     padding-bottom: .75rem
@@ -4192,9 +4196,9 @@ p {
     margin-left: 2rem
 }
 
-.header-8 .top-menu,
 .header-8 .header-dropdown>a,
-.header-8 .header-dropdown>span {
+.header-8 .header-dropdown>span,
+.header-8 .top-menu {
     text-transform: capitalize
 }
 
@@ -4242,20 +4246,20 @@ p {
 
 .header-8 .cart-dropdown .dropdown-menu,
 .header-8 .compare-dropdown .dropdown-menu,
-.header-8 .menu ul,
-.header-8 .menu .megamenu {
+.header-8 .menu .megamenu,
+.header-8 .menu ul {
     margin-top: 0
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
 
-    .header-8 .header-top .top-menu a:hover,
-    .header-8 .header-top .top-menu a:focus {
+    .header-8 .header-top .top-menu a:focus,
+    .header-8 .header-top .top-menu a:hover {
         color: #fff
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-8 .top-menu ul a:not(:hover):not(:focus) {
         color: #666
     }
@@ -4274,7 +4278,7 @@ p {
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-8 .header-search .header-search-wrapper {
         display: flex
     }
@@ -4316,12 +4320,10 @@ p {
     border-color: #fff
 }
 
-.header-9 .wishlist-link:not(:hover):not(:focus),
-.header-9 .search-toggle:not(:hover):not(:focus):not(.active),
-.header-9 .mobile-menu-toggler,
-.header-9 .wishlist-link:not(:hover):not(:focus),
 .header-9 .menu>li:not(:hover):not(.active):not(.show)>a,
-.header-9 .mobile-menu-toggler {
+.header-9 .mobile-menu-toggler,
+.header-9 .search-toggle:not(:hover):not(:focus):not(.active),
+.header-9 .wishlist-link:not(:hover):not(:focus) {
     color: #fff
 }
 
@@ -4334,8 +4336,8 @@ p {
     margin-left: 1rem
 }
 
-.header-9 .menu ul,
-.header-9 .menu .megamenu {
+.header-9 .menu .megamenu,
+.header-9 .menu ul {
     margin-top: 0
 }
 
@@ -4348,7 +4350,7 @@ p {
     background-color: #333
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
 
     .header-9 .cart-dropdown,
     .header-9 .compare-dropdown {
@@ -4370,8 +4372,8 @@ p {
     margin-bottom: 0
 }
 
-.header-10 .header-top .container:after,
-.header-10 .header-top .container-fluid:after {
+.header-10 .header-top .container-fluid:after,
+.header-10 .header-top .container:after {
     display: none
 }
 
@@ -4473,8 +4475,8 @@ p {
     margin-left: 5.2rem
 }
 
-.header-10 .header-bottom .menu ul,
-.header-10 .header-bottom .menu .megamenu {
+.header-10 .header-bottom .menu .megamenu,
+.header-10 .header-bottom .menu ul {
     margin-top: 0
 }
 
@@ -4495,9 +4497,9 @@ p {
     background-color: #fff
 }
 
-.header-10 .menu>li:hover>a,
+.header-10 .menu>li.active>a,
 .header-10 .menu>li.show>a,
-.header-10 .menu>li.active>a {
+.header-10 .menu>li:hover>a {
     color: #fff
 }
 
@@ -4521,7 +4523,7 @@ p {
     right: 1.9rem;
     top: 50%;
     margin-top: -1.15rem;
-    font-weight: normal;
+    font-weight: 400;
     margin-left: 0;
     float: right
 }
@@ -4547,7 +4549,7 @@ p {
     margin-top: 1.6rem
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-10 .header-search-visible .header-search-wrapper:before {
         border-bottom-color: #dadada
     }
@@ -4557,7 +4559,7 @@ p {
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-10 .header-search-extended {
         margin-right: 6.6rem
     }
@@ -4573,7 +4575,7 @@ p {
 }
 
 .header-11 .header-middle {
-    border-bottom-color: rgba(250, 250, 250, 0.2)
+    border-bottom-color: rgba(250, 250, 250, .2)
 }
 
 .header-11 .header-left,
@@ -4609,12 +4611,10 @@ p {
     border-color: #fff
 }
 
-.header-11 .wishlist-link:not(:hover):not(:focus),
-.header-11 .search-toggle:not(:hover):not(:focus):not(.active),
-.header-11 .mobile-menu-toggler,
-.header-11 .wishlist-link:not(:hover):not(:focus),
 .header-11 .menu>li:not(:hover):not(.active):not(.show)>a,
-.header-11 .mobile-menu-toggler {
+.header-11 .mobile-menu-toggler,
+.header-11 .search-toggle:not(:hover):not(:focus):not(.active),
+.header-11 .wishlist-link:not(:hover):not(:focus) {
     color: #fff
 }
 
@@ -4645,7 +4645,7 @@ p {
     margin-left: 0
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
 
     .header-11 .cart-dropdown,
     .header-11 .compare-dropdown {
@@ -4657,7 +4657,7 @@ p {
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-11 .menu>li:not(:last-child) {
         margin-right: 3rem
     }
@@ -4673,18 +4673,18 @@ p {
 }
 
 .header-12 .account,
-.header-12 .wishlist,
+.header-12 .cart-dropdown,
 .header-12 .compare-dropdown,
-.header-12 .cart-dropdown {
+.header-12 .wishlist {
     display: flex;
     align-self: stretch;
     align-items: initial
 }
 
 .header-12 .account>a,
-.header-12 .wishlist>a,
+.header-12 .cart-dropdown>a,
 .header-12 .compare-dropdown>a,
-.header-12 .cart-dropdown>a {
+.header-12 .wishlist>a {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -4736,28 +4736,28 @@ p {
     right: -.3rem
 }
 
+.header-12 .account,
 .header-12 .cart-dropdown,
-.header-12 .wishlist,
-.header-12 .account {
+.header-12 .wishlist {
     padding-left: 3rem
 }
 
+.header-12 .account .dropdown-toggle,
 .header-12 .cart-dropdown .dropdown-toggle,
-.header-12 .wishlist .dropdown-toggle,
-.header-12 .account .dropdown-toggle {
+.header-12 .wishlist .dropdown-toggle {
     color: #333
 }
 
+.header-12 .account,
 .header-12 .cart-dropdown,
-.header-12 .wishlist,
-.header-12 .account {
+.header-12 .wishlist {
     align-items: flex-end;
     padding-left: 3.4rem
 }
 
+.header-12 .account>a p,
 .header-12 .cart-dropdown>a p,
-.header-12 .wishlist>a p,
-.header-12 .account>a p {
+.header-12 .wishlist>a p {
     margin-top: .3rem;
     font-size: 1.1rem;
     font-weight: 300;
@@ -4765,24 +4765,24 @@ p {
     transition: color .3s
 }
 
-.header-12 .cart-dropdown:hover>a,
-.header-12 .cart-dropdown:hover>a p,
-.header-12 .cart-dropdown:focus>a,
-.header-12 .cart-dropdown:focus>a p,
-.header-12 .cart-dropdown.show>a,
-.header-12 .cart-dropdown.show>a p,
-.header-12 .wishlist:hover>a,
-.header-12 .wishlist:hover>a p,
-.header-12 .wishlist:focus>a,
-.header-12 .wishlist:focus>a p,
-.header-12 .wishlist.show>a,
-.header-12 .wishlist.show>a p,
-.header-12 .account:hover>a,
-.header-12 .account:hover>a p,
+.header-12 .account.show>a,
+.header-12 .account.show>a p,
 .header-12 .account:focus>a,
 .header-12 .account:focus>a p,
-.header-12 .account.show>a,
-.header-12 .account.show>a p {
+.header-12 .account:hover>a,
+.header-12 .account:hover>a p,
+.header-12 .cart-dropdown.show>a,
+.header-12 .cart-dropdown.show>a p,
+.header-12 .cart-dropdown:focus>a,
+.header-12 .cart-dropdown:focus>a p,
+.header-12 .cart-dropdown:hover>a,
+.header-12 .cart-dropdown:hover>a p,
+.header-12 .wishlist.show>a,
+.header-12 .wishlist.show>a p,
+.header-12 .wishlist:focus>a,
+.header-12 .wishlist:focus>a p,
+.header-12 .wishlist:hover>a,
+.header-12 .wishlist:hover>a p {
     color: #1cc0a0
 }
 
@@ -4811,7 +4811,7 @@ p {
     display: block;
     height: auto;
     content: '';
-    font-family: 'molla';
+    font-family: molla;
     content: '\f110';
     position: absolute;
     left: auto;
@@ -4905,15 +4905,15 @@ p {
     transition: transform .3s ease
 }
 
-.header-12 .header-bottom .menu>li:hover>a,
+.header-12 .header-bottom .menu>li.active>a,
 .header-12 .header-bottom .menu>li:focus>a,
-.header-12 .header-bottom .menu>li.active>a {
+.header-12 .header-bottom .menu>li:hover>a {
     color: #1cc0a0
 }
 
-.header-12 .header-bottom .menu>li:hover>a::before,
+.header-12 .header-bottom .menu>li.active>a::before,
 .header-12 .header-bottom .menu>li:focus>a::before,
-.header-12 .header-bottom .menu>li.active>a::before {
+.header-12 .header-bottom .menu>li:hover>a::before {
     transform-origin: left center;
     transform: scale(1, 1)
 }
@@ -4959,7 +4959,7 @@ p {
     max-width: 213px
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width:1600px) {
     .header-12 .header-search-extended {
         margin-right: 7rem
     }
@@ -4973,19 +4973,19 @@ p {
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-12 .header-search-visible .header-search-wrapper:before {
         border-bottom-color: #dadada
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-12 .header-text {
         display: block
     }
 }
 
-@media screen and (max-width: 1279px) {
+@media screen and (max-width:1279px) {
     .header-12 .header-bottom .menu>li+li {
         margin-left: .5rem
     }
@@ -4995,7 +4995,7 @@ p {
     }
 }
 
-@media screen and (max-width: 1140px) {
+@media screen and (max-width:1140px) {
     .header-12 .header-bottom .header-right {
         margin-left: 0
     }
@@ -5020,10 +5020,10 @@ p {
     }
 }
 
-@media screen and (max-width: 395px) {
+@media screen and (max-width:395px) {
 
-    .header-12 .wishlist,
-    .header-12 .account {
+    .header-12 .account,
+    .header-12 .wishlist {
         display: none
     }
 }
@@ -5109,8 +5109,8 @@ p {
     background-color: #333
 }
 
-.header-13 .header-bottom .menu ul,
-.header-13 .header-bottom .menu .megamenu {
+.header-13 .header-bottom .menu .megamenu,
+.header-13 .header-bottom .menu ul {
     margin-top: 0
 }
 
@@ -5133,8 +5133,8 @@ p {
     padding-bottom: 1.55rem
 }
 
-.header-13 .header-bottom .menu>li>a:hover,
-.header-13 .header-bottom .menu>li>a:focus {
+.header-13 .header-bottom .menu>li>a:focus,
+.header-13 .header-bottom .menu>li>a:hover {
     color: #fff
 }
 
@@ -5186,19 +5186,19 @@ p {
     right: auto
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-13 .header-search-visible .header-search-wrapper:before {
         border-bottom-color: #dadada
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .header-13 .sticky-header.fixed {
         width: 930px
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-13 .header-text {
         display: block
     }
@@ -5212,7 +5212,7 @@ p {
     }
 }
 
-@media screen and (min-width: 1280px) {
+@media screen and (min-width:1280px) {
     .header-13 .sticky-header.fixed {
         width: 1170px
     }
@@ -5242,15 +5242,15 @@ p {
     font-size: 1.6rem
 }
 
-.header-14 .header-middle .container,
-.header-14 .header-middle .container-fluid,
 .header-14 .header-bottom .container,
-.header-14 .header-bottom .container-fluid {
+.header-14 .header-bottom .container-fluid,
+.header-14 .header-middle .container,
+.header-14 .header-middle .container-fluid {
     display: block
 }
 
-.header-14 .header-bottom .container::after,
-.header-14 .header-bottom .container-fluid::after {
+.header-14 .header-bottom .container-fluid::after,
+.header-14 .header-bottom .container::after {
     content: '';
     position: absolute;
     top: 1.95rem;
@@ -5320,10 +5320,10 @@ p {
     margin-top: 0
 }
 
-.header-14 .cart-dropdown:hover .dropdown-toggle,
 .header-14 .cart-dropdown.show .dropdown-toggle,
-.header-14 .compare-dropdown:hover .dropdown-toggle,
-.header-14 .compare-dropdown.show .dropdown-toggle {
+.header-14 .cart-dropdown:hover .dropdown-toggle,
+.header-14 .compare-dropdown.show .dropdown-toggle,
+.header-14 .compare-dropdown:hover .dropdown-toggle {
     color: #fcb941
 }
 
@@ -5357,8 +5357,8 @@ p {
     background-color: #333
 }
 
-.header-14 .header-bottom .menu ul,
-.header-14 .header-bottom .menu .megamenu {
+.header-14 .header-bottom .menu .megamenu,
+.header-14 .header-bottom .menu ul {
     margin-top: 0
 }
 
@@ -5387,9 +5387,9 @@ p {
     transition: transform .3s ease
 }
 
-.header-14 .header-bottom .menu>li:hover>a::before,
+.header-14 .header-bottom .menu>li.active>a::before,
 .header-14 .header-bottom .menu>li:focus>a::before,
-.header-14 .header-bottom .menu>li.active>a::before {
+.header-14 .header-bottom .menu>li:hover>a::before {
     transform-origin: left center;
     transform: scale(1, 1)
 }
@@ -5526,8 +5526,8 @@ p {
     top: -.5rem
 }
 
-.header-14 .wishlist-link:hover .wishlist-txt,
-.header-14 .wishlist-link:focus .wishlist-txt {
+.header-14 .wishlist-link:focus .wishlist-txt,
+.header-14 .wishlist-link:hover .wishlist-txt {
     color: #fcb941
 }
 
@@ -5539,8 +5539,8 @@ p {
     font-size: 3rem
 }
 
-.header-14 .compare-dropdown:hover .compare-txt,
-.header-14 .compare-dropdown:focus .compare-txt {
+.header-14 .compare-dropdown:focus .compare-txt,
+.header-14 .compare-dropdown:hover .compare-txt {
     color: #fcb941
 }
 
@@ -5555,29 +5555,29 @@ p {
     right: -.3rem
 }
 
-.header-14 .cart-dropdown:hover .cart-txt,
-.header-14 .cart-dropdown:focus .cart-txt {
+.header-14 .cart-dropdown:focus .cart-txt,
+.header-14 .cart-dropdown:hover .cart-txt {
     color: #fcb941
 }
 
-.header-14 .compare-dropdown [class*='count'],
-.header-14 .cart-dropdown [class*='count'],
-.header-14 .wishlist-link [class*='count'] {
+.header-14 .cart-dropdown [class*=count],
+.header-14 .compare-dropdown [class*=count],
+.header-14 .wishlist-link [class*=count] {
     min-width: 1.6rem;
     height: 1.6rem;
     position: absolute
 }
 
-.header-14 .compare-dropdown .dropdown-toggle,
 .header-14 .cart-dropdown .dropdown-toggle,
+.header-14 .compare-dropdown .dropdown-toggle,
 .header-14 .wishlist-link .dropdown-toggle {
     position: relative;
     flex-direction: column
 }
 
-.header-14 .wishlist-txt,
 .header-14 .cart-txt,
-.header-14 .compare-txt {
+.header-14 .compare-txt,
+.header-14 .wishlist-txt {
     font-size: 1.1rem;
     font-weight: 300;
     letter-spacing: 0;
@@ -5592,7 +5592,7 @@ p {
     background-color: #dadada
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .header-14 .header-search-visible .header-search-wrapper:before {
         border-bottom-color: #dadada
     }
@@ -5604,19 +5604,19 @@ p {
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .header-14 .header-middle .header-right {
         max-width: 84%
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .header-14 .main-nav {
         margin-left: 2rem
     }
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width:1600px) {
     .header-14 .container-fluid .megamenu-container {
         position: static
     }
@@ -5630,7 +5630,7 @@ p {
     }
 }
 
-@media screen and (max-width: 1500px) {
+@media screen and (max-width:1500px) {
     .header-14 .header-bottom .col-lg-9 {
         position: static
     }
@@ -5641,28 +5641,28 @@ p {
     }
 }
 
-@media screen and (max-width: 1199px) {
+@media screen and (max-width:1199px) {
     .header-14 .menu .megamenu {
         left: 1.5rem;
         right: 1.5rem
     }
 }
 
-@media screen and (max-width: 992px) {
+@media screen and (max-width:992px) {
     .header-14 .top-menu .menus {
         display: block
     }
 }
 
-@media screen and (max-width: 1700px) {
+@media screen and (max-width:1700px) {
 
-    .header-14 .header-bottom .container::after,
-    .header-14 .header-bottom .container-fluid::after {
+    .header-14 .header-bottom .container-fluid::after,
+    .header-14 .header-bottom .container::after {
         right: 22%
     }
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width:1200px) {
     .header-14 .header-bottom .header-right {
         padding-right: 1rem
     }
@@ -5688,8 +5688,8 @@ p {
     color: inherit
 }
 
-.footer a:hover,
-.footer a:focus {
+.footer a:focus,
+.footer a:hover {
     color: #c96
 }
 
@@ -5698,7 +5698,7 @@ p {
 }
 
 .footer .widget-title {
-    color: #333333;
+    color: #333;
     font-weight: 500;
     font-size: 1.6rem;
     letter-spacing: -.01em;
@@ -5772,8 +5772,8 @@ p {
     padding-bottom: 2.9rem
 }
 
-.footer-bottom .container:before,
-.footer-bottom .container-fluid:before {
+.footer-bottom .container-fluid:before,
+.footer-bottom .container:before {
     content: '';
     display: block;
     height: 1px;
@@ -5802,7 +5802,7 @@ p {
     right: 50px;
     bottom: 128px;
     z-index: 999;
-    color: #cccccc;
+    color: #ccc;
     display: none;
     align-items: center;
     justify-content: center;
@@ -5814,13 +5814,13 @@ p {
     border: none;
     background-color: #fafafa;
     font-size: 3rem;
-    transition: all 0.4s ease;
+    transition: all .4s ease;
     transform: translateY(60px);
     -ms-transform: translateY(60px)
 }
 
-#scroll-top:hover,
-#scroll-top:focus {
+#scroll-top:focus,
+#scroll-top:hover {
     color: #777;
     background-color: #eaeaea
 }
@@ -5833,13 +5833,13 @@ p {
     -ms-transform: translateY(0)
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     #scroll-top {
         display: flex
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
 
     .footer-bottom .container,
     .footer-bottom .container-fluid {
@@ -5856,28 +5856,28 @@ p {
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .footer-bottom .container-fluid:before {
         left: 30px;
         right: 30px
     }
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width:1600px) {
     .footer-bottom .container-fluid:before {
         left: 70px;
         right: 70px
     }
 }
 
-@media screen and (min-width: 992px) and (max-width: 1200px) {
+@media screen and (min-width:992px) and (max-width:1200px) {
     .footer .widget-about .social-icon:not(:last-child) {
         margin-right: .4rem
     }
 }
 
 .footer-dark {
-    background-color: #333333
+    background-color: #333
 }
 
 .footer-dark .footer-middle {
@@ -5888,13 +5888,13 @@ p {
     color: #fff
 }
 
-.footer-dark .social-icon:hover,
-.footer-dark .social-icon:focus {
+.footer-dark .social-icon:focus,
+.footer-dark .social-icon:hover {
     color: #fff
 }
 
 .footer-dark .footer-bottom {
-    color: #666666
+    color: #666
 }
 
 .footer-dark .footer-bottom .container:before {
@@ -5910,7 +5910,7 @@ p {
 }
 
 .footer-dark.footer-2 .footer-bottom {
-    color: #999999
+    color: #999
 }
 
 .footer-2 .footer-middle {
@@ -5924,8 +5924,8 @@ p {
     flex-direction: column-reverse
 }
 
-.col-md-6 .widget-about p,
-.col-lg-6 .widget-about p {
+.col-lg-6 .widget-about p,
+.col-md-6 .widget-about p {
     max-width: none
 }
 
@@ -5945,7 +5945,7 @@ p {
     display: block;
     font-weight: 300;
     font-size: 1.3rem;
-    color: #333333;
+    color: #333;
     letter-spacing: 0;
     margin-bottom: .4rem
 }
@@ -5992,16 +5992,16 @@ p {
     font-size: 1.4rem;
     line-height: 1.5;
     font-weight: 300;
-    color: #999999;
+    color: #999;
     background-color: #fff;
     border: none;
     border-radius: 0;
     margin-bottom: 0;
-    transition: all 0.3s
+    transition: all .3s
 }
 
 .footer-newsletter .form-control.form-control::placeholder {
-    color: #999999
+    color: #999
 }
 
 .footer-newsletter .btn i:last-child {
@@ -6040,7 +6040,7 @@ p {
     box-shadow: 0 1px 0 #b5b5b5
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
 
     .footer-2 .footer-bottom .container,
     .footer-2 .footer-bottom .container-fluid {
@@ -6060,7 +6060,7 @@ p {
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
     .widget-about-info .col-sm-6:not(:last-child) {
         margin-bottom: 1rem
     }
@@ -6076,7 +6076,7 @@ p {
 
 .page-header h1 {
     color: #333;
-    font: normal 400 3.2rem/1.1 "Poppins", sans-serif;
+    font: normal 400 3.2rem/1.1 Poppins, sans-serif;
     letter-spacing: -.025em;
     margin-bottom: 0
 }
@@ -6102,7 +6102,7 @@ p {
     letter-spacing: 0
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .page-header h1 {
         font-size: 3.6rem
     }
@@ -6116,7 +6116,7 @@ p {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .page-header h1 {
         font-size: 4rem
     }
@@ -6132,7 +6132,7 @@ p {
 
 .breadcrumb-nav {
     margin-bottom: 4rem;
-    border-bottom: 0.1rem solid rgba(235, 235, 235, 0.55)
+    border-bottom: .1rem solid rgba(235, 235, 235, .55)
 }
 
 .breadcrumb-nav .container,
@@ -6181,13 +6181,13 @@ p {
     color: #777
 }
 
-.breadcrumb-item a:hover,
-.breadcrumb-item a:focus {
+.breadcrumb-item a:focus,
+.breadcrumb-item a:hover {
     color: #c96
 }
 
 .breadcrumb-item.active {
-    color: #333333
+    color: #333
 }
 
 .breadcrumb-item+.breadcrumb-item {
@@ -6195,9 +6195,9 @@ p {
 }
 
 .breadcrumb-item+.breadcrumb-item:before {
-    color: #999999;
+    color: #999;
     content: '\f112';
-    font-family: "molla";
+    font-family: molla;
     padding-right: .7rem;
     font-size: 1.1rem;
     vertical-align: middle;
@@ -6248,7 +6248,7 @@ p {
 
 .title-separator {
     font-weight: 300;
-    color: #cccccc
+    color: #ccc
 }
 
 .text-white .title-separator {
@@ -6273,8 +6273,8 @@ p {
     transition: all .3s ease
 }
 
-.title-link:hover,
-.title-link:focus {
+.title-link:focus,
+.title-link:hover {
     box-shadow: 0 1px 0 0 #c96
 }
 
@@ -6286,7 +6286,7 @@ p {
     margin-left: .5rem
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .title {
         font-size: 2.4rem
     }
@@ -6296,7 +6296,7 @@ p {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .heading.heading-flex {
         align-items: center;
         flex-direction: row;
@@ -6324,7 +6324,7 @@ p {
 }
 
 .icon-box-title {
-    color: #333333;
+    color: #333;
     font-weight: 400;
     font-size: 1.8rem;
     letter-spacing: -.025em;
@@ -6429,7 +6429,7 @@ p {
     margin-bottom: 0
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .icon-box {
         margin-bottom: 4rem
     }
@@ -6439,8 +6439,8 @@ p {
     }
 }
 
-@media screen and (min-width: 1200px) {
-    .icon-boxes-separator [class*="col-"]+[class*="col-"]:before {
+@media screen and (min-width:1200px) {
+    .icon-boxes-separator [class*=col-]+[class*=col-]:before {
         content: '';
         display: block;
         width: .1rem;
@@ -6453,7 +6453,7 @@ p {
     }
 }
 
-@media screen and (max-width: 1199px) {
+@media screen and (max-width:1199px) {
     .icon-box-sm br {
         display: none
     }
@@ -6503,7 +6503,7 @@ p {
     color: #c96;
     border: none;
     background-color: transparent;
-    outline: none !important
+    outline: 0 !important
 }
 
 .card-title a i {
@@ -6518,19 +6518,19 @@ p {
     right: 1.2rem;
     top: 50%;
     color: #c96;
-    font-family: "molla";
+    font-family: molla;
     line-height: 1;
     transform: translateY(-50%);
     -ms-transform: translateY(-50%);
-    transition: all 0.3s
+    transition: all .3s
 }
 
 .card-title a.collapsed {
     color: #333
 }
 
-.card-title a.collapsed:hover,
-.card-title a.collapsed:focus {
+.card-title a.collapsed:focus,
+.card-title a.collapsed:hover {
     color: #c96
 }
 
@@ -6616,14 +6616,14 @@ p {
     background-color: #fafafa
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .card-title {
         font-size: 2rem
     }
 }
 
 .nav-link:focus {
-    outline: none !important
+    outline: 0 !important
 }
 
 .nav.nav-tabs {
@@ -6647,8 +6647,8 @@ p {
     transition: all .35s ease
 }
 
-.nav.nav-tabs .nav-link:hover,
-.nav.nav-tabs .nav-link:focus {
+.nav.nav-tabs .nav-link:focus,
+.nav.nav-tabs .nav-link:hover {
     color: #c96;
     border-color: transparent
 }
@@ -6657,8 +6657,8 @@ p {
     margin-left: .1rem
 }
 
-.nav.nav-tabs .nav-item.show .nav-link,
-.nav.nav-tabs .nav-item .nav-link.active {
+.nav.nav-tabs .nav-item .nav-link.active,
+.nav.nav-tabs .nav-item.show .nav-link {
     color: #c96;
     border-color: #d7d7d7;
     border-bottom-color: transparent
@@ -6709,21 +6709,21 @@ p {
     transition: all .35s ease
 }
 
-.nav.nav-pills .nav-link:hover,
-.nav.nav-pills .nav-link:focus {
+.nav.nav-pills .nav-link:focus,
+.nav.nav-pills .nav-link:hover {
     color: #c96
 }
 
 .nav.nav-pills .nav-link:focus {
-    outline: none !important
+    outline: 0 !important
 }
 
 .nav.nav-pills .nav-item+.nav-item {
     margin-left: 1rem
 }
 
-.nav.nav-pills .nav-item.show .nav-link,
-.nav.nav-pills .nav-item .nav-link.active {
+.nav.nav-pills .nav-item .nav-link.active,
+.nav.nav-pills .nav-item.show .nav-link {
     color: #c96;
     border-color: #d7d7d7;
     border-bottom-color: #c96
@@ -6778,8 +6778,8 @@ p {
     margin-top: 1px
 }
 
-.tabs-vertical .nav.nav-tabs .nav-item.show .nav-link,
-.tabs-vertical .nav.nav-tabs .nav-item .nav-link.active {
+.tabs-vertical .nav.nav-tabs .nav-item .nav-link.active,
+.tabs-vertical .nav.nav-tabs .nav-item.show .nav-link {
     border-color: #d7d7d7;
     border-right-color: transparent
 }
@@ -6836,7 +6836,7 @@ p {
     height: .2rem
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .nav-pills+.tab-content .tab-pane {
         padding-left: 1rem;
         padding-right: 1rem
@@ -6867,7 +6867,7 @@ p {
     min-width: 170px;
     border-radius: 0;
     white-space: normal;
-    transition: all 0.3s
+    transition: all .3s
 }
 
 .btn span {
@@ -6886,9 +6886,9 @@ p {
     box-shadow: none
 }
 
-.btn:focus,
-.btn:active {
-    outline: none !important
+.btn:active,
+.btn:focus {
+    outline: 0 !important
 }
 
 .btn:active:focus {
@@ -6908,7 +6908,7 @@ p {
 }
 
 .btn:active {
-    outline: none
+    outline: 0
 }
 
 .btn-rounded {
@@ -6951,17 +6951,17 @@ p {
     letter-spacing: 0;
     font-size: 1.4rem;
     min-width: 0;
-    font-family: "Poppins", sans-serif
+    font-family: Poppins, sans-serif
 }
 
 .btn-link.btn-link-dark {
     color: #333
 }
 
-.btn-link:hover,
-.btn-link:focus,
+.btn-link .btn-link-dark:focus,
 .btn-link .btn-link-dark:hover,
-.btn-link .btn-link-dark:focus {
+.btn-link:focus,
+.btn-link:hover {
     color: #c96;
     text-decoration: none;
     border-color: #c96
@@ -6979,13 +6979,13 @@ p {
     display: none
 }
 
-.btn:hover .btn-text,
-.btn:focus .btn-text {
+.btn:focus .btn-text,
+.btn:hover .btn-text {
     display: none
 }
 
-.btn:hover .btn-hover-text,
-.btn:focus .btn-hover-text {
+.btn:focus .btn-hover-text,
+.btn:hover .btn-hover-text {
     display: inline-block
 }
 
@@ -6996,11 +6996,11 @@ p {
     box-shadow: none
 }
 
-.btn-primary:hover,
-.btn-primary:focus,
 .btn-primary.focus,
-.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary:focus,
+.btn-primary:hover,
 .btn-primary:not(:disabled):not(.disabled).active,
+.btn-primary:not(:disabled):not(.disabled):active,
 .show>.btn-primary.dropdown-toggle {
     color: #fff;
     background-color: #a6c76c;
@@ -7022,11 +7022,11 @@ p {
     box-shadow: none
 }
 
-.btn-secondary:hover,
-.btn-secondary:focus,
 .btn-secondary.focus,
-.btn-secondary:not(:disabled):not(.disabled):active,
+.btn-secondary:focus,
+.btn-secondary:hover,
 .btn-secondary:not(:disabled):not(.disabled).active,
+.btn-secondary:not(:disabled):not(.disabled):active,
 .show>.btn-secondary.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7048,11 +7048,11 @@ p {
     box-shadow: none
 }
 
-.btn-white:hover,
-.btn-white:focus,
 .btn-white.focus,
-.btn-white:not(:disabled):not(.disabled):active,
+.btn-white:focus,
+.btn-white:hover,
 .btn-white:not(:disabled):not(.disabled).active,
+.btn-white:not(:disabled):not(.disabled):active,
 .show>.btn-white.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7074,11 +7074,11 @@ p {
     box-shadow: none
 }
 
-.btn-white-2:hover,
-.btn-white-2:focus,
 .btn-white-2.focus,
-.btn-white-2:not(:disabled):not(.disabled):active,
+.btn-white-2:focus,
+.btn-white-2:hover,
 .btn-white-2:not(:disabled):not(.disabled).active,
+.btn-white-2:not(:disabled):not(.disabled):active,
 .show>.btn-white-2.dropdown-toggle {
     color: #fff;
     background-color: #a6c76c;
@@ -7100,11 +7100,11 @@ p {
     box-shadow: none
 }
 
-.btn-primary-white:hover,
-.btn-primary-white:focus,
 .btn-primary-white.focus,
-.btn-primary-white:not(:disabled):not(.disabled):active,
+.btn-primary-white:focus,
+.btn-primary-white:hover,
 .btn-primary-white:not(:disabled):not(.disabled).active,
+.btn-primary-white:not(:disabled):not(.disabled):active,
 .show>.btn-primary-white.dropdown-toggle {
     color: #c96;
     background-color: #fff;
@@ -7126,11 +7126,11 @@ p {
     box-shadow: none
 }
 
-.btn-white-primary:hover,
-.btn-white-primary:focus,
 .btn-white-primary.focus,
-.btn-white-primary:not(:disabled):not(.disabled):active,
+.btn-white-primary:focus,
+.btn-white-primary:hover,
 .btn-white-primary:not(:disabled):not(.disabled).active,
+.btn-white-primary:not(:disabled):not(.disabled):active,
 .show>.btn-white-primary.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7152,11 +7152,11 @@ p {
     box-shadow: none
 }
 
-.btn-dark:hover,
-.btn-dark:focus,
 .btn-dark.focus,
-.btn-dark:not(:disabled):not(.disabled):active,
+.btn-dark:focus,
+.btn-dark:hover,
 .btn-dark:not(:disabled):not(.disabled).active,
+.btn-dark:not(:disabled):not(.disabled):active,
 .show>.btn-dark.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7176,19 +7176,19 @@ p {
     background-color: transparent;
     background-image: none;
     border-color: #ebebeb;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05)
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .05)
 }
 
-.btn-outline:hover,
-.btn-outline:focus,
 .btn-outline.focus,
-.btn-outline:not(:disabled):not(.disabled):active,
+.btn-outline:focus,
+.btn-outline:hover,
 .btn-outline:not(:disabled):not(.disabled).active,
+.btn-outline:not(:disabled):not(.disabled):active,
 .show>.btn-outline.dropdown-toggle {
     color: #c96;
     background-color: transparent;
     border-color: #ebebeb;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15)
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .15)
 }
 
 .btn-outline.disabled,
@@ -7205,16 +7205,16 @@ p {
     box-shadow: none
 }
 
-.btn-outline-primary:hover,
-.btn-outline-primary:focus,
 .btn-outline-primary.focus,
-.btn-outline-primary:not(:disabled):not(.disabled):active,
+.btn-outline-primary:focus,
+.btn-outline-primary:hover,
 .btn-outline-primary:not(:disabled):not(.disabled).active,
+.btn-outline-primary:not(:disabled):not(.disabled):active,
 .show>.btn-outline-primary.dropdown-toggle {
     color: #c96;
     background-color: transparent;
     border-color: #ebebeb;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05)
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .05)
 }
 
 .btn-outline-primary.disabled,
@@ -7231,11 +7231,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-primary-2:hover,
-.btn-outline-primary-2:focus,
 .btn-outline-primary-2.focus,
-.btn-outline-primary-2:not(:disabled):not(.disabled):active,
+.btn-outline-primary-2:focus,
+.btn-outline-primary-2:hover,
 .btn-outline-primary-2:not(:disabled):not(.disabled).active,
+.btn-outline-primary-2:not(:disabled):not(.disabled):active,
 .show>.btn-outline-primary-2.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7257,11 +7257,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-light:hover,
-.btn-outline-light:focus,
 .btn-outline-light.focus,
-.btn-outline-light:not(:disabled):not(.disabled):active,
+.btn-outline-light:focus,
+.btn-outline-light:hover,
 .btn-outline-light:not(:disabled):not(.disabled).active,
+.btn-outline-light:not(:disabled):not(.disabled):active,
 .show>.btn-outline-light.dropdown-toggle {
     color: #c96;
     background-color: transparent;
@@ -7283,16 +7283,16 @@ p {
     box-shadow: none
 }
 
-.btn-outline-dark:hover,
-.btn-outline-dark:focus,
 .btn-outline-dark.focus,
-.btn-outline-dark:not(:disabled):not(.disabled):active,
+.btn-outline-dark:focus,
+.btn-outline-dark:hover,
 .btn-outline-dark:not(:disabled):not(.disabled).active,
+.btn-outline-dark:not(:disabled):not(.disabled):active,
 .show>.btn-outline-dark.dropdown-toggle {
     color: #c96;
     background-color: transparent;
     border-color: #ebebeb;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05)
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .05)
 }
 
 .btn-outline-dark.disabled,
@@ -7309,11 +7309,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-dark-2:hover,
-.btn-outline-dark-2:focus,
 .btn-outline-dark-2.focus,
-.btn-outline-dark-2:not(:disabled):not(.disabled):active,
+.btn-outline-dark-2:focus,
+.btn-outline-dark-2:hover,
 .btn-outline-dark-2:not(:disabled):not(.disabled).active,
+.btn-outline-dark-2:not(:disabled):not(.disabled):active,
 .show>.btn-outline-dark-2.dropdown-toggle {
     color: #c96;
     background-color: #fafafa;
@@ -7335,11 +7335,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-dark-3:hover,
-.btn-outline-dark-3:focus,
 .btn-outline-dark-3.focus,
-.btn-outline-dark-3:not(:disabled):not(.disabled):active,
+.btn-outline-dark-3:focus,
+.btn-outline-dark-3:hover,
 .btn-outline-dark-3:not(:disabled):not(.disabled).active,
+.btn-outline-dark-3:not(:disabled):not(.disabled):active,
 .show>.btn-outline-dark-3.dropdown-toggle {
     color: #c96;
     background-color: transparent;
@@ -7361,11 +7361,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-darker:hover,
-.btn-outline-darker:focus,
 .btn-outline-darker.focus,
-.btn-outline-darker:not(:disabled):not(.disabled):active,
+.btn-outline-darker:focus,
+.btn-outline-darker:hover,
 .btn-outline-darker:not(:disabled):not(.disabled).active,
+.btn-outline-darker:not(:disabled):not(.disabled):active,
 .show>.btn-outline-darker.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7387,11 +7387,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-gray:hover,
-.btn-outline-gray:focus,
 .btn-outline-gray.focus,
-.btn-outline-gray:not(:disabled):not(.disabled):active,
+.btn-outline-gray:focus,
+.btn-outline-gray:hover,
 .btn-outline-gray:not(:disabled):not(.disabled).active,
+.btn-outline-gray:not(:disabled):not(.disabled):active,
 .show>.btn-outline-gray.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7413,11 +7413,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-lightgray:hover,
-.btn-outline-lightgray:focus,
 .btn-outline-lightgray.focus,
-.btn-outline-lightgray:not(:disabled):not(.disabled):active,
+.btn-outline-lightgray:focus,
+.btn-outline-lightgray:hover,
 .btn-outline-lightgray:not(:disabled):not(.disabled).active,
+.btn-outline-lightgray:not(:disabled):not(.disabled):active,
 .show>.btn-outline-lightgray.dropdown-toggle {
     color: #c96;
     background-color: #f5f6f9;
@@ -7432,13 +7432,13 @@ p {
 }
 
 .btn-shadow {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05) !important
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .05) !important
 }
 
-.btn-shadow:hover,
+.btn-shadow:active,
 .btn-shadow:focus,
-.btn-shadow:active {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15) !important
+.btn-shadow:hover {
+    box-shadow: 0 5px 10px rgba(0, 0, 0, .15) !important
 }
 
 .btn-outline-white {
@@ -7449,11 +7449,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-white:hover,
-.btn-outline-white:focus,
 .btn-outline-white.focus,
-.btn-outline-white:not(:disabled):not(.disabled):active,
+.btn-outline-white:focus,
+.btn-outline-white:hover,
 .btn-outline-white:not(:disabled):not(.disabled).active,
+.btn-outline-white:not(:disabled):not(.disabled):active,
 .show>.btn-outline-white.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7475,11 +7475,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-white-2:hover,
-.btn-outline-white-2:focus,
 .btn-outline-white-2.focus,
-.btn-outline-white-2:not(:disabled):not(.disabled):active,
+.btn-outline-white-2:focus,
+.btn-outline-white-2:hover,
 .btn-outline-white-2:not(:disabled):not(.disabled).active,
+.btn-outline-white-2:not(:disabled):not(.disabled):active,
 .show>.btn-outline-white-2.dropdown-toggle {
     color: #fff;
     background-color: #a6c76c;
@@ -7501,11 +7501,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-white-3:hover,
-.btn-outline-white-3:focus,
 .btn-outline-white-3.focus,
-.btn-outline-white-3:not(:disabled):not(.disabled):active,
+.btn-outline-white-3:focus,
+.btn-outline-white-3:hover,
 .btn-outline-white-3:not(:disabled):not(.disabled).active,
+.btn-outline-white-3:not(:disabled):not(.disabled):active,
 .show>.btn-outline-white-3.dropdown-toggle {
     color: #333;
     background-color: #fff;
@@ -7527,11 +7527,11 @@ p {
     box-shadow: none
 }
 
-.btn-outline-white-4:hover,
-.btn-outline-white-4:focus,
 .btn-outline-white-4.focus,
-.btn-outline-white-4:not(:disabled):not(.disabled):active,
+.btn-outline-white-4:focus,
+.btn-outline-white-4:hover,
 .btn-outline-white-4:not(:disabled):not(.disabled).active,
+.btn-outline-white-4:not(:disabled):not(.disabled):active,
 .show>.btn-outline-white-4.dropdown-toggle {
     color: #c96;
     background-color: #fff;
@@ -7553,17 +7553,17 @@ p {
     color: #fff
 }
 
-.bg-image .btn-link-dark:hover,
-.bg-image .btn-link-dark:focus {
+.bg-image .btn-link-dark:focus,
+.bg-image .btn-link-dark:hover {
     color: #c96;
     border-color: #c96
 }
 
-.bg-image .btn-outline-primary:hover,
-.bg-image .btn-outline-primary:focus,
 .bg-image .btn-outline-primary.focus,
-.bg-image .btn-outline-primary:not(:disabled):not(.disabled):active,
+.bg-image .btn-outline-primary:focus,
+.bg-image .btn-outline-primary:hover,
 .bg-image .btn-outline-primary:not(:disabled):not(.disabled).active,
+.bg-image .btn-outline-primary:not(:disabled):not(.disabled):active,
 .show>.bg-image .btn-outline-primary.dropdown-toggle {
     color: #fff;
     background-color: #c96;
@@ -7575,11 +7575,11 @@ p {
     border-color: #fff
 }
 
-.bg-image .btn-outline-dark:hover,
-.bg-image .btn-outline-dark:focus,
 .bg-image .btn-outline-dark.focus,
-.bg-image .btn-outline-dark:not(:disabled):not(.disabled):active,
+.bg-image .btn-outline-dark:focus,
+.bg-image .btn-outline-dark:hover,
 .bg-image .btn-outline-dark:not(:disabled):not(.disabled).active,
+.bg-image .btn-outline-dark:not(:disabled):not(.disabled):active,
 .show>.bg-image .btn-outline-dark.dropdown-toggle {
     color: #c96;
     background-color: #fff;
@@ -7598,7 +7598,7 @@ p {
 }
 
 .product:hover {
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05)
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .05)
 }
 
 .product-media {
@@ -7654,7 +7654,7 @@ p {
     padding: 1.4rem 0 1.2rem;
     margin-left: .5rem;
     margin-right: .5rem;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, .9);
     border-radius: .4rem
 }
 
@@ -7677,7 +7677,7 @@ p {
 .product-countdown .countdown-period {
     display: block;
     font-weight: 400;
-    color: #333333;
+    color: #333;
     text-transform: lowercase;
     width: 100%;
     padding-left: .2rem;
@@ -7709,7 +7709,7 @@ p {
     padding-top: .9rem;
     padding-bottom: .9rem;
     border-radius: .3rem;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, .95);
     letter-spacing: -.01em;
     transition: all .4s ease;
     visibility: visible;
@@ -7766,7 +7766,7 @@ p {
     font-size: 1.6rem;
     line-height: 1.25;
     letter-spacing: -.01em;
-    color: #333333;
+    color: #333;
     margin-bottom: .2rem
 }
 
@@ -7774,8 +7774,8 @@ p {
     color: inherit
 }
 
-.product-title a:hover,
-.product-title a:focus {
+.product-title a:focus,
+.product-title a:hover {
     color: #c96
 }
 
@@ -7792,8 +7792,8 @@ p {
     color: inherit
 }
 
-.product-cat a:hover,
-.product-cat a:focus {
+.product-cat a:focus,
+.product-cat a:hover {
     color: #666
 }
 
@@ -7814,12 +7814,12 @@ p {
 }
 
 .old-price {
-    color: #cccccc;
+    color: #ccc;
     text-decoration: line-through
 }
 
 .out-price {
-    color: #cccccc
+    color: #ccc
 }
 
 .out-text {
@@ -7841,7 +7841,7 @@ p {
     padding: .5rem .9rem;
     min-width: 45px;
     text-align: center;
-    color: #333333;
+    color: #333;
     background-color: #fff
 }
 
@@ -7918,20 +7918,20 @@ p {
 
 .ratings {
     position: relative;
-    color: #cccccc
+    color: #ccc
 }
 
 .ratings,
 .ratings-val {
     display: inline-block;
     font-size: 1.4rem;
-    letter-spacing: 0.1em;
+    letter-spacing: .1em;
     line-height: 1;
-    font-family: "molla"
+    font-family: molla
 }
 
-.ratings:before,
-.ratings-val:before {
+.ratings-val:before,
+.ratings:before {
     content: "\f318" "\f318" "\f318" "\f318" "\f318"
 }
 
@@ -7949,7 +7949,7 @@ p {
 }
 
 .ratings-text {
-    color: #cccccc;
+    color: #ccc;
     letter-spacing: -.01em;
     margin-left: .8rem
 }
@@ -7958,8 +7958,8 @@ p {
     color: inherit
 }
 
-.ratings-text a:hover,
-.ratings-text a:focus {
+.ratings-text a:focus,
+.ratings-text a:hover {
     color: #c96
 }
 
@@ -7970,7 +7970,7 @@ p {
     bottom: 0;
     display: flex;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, .95);
     z-index: 10;
     transition: all .35s ease;
     opacity: 0;
@@ -7978,8 +7978,8 @@ p {
     transform: translateY(100%)
 }
 
-.product:hover .product-action,
-.product:focus .product-action {
+.product:focus .product-action,
+.product:hover .product-action {
     visibility: visible;
     opacity: 1;
     transform: translateY(0)
@@ -8024,31 +8024,31 @@ p {
 }
 
 .btn-product:before {
-    font-family: "molla";
+    font-family: molla;
     margin-right: .9rem
 }
 
 .btn-product span {
-    color: #666666;
+    color: #666;
     font-weight: 400;
     font-size: 1.3rem;
     letter-spacing: -.01em;
     transition: all .35s ease
 }
 
-.btn-product:hover,
-.btn-product:focus {
-    outline: none !important
+.btn-product:focus,
+.btn-product:hover {
+    outline: 0 !important
 }
 
-.btn-product:hover span,
-.btn-product:focus span {
+.btn-product:focus span,
+.btn-product:hover span {
     color: #c96;
     box-shadow: 0 1px 0 0 #c96
 }
 
 .product-action-dark {
-    background-color: #333333
+    background-color: #333
 }
 
 .product-action-dark .btn-product:not(:hover):not(:focus) span {
@@ -8097,15 +8097,15 @@ p {
 }
 
 .btn-product-icon:before {
-    font-family: "molla"
+    font-family: molla
 }
 
 .btn-product-icon span {
     display: none
 }
 
-.btn-product-icon:hover,
-.btn-product-icon:focus {
+.btn-product-icon:focus,
+.btn-product-icon:hover {
     color: #fff;
     background-color: #c96
 }
@@ -8133,7 +8133,7 @@ p {
     color: #ccc;
     padding: 0;
     margin: 0;
-    background: none
+    background: 0 0
 }
 
 .product-body .btn-wishlist:before {
@@ -8144,10 +8144,10 @@ p {
     display: none
 }
 
-.product-body .btn-wishlist:hover,
-.product-body .btn-wishlist:focus {
+.product-body .btn-wishlist:focus,
+.product-body .btn-wishlist:hover {
     color: #c96;
-    background: none
+    background: 0 0
 }
 
 .btn-quickview:before {
@@ -8187,14 +8187,14 @@ p {
     z-index: -1
 }
 
-.btn-expandable:hover,
-.btn-expandable:focus {
+.btn-expandable:focus,
+.btn-expandable:hover {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0
 }
 
-.btn-expandable:hover span,
-.btn-expandable:focus span {
+.btn-expandable:focus span,
+.btn-expandable:hover span {
     visibility: visible;
     opacity: 1;
     transform: translateX(0)
@@ -8218,7 +8218,7 @@ p {
     font-size: 1.2rem;
     padding-top: .1rem;
     line-height: 1;
-    color: #666666;
+    color: #666;
     background-color: #f7f8fa;
     border-radius: .2rem;
     transition: all .35s ease;
@@ -8229,15 +8229,15 @@ p {
     margin-right: 0
 }
 
-.product-size a:hover,
+.product-size a.active,
 .product-size a:focus,
-.product-size a.active {
+.product-size a:hover {
     color: #fff;
     background-color: #333
 }
 
 .product-size a.disabled {
-    color: #cccccc;
+    color: #ccc;
     pointer-events: none
 }
 
@@ -8264,12 +8264,12 @@ p {
 }
 
 .product-nav-dots a.active,
-.product-nav-dots a:hover,
 .product-nav-dots a:focus,
+.product-nav-dots a:hover,
 .product-nav-dots span.active,
-.product-nav-dots span:hover,
-.product-nav-dots span:focus {
-    box-shadow: 0 0 0 0.1rem #cccccc
+.product-nav-dots span:focus,
+.product-nav-dots span:hover {
+    box-shadow: 0 0 0 .1rem #ccc
 }
 
 .product-nav-dots a:last-child,
@@ -8295,12 +8295,12 @@ p {
 }
 
 .product-nav-thumbs a.active,
-.product-nav-thumbs a:hover,
 .product-nav-thumbs a:focus,
+.product-nav-thumbs a:hover,
 .product-nav-thumbs span.active,
-.product-nav-thumbs span:hover,
-.product-nav-thumbs span:focus {
-    box-shadow: 0 0 0 0.1rem #cccccc
+.product-nav-thumbs span:focus,
+.product-nav-thumbs span:hover {
+    box-shadow: 0 0 0 .1rem #ccc
 }
 
 .product-nav-thumbs a:last-child,
@@ -8323,10 +8323,10 @@ p {
     background-color: #ccc !important
 }
 
-.product.text-center .product-price,
-.product.text-center .ratings-container,
 .product.text-center .product-nav,
-.product.text-center .product-size {
+.product.text-center .product-price,
+.product.text-center .product-size,
+.product.text-center .ratings-container {
     justify-content: center
 }
 
@@ -8389,8 +8389,8 @@ p {
     color: #333
 }
 
-.product.product-3 .product-price,
-.product.product-3 .product-nav {
+.product.product-3 .product-nav,
+.product.product-3 .product-price {
     margin-bottom: 0
 }
 
@@ -8445,14 +8445,14 @@ p {
     transition-duration: 0s
 }
 
-.product.product-4 .btn-product:hover,
-.product.product-4 .btn-product:focus {
+.product.product-4 .btn-product:focus,
+.product.product-4 .btn-product:hover {
     color: #fff;
     background-color: #a6c76c
 }
 
-.product.product-4 .btn-product:hover span,
-.product.product-4 .btn-product:focus span {
+.product.product-4 .btn-product:focus span,
+.product.product-4 .btn-product:hover span {
     box-shadow: none
 }
 
@@ -8487,7 +8487,7 @@ p {
 
 .product.product-4:hover .product-footer {
     opacity: 1;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05)
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .05)
 }
 
 .product-4-carousel .owl-stage {
@@ -8517,7 +8517,7 @@ p {
     padding-top: 1.1rem;
     padding-bottom: 1.1rem;
     color: #c96;
-    background-color: #333333
+    background-color: #333
 }
 
 .product.product-5 .btn-product span {
@@ -8525,14 +8525,14 @@ p {
     transition-duration: 0s
 }
 
-.product.product-5 .btn-product:hover,
-.product.product-5 .btn-product:focus {
+.product.product-5 .btn-product:focus,
+.product.product-5 .btn-product:hover {
     color: #fff;
     background-color: #c96
 }
 
-.product.product-5 .btn-product:hover span,
-.product.product-5 .btn-product:focus span {
+.product.product-5 .btn-product:focus span,
+.product.product-5 .btn-product:hover span {
     box-shadow: none
 }
 
@@ -8567,7 +8567,7 @@ p {
 
 .product.product-5:hover .product-footer {
     opacity: 1;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05)
+    box-shadow: 0 5px 20px rgba(0, 0, 0, .05)
 }
 
 .product-5-carousel .owl-stage {
@@ -8646,15 +8646,15 @@ p {
     margin-top: -.1rem
 }
 
-.product.product-7 .btn-product:hover,
-.product.product-7 .btn-product:focus {
+.product.product-7 .btn-product:focus,
+.product.product-7 .btn-product:hover {
     color: #fff;
     background-color: #c96;
     border-bottom-color: #c96
 }
 
-.product.product-7 .btn-product:hover span,
-.product.product-7 .btn-product:focus span {
+.product.product-7 .btn-product:focus span,
+.product.product-7 .btn-product:hover span {
     color: #fff;
     box-shadow: none
 }
@@ -8712,19 +8712,19 @@ p {
     transition-duration: 0s
 }
 
-.product.product-8 .btn-product:hover,
-.product.product-8 .btn-product:focus {
+.product.product-8 .btn-product:focus,
+.product.product-8 .btn-product:hover {
     color: #fff;
     background-color: #c96
 }
 
-.product.product-8 .btn-product:hover:before,
-.product.product-8 .btn-product:focus:before {
+.product.product-8 .btn-product:focus:before,
+.product.product-8 .btn-product:hover:before {
     color: #fff
 }
 
-.product.product-8 .btn-product:hover span,
-.product.product-8 .btn-product:focus span {
+.product.product-8 .btn-product:focus span,
+.product.product-8 .btn-product:hover span {
     box-shadow: none
 }
 
@@ -8820,8 +8820,8 @@ p {
     box-shadow: none
 }
 
-.product.product-9:hover .product-body,
-.product.product-9:hover .product-action {
+.product.product-9:hover .product-action,
+.product.product-9:hover .product-body {
     transform: translateY(-100%)
 }
 
@@ -8842,13 +8842,13 @@ p {
     border-radius: .5rem
 }
 
-.product.product-10:hover .product-body,
-.product.product-10:focus .product-body {
+.product.product-10:focus .product-body,
+.product.product-10:hover .product-body {
     transform: translateY(-56px)
 }
 
-.product.product-10:hover .product-action,
-.product.product-10:focus .product-action {
+.product.product-10:focus .product-action,
+.product.product-10:hover .product-action {
     transform: translateY(22%)
 }
 
@@ -8878,18 +8878,18 @@ p {
     display: flex
 }
 
-.product.product-10 .product-body .btn-wishlist:hover,
-.product.product-10 .product-body .btn-wishlist:focus {
+.product.product-10 .product-body .btn-wishlist:focus,
+.product.product-10 .product-body .btn-wishlist:hover {
     color: #666
 }
 
-.product.product-10 .product-body .btn-wishlist:hover::before,
-.product.product-10 .product-body .btn-wishlist:focus::before {
+.product.product-10 .product-body .btn-wishlist:focus::before,
+.product.product-10 .product-body .btn-wishlist:hover::before {
     content: '\f233'
 }
 
-.product.product-10 .btn-product:hover span,
-.product.product-10 .btn-product:focus span {
+.product.product-10 .btn-product:focus span,
+.product.product-10 .btn-product:hover span {
     color: #c96;
     box-shadow: 0 1px 0 0 #fcb941
 }
@@ -8918,8 +8918,8 @@ p {
     content: ''
 }
 
-.product.product-10 .btn-cart:hover,
-.product.product-10 .btn-cart:focus {
+.product.product-10 .btn-cart:focus,
+.product.product-10 .btn-cart:hover {
     color: #222;
     background-color: #fcb941
 }
@@ -8928,8 +8928,8 @@ p {
     color: #fcb941
 }
 
-.product.product-10 .btn-quickview:hover,
-.product.product-10 .btn-quickview:focus {
+.product.product-10 .btn-quickview:focus,
+.product.product-10 .btn-quickview:hover {
     color: #fff;
     background-color: #fcb941
 }
@@ -8937,13 +8937,13 @@ p {
 .product.product-10 .product-title a {
     font-size: 1.3rem;
     font-weight: 400;
-    font-family: 'Poppins';
+    font-family: Poppins;
     letter-spacing: 0;
     color: #333
 }
 
-.product.product-10 .product-title a:hover,
-.product.product-10 .product-title a:focus {
+.product.product-10 .product-title a:focus,
+.product.product-10 .product-title a:hover {
     color: #fcb941
 }
 
@@ -8951,22 +8951,22 @@ p {
     margin-top: .8rem;
     font-size: 1.3rem;
     font-weight: 700;
-    font-family: 'Poppins';
+    font-family: Poppins;
     letter-spacing: 0;
-    color: #333333
+    color: #333
 }
 
 .product.product-10 .new-price {
     font-size: 1.3rem;
     font-weight: 700;
-    font-family: 'Poppins';
+    font-family: Poppins;
     letter-spacing: 0
 }
 
 .product.product-10 .old-price {
     font-size: 1.3rem;
     font-weight: 400;
-    font-family: 'Poppins';
+    font-family: Poppins;
     letter-spacing: 0;
     text-decoration: none
 }
@@ -8976,7 +8976,7 @@ p {
     text-transform: uppercase;
     font-size: 1.3rem;
     font-weight: 700;
-    font-family: 'Poppins';
+    font-family: Poppins;
     letter-spacing: -.01em
 }
 
@@ -8985,12 +8985,12 @@ p {
     background-color: #ef837b;
     padding: .5rem 2rem;
     left: 0;
-    box-shadow: 0 5px 10px rgba(34, 34, 34, 0.2)
+    box-shadow: 0 5px 10px rgba(34, 34, 34, .2)
 }
 
-.product.product-11 a:hover,
-.product.product-11 a:focus {
-    color: #cc9966
+.product.product-11 a:focus,
+.product.product-11 a:hover {
+    color: #c96
 }
 
 .product.product-11 .btn-product-icon {
@@ -8998,11 +8998,11 @@ p {
     border: .1rem solid #ebebeb
 }
 
-.product.product-11 .btn-product-icon:hover,
-.product.product-11 .btn-product-icon:focus {
+.product.product-11 .btn-product-icon:focus,
+.product.product-11 .btn-product-icon:hover {
     color: #fff;
-    background-color: #cc9966;
-    border-color: #cc9966
+    background-color: #c96;
+    border-color: #c96
 }
 
 .product.product-11 .product-price {
@@ -9035,21 +9035,21 @@ p {
     font-size: 1.4rem
 }
 
-.product.product-11 .btn-product:hover,
-.product.product-11 .btn-product:focus {
+.product.product-11 .btn-product:focus,
+.product.product-11 .btn-product:hover {
     color: #fff;
-    border-color: #cc9966;
-    background-color: #cc9966
+    border-color: #c96;
+    background-color: #c96
 }
 
-.product.product-11 .btn-product:hover span,
-.product.product-11 .btn-product:focus span {
+.product.product-11 .btn-product:focus span,
+.product.product-11 .btn-product:hover span {
     color: #fff;
     box-shadow: none
 }
 
-.product.product-11:hover,
-.product.product-11:focus {
+.product.product-11:focus,
+.product.product-11:hover {
     z-index: 10
 }
 
@@ -9137,19 +9137,19 @@ p {
     pointer-events: none
 }
 
-.product.product-list .btn-product:hover,
-.product.product-list .btn-product:focus {
+.product.product-list .btn-product:focus,
+.product.product-list .btn-product:hover {
     color: #c96
 }
 
-.product.product-list .btn-product:hover span,
-.product.product-list .btn-product:focus span {
+.product.product-list .btn-product:focus span,
+.product.product-list .btn-product:hover span {
     color: inherit
 }
 
 .product.product-list .btn-product.btn-cart {
     color: #c96;
-    border: 0.1rem solid #c96;
+    border: .1rem solid #c96;
     flex: 1 1 100%;
     max-width: 100%;
     text-transform: uppercase;
@@ -9163,14 +9163,14 @@ p {
     font-size: 1.3rem
 }
 
-.product.product-list .btn-product.btn-cart:hover,
-.product.product-list .btn-product.btn-cart:focus {
+.product.product-list .btn-product.btn-cart:focus,
+.product.product-list .btn-product.btn-cart:hover {
     color: #fff;
     background-color: #c96
 }
 
-.product.product-list .btn-product.btn-cart:hover span,
-.product.product-list .btn-product.btn-cart:focus span {
+.product.product-list .btn-product.btn-cart:focus span,
+.product.product-list .btn-product.btn-cart:hover span {
     box-shadow: none
 }
 
@@ -9209,7 +9209,7 @@ p {
 }
 
 .product.product-sm .product-cat {
-    color: #cccccc;
+    color: #ccc;
     font-weight: 400;
     font-size: 1.3rem;
     text-transform: uppercase;
@@ -9236,7 +9236,7 @@ p {
     text-decoration: none
 }
 
-@media screen and (min-width: 480px) {
+@media screen and (min-width:480px) {
     .just-action-icons-sm .btn-product span {
         display: none
     }
@@ -9246,7 +9246,7 @@ p {
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .just-action-icons-md .btn-product span {
         display: none
     }
@@ -9256,7 +9256,7 @@ p {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .just-action-icons-lg .btn-product span {
         display: none
     }
@@ -9266,7 +9266,7 @@ p {
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .just-action-icons-xl .btn-product span {
         display: none
     }
@@ -9276,15 +9276,15 @@ p {
     }
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width:1200px) {
 
-    .product.product-9:hover .product-body,
-    .product.product-9:hover .product-action {
+    .product.product-9:hover .product-action,
+    .product.product-9:hover .product-body {
         transform: translateY(-60%)
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .sticky-wrapper {
         z-index: 1
     }
@@ -9304,7 +9304,7 @@ p {
 .banner>a {
     position: relative;
     display: block;
-    outline: none !important
+    outline: 0 !important
 }
 
 .banner img {
@@ -9329,8 +9329,8 @@ p {
     -ms-transform: translateY(-50%)
 }
 
-.banner-content a:hover,
-.banner-content a:focus {
+.banner-content a:focus,
+.banner-content a:hover {
     text-decoration: underline
 }
 
@@ -9343,7 +9343,7 @@ p {
 }
 
 .banner-title {
-    color: #333333;
+    color: #333;
     font-weight: 500;
     font-size: 2rem;
     line-height: 1.3;
@@ -9355,8 +9355,8 @@ p {
     color: inherit
 }
 
-.banner-title a:hover,
-.banner-title a:focus {
+.banner-title a:focus,
+.banner-title a:hover {
     text-decoration: none
 }
 
@@ -9377,8 +9377,8 @@ p {
     color: inherit
 }
 
-.banner-subtitle a:hover,
-.banner-subtitle a:focus {
+.banner-subtitle a:focus,
+.banner-subtitle a:hover {
     text-decoration: none
 }
 
@@ -9392,7 +9392,7 @@ p {
 }
 
 .banner-big {
-    color: #cccccc
+    color: #ccc
 }
 
 .banner-big .banner-content {
@@ -9419,7 +9419,7 @@ p {
     margin-bottom: 2.3rem
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .banner-content {
         left: 3rem
     }
@@ -9433,7 +9433,7 @@ p {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .banner-content {
         left: 4rem
     }
@@ -9458,8 +9458,8 @@ p {
     z-index: 1;
     opacity: 0;
     visibility: hidden;
-    background-color: rgba(51, 51, 51, 0.4);
-    transition: all 0.35s ease
+    background-color: rgba(51, 51, 51, .4);
+    transition: all .35s ease
 }
 
 .banner-display:hover>a:before {
@@ -9518,24 +9518,24 @@ p {
     right: 0;
     top: 0;
     bottom: 0;
-    background-color: rgba(51, 51, 51, 0.25);
+    background-color: rgba(51, 51, 51, .25);
     z-index: 1;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s ease
+    transition: all .4s ease
 }
 
 .banner-overlay.banner-overlay-light>a:after {
-    background-color: rgba(255, 255, 255, 0.3)
+    background-color: rgba(255, 255, 255, .3)
 }
 
-.banner-overlay:hover>a:after,
-.banner-overlay:focus>a:after {
+.banner-overlay:focus>a:after,
+.banner-overlay:hover>a:after {
     visibility: visible;
     opacity: 1
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .banner-display .banner-title {
         font-size: 2.4rem
     }
@@ -9588,7 +9588,7 @@ p {
     color: #c96;
     background-color: #fff;
     border-radius: 50%;
-    box-shadow: 0 0 0 1.5rem rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 0 1.5rem rgba(255, 255, 255, .2);
     transition: all .35s ease
 }
 
@@ -9596,11 +9596,11 @@ p {
     margin-right: -.2rem
 }
 
-.btn-video:hover,
-.btn-video:focus {
+.btn-video:focus,
+.btn-video:hover {
     color: #fff;
     background-color: #a6c76c;
-    box-shadow: 0 0 0 1rem rgba(255, 255, 255, 0.2)
+    box-shadow: 0 0 0 1rem rgba(255, 255, 255, .2)
 }
 
 .video-banner-poster .video-banner-title {
@@ -9664,7 +9664,7 @@ p {
     margin-bottom: 2rem
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .video-banner-bg {
         padding-top: 14.5rem;
         padding-bottom: 13.5rem
@@ -9685,7 +9685,7 @@ p {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .video-banner-bg {
         padding-top: 18.5rem;
         padding-bottom: 17.5rem
@@ -9701,7 +9701,7 @@ p {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .video-box-content {
         padding-left: 7rem
     }
@@ -9718,7 +9718,7 @@ p {
 .banner-content-overlay {
     overflow: hidden;
     padding: 1.8rem 2rem .7rem;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, .9);
     left: 0;
     right: 0;
     top: auto;
@@ -9877,8 +9877,8 @@ p {
     overflow: hidden
 }
 
-.banner-badge .banner-title,
-.banner-badge .banner-subtitle {
+.banner-badge .banner-subtitle,
+.banner-badge .banner-title {
     transition: all .3s ease
 }
 
@@ -9902,22 +9902,22 @@ p {
     -webkit-transform: translateY(100%)
 }
 
-.banner-badge .banner-link:hover,
-.banner-badge .banner-link:focus {
+.banner-badge .banner-link:focus,
+.banner-badge .banner-link:hover {
     text-decoration: none
 }
 
-.banner-badge .banner-link:hover .banner-title,
-.banner-badge .banner-link:hover .banner-subtitle,
+.banner-badge .banner-link:focus .banner-subtitle,
 .banner-badge .banner-link:focus .banner-title,
-.banner-badge .banner-link:focus .banner-subtitle {
+.banner-badge .banner-link:hover .banner-subtitle,
+.banner-badge .banner-link:hover .banner-title {
     opacity: 0;
     transform: translateY(100%);
     -webkit-transform: translateY(100%)
 }
 
-.banner-badge .banner-link:hover .banner-link-text,
-.banner-badge .banner-link:focus .banner-link-text {
+.banner-badge .banner-link:focus .banner-link-text,
+.banner-badge .banner-link:hover .banner-link-text {
     opacity: 1;
     background-color: #c96;
     transform: translateY(0);
@@ -9951,8 +9951,8 @@ p {
     margin-right: 1rem
 }
 
-.social-icon:hover,
-.social-icon:focus {
+.social-icon:focus,
+.social-icon:hover {
     color: #c96;
     border-color: #c96;
     background-color: transparent
@@ -9979,7 +9979,7 @@ p {
 }
 
 .social-icon.social-linkedin {
-    color: #3399cc
+    color: #39c
 }
 
 .social-icons-color,
@@ -10050,52 +10050,52 @@ p {
 
 .social-icons-colored .social-icon.social-linkedin {
     color: #fff;
-    border-color: #3399cc;
-    background-color: #3399cc
+    border-color: #39c;
+    background-color: #39c
 }
 
-.social-icons-colored .social-icon:hover,
-.social-icons-colored .social-icon:focus {
+.social-icons-colored .social-icon:focus,
+.social-icons-colored .social-icon:hover {
     background-color: #fff !important;
     border-color: #d7d7d7 !important
 }
 
-.social-icons-colored .social-icon:hover.social-facebook,
-.social-icons-colored .social-icon:focus.social-facebook {
+.social-icons-colored .social-icon:focus.social-facebook,
+.social-icons-colored .social-icon:hover.social-facebook {
     color: #8f79ed
 }
 
-.social-icons-colored .social-icon:hover.social-twitter,
-.social-icons-colored .social-icon:focus.social-twitter {
+.social-icons-colored .social-icon:focus.social-twitter,
+.social-icons-colored .social-icon:hover.social-twitter {
     color: #79c8ed
 }
 
-.social-icons-colored .social-icon:hover.social-instagram,
-.social-icons-colored .social-icon:focus.social-instagram {
+.social-icons-colored .social-icon:focus.social-instagram,
+.social-icons-colored .social-icon:hover.social-instagram {
     color: #dd6d9a
 }
 
-.social-icons-colored .social-icon:hover.social-youtube,
-.social-icons-colored .social-icon:focus.social-youtube {
+.social-icons-colored .social-icon:focus.social-youtube,
+.social-icons-colored .social-icon:hover.social-youtube {
     color: #e66262
 }
 
-.social-icons-colored .social-icon:hover.social-pinterest,
-.social-icons-colored .social-icon:focus.social-pinterest {
+.social-icons-colored .social-icon:focus.social-pinterest,
+.social-icons-colored .social-icon:hover.social-pinterest {
     color: #e66262
 }
 
-.social-icons-colored .social-icon:hover.social-linkedin,
-.social-icons-colored .social-icon:focus.social-linkedin {
-    color: #3399cc
+.social-icons-colored .social-icon:focus.social-linkedin,
+.social-icons-colored .social-icon:hover.social-linkedin {
+    color: #39c
 }
 
 .testimonial-icon:before {
-    font-family: 'molla';
+    font-family: molla;
     content: '\f10d';
     display: inline-block;
     font-style: normal;
-    font-weight: normal;
+    font-weight: 400;
     font-size: 2.6rem;
     line-height: 1;
     color: #c96;
@@ -10111,11 +10111,11 @@ p {
     margin-bottom: 2.1rem
 }
 
-.owl-testimonials.owl-theme .owl-nav [class*='owl-'] {
+.owl-testimonials.owl-theme .owl-nav [class*=owl-] {
     top: 65px
 }
 
-.owl-testimonials-photo.owl-theme .owl-nav [class*='owl-'] {
+.owl-testimonials-photo.owl-theme .owl-nav [class*=owl-] {
     top: 110px
 }
 
@@ -10139,7 +10139,7 @@ p {
     border: 1px solid #ebebeb;
     border-radius: 0;
     margin-bottom: 2rem;
-    transition: all 0.3s;
+    transition: all .3s;
     box-shadow: none
 }
 
@@ -10156,7 +10156,7 @@ select.form-control:not([size]):not([multiple]) {
     background-color: #fff;
     border-color: #c96;
     box-shadow: none;
-    outline: none !important
+    outline: 0 !important
 }
 
 .form-control::placeholder {
@@ -10218,7 +10218,7 @@ small.form-text {
 }
 
 .required+.form-footer {
-    margin-top: 0.8rem
+    margin-top: .8rem
 }
 
 .form-footer {
@@ -10239,7 +10239,7 @@ small.form-text {
 }
 
 .select-custom::after {
-    font-family: "molla";
+    font-family: molla;
     content: '\f110';
     position: absolute;
     display: inline-block;
@@ -10322,7 +10322,7 @@ small.form-text {
     color: #fff;
     background-image: none;
     font-size: 1rem;
-    font-family: 'molla';
+    font-family: molla;
     content: '\ec2d';
     line-height: 1;
     text-align: center;
@@ -10343,11 +10343,11 @@ small.form-text {
 }
 
 .custom-checkbox .custom-control-input:disabled:checked~.custom-control-label::before {
-    background-color: rgba(51, 51, 51, 0.5)
+    background-color: rgba(51, 51, 51, .5)
 }
 
 .custom-checkbox .custom-control-input:disabled:indeterminate~.custom-control-label::before {
-    background-color: rgba(51, 51, 51, 0.5)
+    background-color: rgba(51, 51, 51, .5)
 }
 
 .custom-checkbox .custom-control-input:checked~.custom-control-label::after {
@@ -10395,11 +10395,11 @@ small.form-text {
     font-size: 2.4rem;
     color: #777;
     transform: translateY(-50%);
-    transition: all 0.3s
+    transition: all .3s
 }
 
-.form-control-tooltip .input-tooltip:hover,
-.form-control-tooltip .input-tooltip:focus {
+.form-control-tooltip .input-tooltip:focus,
+.form-control-tooltip .input-tooltip:hover {
     color: #000
 }
 
@@ -10448,8 +10448,8 @@ small.form-text {
     margin-right: 2rem
 }
 
-.cta-horizontal .form-control,
-.cta-horizontal .cta-desc {
+.cta-horizontal .cta-desc,
+.cta-horizontal .form-control {
     margin-bottom: 0
 }
 
@@ -10483,7 +10483,7 @@ small.form-text {
     position: relative
 }
 
-.cta-separator [class*="col-"]+[class*="col-"]:before {
+.cta-separator [class*=col-]+[class*=col-]:before {
     content: '';
     width: .1rem;
     display: block;
@@ -10496,7 +10496,7 @@ small.form-text {
     background-color: #ebebeb
 }
 
-.cta-separator.bg-image [class*="col-"]+[class*="col-"]:before {
+.cta-separator.bg-image [class*=col-]+[class*=col-]:before {
     background-color: #dadada
 }
 
@@ -10577,7 +10577,7 @@ small.form-text {
     margin-bottom: 0
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .cta-border {
         text-align: left;
         padding-left: 0;
@@ -10610,19 +10610,19 @@ small.form-text {
     }
 }
 
-@media screen and (max-width: 1199px) {
+@media screen and (max-width:1199px) {
     .cta-horizontal-box {
         padding-left: 3rem;
         padding-right: 3rem
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .cta-horizontal .cta-desc {
         margin-bottom: 1.5rem
     }
 
-    .cta-separator [class*="col-"]+[class*="col-"]:before {
+    .cta-separator [class*=col-]+[class*=col-]:before {
         height: .1rem;
         width: 80%;
         left: 10%;
@@ -10636,7 +10636,7 @@ small.form-text {
     }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width:767px) {
     .cta-horizontal .form-control {
         margin-right: 1rem
     }
@@ -10651,7 +10651,7 @@ small.form-text {
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
     .cta .input-group {
         flex-direction: column
     }
@@ -10671,8 +10671,8 @@ small.form-text {
         justify-content: center
     }
 
-    .cta .input-group-round .form-control,
-    .cta .input-group-round .btn {
+    .cta .input-group-round .btn,
+    .cta .input-group-round .form-control {
         border-radius: 30px
     }
 
@@ -10692,15 +10692,15 @@ small.form-text {
     color: #999
 }
 
+.table td,
 .table th,
-.table thead th,
-.table td {
+.table thead th {
     border-top: none;
     border-bottom: .1rem solid #ebebeb
 }
 
-.table th,
-.table td {
+.table td,
+.table th {
     padding-left: 0;
     padding-right: 0;
     padding-top: 1.4rem;
@@ -10773,25 +10773,25 @@ small.form-text {
     margin-right: 0
 }
 
-.page-link.page-link-prev,
-.page-link.page-link-next {
+.page-link.page-link-next,
+.page-link.page-link-prev {
     padding-left: 1rem;
     padding-right: 1rem;
     min-width: 70px
 }
 
-.page-link:hover,
-.page-link:focus {
+.page-link:focus,
+.page-link:hover {
     box-shadow: none;
     color: #c96;
     border-color: #ebebeb;
     text-decoration: none;
     background-color: transparent;
-    outline: none !important
+    outline: 0 !important
 }
 
 .page-item-total {
-    color: #cccccc;
+    color: #ccc;
     font-size: 1.4rem;
     font-weight: 400;
     margin-left: 1.2rem
@@ -10842,23 +10842,23 @@ small.form-text {
 
 .modal-content {
     border: none;
-    box-shadow: 5px 10px 16px rgba(51, 51, 51, 0.05), -5px 10px 16px rgba(51, 51, 51, 0.05)
+    box-shadow: 5px 10px 16px rgba(51, 51, 51, .05), -5px 10px 16px rgba(51, 51, 51, .05)
 }
 
 .close {
-    font-weight: normal;
+    font-weight: 400;
     font-size: 1.8rem;
     color: #666;
     opacity: 1;
     transition: all .3s
 }
 
-.close:hover,
-.close:focus {
+.close:focus,
+.close:hover {
     color: #c96
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .modal-dialog {
         max-width: 575px
     }
@@ -10880,16 +10880,16 @@ small.form-text {
 }
 
 .alert a {
-    color: rgba(255, 255, 255, 0.7)
+    color: rgba(255, 255, 255, .7)
 }
 
-.alert a:hover,
-.alert a:focus {
-    color: rgba(255, 255, 255, 0.9)
+.alert a:focus,
+.alert a:hover {
+    color: rgba(255, 255, 255, .9)
 }
 
 .alert .close {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, .5);
     font-weight: 300;
     font-size: 1.6rem;
     line-height: 1;
@@ -10953,15 +10953,15 @@ small.form-text {
     right: 0;
     top: 0;
     bottom: 0;
-    background-color: rgba(51, 51, 51, 0.4);
-    transition: all 0.4s ease;
+    background-color: rgba(51, 51, 51, .4);
+    transition: all .4s ease;
     opacity: 0;
     visibility: hidden;
     z-index: 1
 }
 
-.instagram-feed:hover:after,
-.instagram-feed:hover .instagram-feed-content {
+.instagram-feed:hover .instagram-feed-content,
+.instagram-feed:hover:after {
     opacity: 1;
     visibility: visible
 }
@@ -10984,13 +10984,13 @@ small.form-text {
     color: #fff;
     font-weight: 400;
     font-size: 1.6rem;
-    transition: all 0.45s ease;
+    transition: all .45s ease;
     opacity: 0;
     visibility: hidden
 }
 
 .instagram-feed-content i {
-    font-weight: normal;
+    font-weight: 400;
     margin-right: .8rem
 }
 
@@ -10998,8 +10998,8 @@ small.form-text {
     color: inherit
 }
 
-.instagram-feed-content a:hover,
-.instagram-feed-content a:focus {
+.instagram-feed-content a:focus,
+.instagram-feed-content a:hover {
     color: #c96
 }
 
@@ -11011,11 +11011,11 @@ small.form-text {
     padding: 1rem
 }
 
-.elements>div:nth-child(1) .element-img {
+.elements>div:first-child .element-img {
     background-position: calc(-200px*calc(1 - 1)) 0
 }
 
-.elements>div:nth-child(1) .element-hover-img {
+.elements>div:first-child .element-hover-img {
     background-position: calc(-200px * 1 + 100px) 0
 }
 
@@ -11137,24 +11137,24 @@ small.form-text {
     transition: all .3s
 }
 
-.element:hover,
-.element:focus {
-    box-shadow: 0 5px 20px rgba(234, 234, 234, 0.8)
+.element:focus,
+.element:hover {
+    box-shadow: 0 5px 20px rgba(234, 234, 234, .8)
 }
 
-.element:hover .element-hover-img,
-.element:focus .element-hover-img {
+.element:focus .element-hover-img,
+.element:hover .element-hover-img {
     visibility: visible;
     opacity: 1
 }
 
-.element:hover .element-img,
-.element:focus .element-img {
+.element:focus .element-img,
+.element:hover .element-img {
     opacity: 0
 }
 
-.element:hover p,
-.element:focus p {
+.element:focus p,
+.element:hover p {
     color: #333
 }
 
@@ -11163,8 +11163,8 @@ small.form-text {
     padding-bottom: 1rem
 }
 
-.element-img,
-.element-hover-img {
+.element-hover-img,
+.element-img {
     width: 100px;
     height: 100px;
     background-image: url(../images/elements.png);
@@ -11185,7 +11185,7 @@ small.form-text {
 .element-type {
     font-size: 1.3rem;
     font-weight: 400;
-    font-family: 'Poppins';
+    font-family: Poppins;
     letter-spacing: .01em;
     color: #666;
     text-transform: uppercase
@@ -11211,39 +11211,39 @@ small.form-text {
     margin-bottom: .5rem
 }
 
-.intro-slider-container,
-.intro-slide {
-    background-color: #cccccc
+.intro-slide,
+.intro-slider-container {
+    background-color: #ccc
 }
 
-.intro-slider-container,
-.intro-slide .slide-image {
+.intro-slide .slide-image,
+.intro-slider-container {
     position: relative
 }
 
-.intro-slider-container:before,
-.intro-slide .slide-image:before {
+.intro-slide .slide-image:before,
+.intro-slider-container:before {
     display: block;
     content: '';
     width: 100%
 }
 
-.slider-container-1:before,
-.intro-slider-1 .slide-image:before {
+.intro-slider-1 .slide-image:before,
+.slider-container-1:before {
     padding-top: 56.5384615385%
 }
 
-@media screen and (max-width: 479px) {
+@media screen and (max-width:479px) {
 
-    .slider-container-1:before,
-    .intro-slider-1 .slide-image:before {
+    .intro-slider-1 .slide-image:before,
+    .slider-container-1:before {
         padding-top: 83.3333333333%
     }
 }
 
-.slider-container-ratio .intro-slider,
+.slide-image>img,
 .slide-image>picture,
-.slide-image>img {
+.slider-container-ratio .intro-slider {
     position: absolute;
     left: 0;
     top: 0;
@@ -11271,7 +11271,7 @@ small.form-text {
     height: 5rem;
     margin-top: -2.5rem;
     margin-left: -2.5rem;
-    font-family: "molla";
+    font-family: molla;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -11286,12 +11286,12 @@ small.form-text {
 }
 
 button:focus {
-    outline: none
+    outline: 0
 }
 
 @keyframes rotating {
     from {
-        transform: rotate(0deg)
+        transform: rotate(0)
     }
 
     to {
@@ -11345,7 +11345,7 @@ button:focus {
 }
 
 .brand:focus {
-    outline: none !important
+    outline: 0 !important
 }
 
 .title-lg {
@@ -11396,7 +11396,7 @@ button:focus {
     padding-top: 3rem
 }
 
-.carousel-with-shadow.owl-simple .owl-nav [class*='owl-'] {
+.carousel-with-shadow.owl-simple .owl-nav [class*=owl-] {
     margin-top: -31px
 }
 
@@ -11413,7 +11413,7 @@ button:focus {
 }
 
 .blog-posts .entry-meta {
-    color: #cccccc;
+    color: #ccc;
     margin-bottom: .8rem
 }
 
@@ -11434,8 +11434,8 @@ button:focus {
     display: none
 }
 
-.blog-posts .read-more:hover,
-.blog-posts .read-more:focus {
+.blog-posts .read-more:focus,
+.blog-posts .read-more:hover {
     padding-right: 0
 }
 
@@ -11448,7 +11448,7 @@ button:focus {
 }
 
 .entry.entry-display:hover {
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.03), -5px 5px 10px rgba(0, 0, 0, 0.03)
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, .03), -5px 5px 10px rgba(0, 0, 0, .03)
 }
 
 .cta-display .cta-title {
@@ -11487,8 +11487,8 @@ button:focus {
     align-items: center
 }
 
-.cross-txt:before,
-.cross-txt:after {
+.cross-txt:after,
+.cross-txt:before {
     content: '';
     -ms-flex: 1;
     flex: 1;
@@ -11513,14 +11513,14 @@ button:focus {
     background-color: #fff
 }
 
-.quickView-content .owl-theme.owl-light .owl-nav [class*='owl-'] {
+.quickView-content .owl-theme.owl-light .owl-nav [class*=owl-] {
     border: none;
     font-size: 3rem;
     color: #fff
 }
 
-.quickView-content .owl-theme.owl-light .owl-nav [class*='owl-']:hover,
-.quickView-content .owl-theme.owl-light .owl-nav [class*='owl-']:focus {
+.quickView-content .owl-theme.owl-light .owl-nav [class*=owl-]:focus,
+.quickView-content .owl-theme.owl-light .owl-nav [class*=owl-]:hover {
     color: #c96;
     background-color: transparent
 }
@@ -11535,11 +11535,11 @@ button:focus {
     margin: 0
 }
 
-.quickView-content .owl-theme .owl-nav [class*='owl-'] {
+.quickView-content .owl-theme .owl-nav [class*=owl-] {
     top: 50%
 }
 
-.quickView-content .owl-theme.owl-light .owl-nav [class*='owl-'] {
+.quickView-content .owl-theme.owl-light .owl-nav [class*=owl-] {
     background-color: transparent
 }
 
@@ -11568,8 +11568,8 @@ button:focus {
     margin-top: 3rem
 }
 
-.quickView-content .product-title,
-.quickView-content .product-price {
+.quickView-content .product-price,
+.quickView-content .product-title {
     font-size: 2.4rem;
     font-weight: 400;
     letter-spacing: -.025em;
@@ -11628,8 +11628,8 @@ button:focus {
     padding: 1.2rem 1.5rem
 }
 
-.quickView-content .btn-product.btn-cart:hover span,
-.quickView-content .btn-product.btn-cart:focus span {
+.quickView-content .btn-product.btn-cart:focus span,
+.quickView-content .btn-product.btn-cart:hover span {
     color: #fff;
     box-shadow: none
 }
@@ -11683,8 +11683,8 @@ button:focus {
     max-width: 80.8%
 }
 
-.quickView-content .intro-slider-container,
-.quickView-content .intro-slide {
+.quickView-content .intro-slide,
+.quickView-content .intro-slider-container {
     height: unset
 }
 
@@ -11696,23 +11696,23 @@ button:focus {
     content: '\f2d0'
 }
 
-.quickView-content .btn-wishlist,
-.quickView-content .btn-compare {
+.quickView-content .btn-compare,
+.quickView-content .btn-wishlist {
     border: none
 }
 
-.quickView-content .btn-wishlist:hover,
-.quickView-content .btn-wishlist:focus,
+.quickView-content .btn-compare:focus,
 .quickView-content .btn-compare:hover,
-.quickView-content .btn-compare:focus {
+.quickView-content .btn-wishlist:focus,
+.quickView-content .btn-wishlist:hover {
     color: #c96;
     background-color: transparent
 }
 
-.quickView-content .btn-wishlist:hover span,
-.quickView-content .btn-wishlist:focus span,
+.quickView-content .btn-compare:focus span,
 .quickView-content .btn-compare:hover span,
-.quickView-content .btn-compare:focus span {
+.quickView-content .btn-wishlist:focus span,
+.quickView-content .btn-wishlist:hover span {
     color: #c96
 }
 
@@ -11731,8 +11731,8 @@ button:focus {
     box-shadow: 0 0 0 1px #c96
 }
 
-.quickView-content .carousel-dot:hover img,
-.quickView-content .carousel-dot:focus img {
+.quickView-content .carousel-dot:focus img,
+.quickView-content .carousel-dot:hover img {
     opacity: 1
 }
 
@@ -11748,34 +11748,34 @@ button:focus {
     width: 4rem;
     height: 4rem;
     color: #777;
-    font-weight: normal;
+    font-weight: 400;
     font-size: 2rem;
     line-height: 1;
     background-color: #fff;
-    box-shadow: 2px 6px 16px rgba(51, 51, 51, 0.05);
+    box-shadow: 2px 6px 16px rgba(51, 51, 51, .05);
     transition: all .35s ease
 }
 
-.quickView-content .btn-fullscreen:hover,
-.quickView-content .btn-fullscreen:focus {
+.quickView-content .btn-fullscreen:focus,
+.quickView-content .btn-fullscreen:hover {
     color: #fff;
     background-color: #c96
 }
 
+.container.newsletter-popup-container,
 .container.quickView-container,
-.fullscreen-container .container,
-.container.newsletter-popup-container {
+.fullscreen-container .container {
     width: 1188px;
     max-width: 100%
 }
 
-.quickView-container,
-.fullscreen-container {
+.fullscreen-container,
+.quickView-container {
     position: relative
 }
 
-.quickView-container button.mfp-close,
-.fullscreen-container button.mfp-close {
+.fullscreen-container button.mfp-close,
+.quickView-container button.mfp-close {
     color: #666;
     font-size: 1.8rem;
     top: 1.5rem;
@@ -11833,8 +11833,8 @@ button:focus {
     padding-top: 2.5rem;
     padding-left: 1rem;
     padding-right: 1rem;
-    flex: 0 0 calc((100% + 20px) / 6 * 4);
-    max-width: calc((100% + 20px) / 6 * 4)
+    flex: 0 0 calc((100% + 20px)/ 6 * 4);
+    max-width: calc((100% + 20px)/ 6 * 4)
 }
 
 .newsletter-popup-container .banner-title {
@@ -11900,8 +11900,8 @@ button:focus {
     text-transform: uppercase
 }
 
-.newsletter-popup-container .input-group .btn:hover,
-.newsletter-popup-container .input-group .btn:focus {
+.newsletter-popup-container .input-group .btn:focus,
+.newsletter-popup-container .input-group .btn:hover {
     background-color: #c96
 }
 
@@ -11921,8 +11921,8 @@ button:focus {
     padding-left: 4.4rem
 }
 
-.newsletter-popup-container .custom-control-label:before,
-.newsletter-popup-container .custom-control-label:after {
+.newsletter-popup-container .custom-control-label:after,
+.newsletter-popup-container .custom-control-label:before {
     left: -.5rem;
     width: 1.4rem;
     height: 1.4rem;
@@ -11930,7 +11930,7 @@ button:focus {
 }
 
 .newsletter-popup-container .newsletter-popup-content {
-    box-shadow: 0 10px 20px rgba(34, 34, 34, 0.3)
+    box-shadow: 0 10px 20px rgba(34, 34, 34, .3)
 }
 
 .newsletter-popup-container .mfp-close {
@@ -11943,7 +11943,7 @@ button:focus {
     height: 3rem
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .quickView-content>.row .product-fullscreen {
         flex: 0 0 calc(50% + 2rem);
         max-width: calc(50% + 2rem);
@@ -11961,7 +11961,7 @@ button:focus {
     opacity: 1
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width:576px) {
     .intro-content {
         left: 50px
     }
@@ -11983,7 +11983,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .intro-content {
         left: 70px
     }
@@ -12004,13 +12004,13 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .cta-display .cta-title {
         font-size: 3rem
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .intro-content {
         left: 100px
     }
@@ -12031,7 +12031,7 @@ button:focus {
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
     .cta-display .cta-desc {
         margin-bottom: 2rem
     }
@@ -12042,7 +12042,7 @@ button:focus {
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .newsletter-img {
         display: none
     }
@@ -12052,27 +12052,27 @@ button:focus {
     }
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width:900px) {
     .fullscreen-container {
         margin-left: -.6rem;
         margin-right: -.6rem
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .banner-display .banner-title {
         font-size: 1.8rem
     }
 }
 
-@media screen and (max-width: 591px) {
+@media screen and (max-width:591px) {
     .newsletter-popup-container .banner-content {
         flex: 0 0 90%;
         max-width: 90%
     }
 }
 
-@media screen and (max-width: 439px) {
+@media screen and (max-width:439px) {
     .quickView-content .details-action-wrapper {
         flex-direction: column
     }
@@ -12083,7 +12083,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .banners-sm .banner-link-anim {
         padding-left: 0;
         padding-right: 0
@@ -12206,12 +12206,12 @@ button:focus {
 
 .btn-layout svg {
     fill: #dadada;
-    transition: fill 0.35s
+    transition: fill .35s
 }
 
-.btn-layout:hover svg,
+.btn-layout.active svg,
 .btn-layout:focus svg,
-.btn-layout.active svg {
+.btn-layout:hover svg {
     fill: #333
 }
 
@@ -12229,8 +12229,8 @@ button:focus {
     overflow: hidden
 }
 
-.carousel-equal-height .owl-stage,
-.carousel-equal-height .owl-item {
+.carousel-equal-height .owl-item,
+.carousel-equal-height .owl-stage {
     display: flex;
     align-items: stretch
 }
@@ -12291,7 +12291,7 @@ button:focus {
 }
 
 .sidebar-shop .custom-control-label::before {
-    border-radius: 0.2rem
+    border-radius: .2rem
 }
 
 .widget-clean {
@@ -12328,7 +12328,7 @@ button:focus {
     color: #333;
     content: '\f110';
     display: block;
-    font-family: 'molla';
+    font-family: molla;
     font-size: 1.4rem;
     line-height: 1;
     position: absolute;
@@ -12342,7 +12342,7 @@ button:focus {
 }
 
 .widget-collapsible .widget-title a:focus {
-    outline: none !important
+    outline: 0 !important
 }
 
 .widget-collapsible .widget-body {
@@ -12394,8 +12394,8 @@ button:focus {
     margin-right: .9rem
 }
 
-.sidebar-toggler:hover,
-.sidebar-toggler:focus {
+.sidebar-toggler:focus,
+.sidebar-toggler:hover {
     color: #c96
 }
 
@@ -12424,7 +12424,7 @@ button:focus {
 
 .filter-colors a:after {
     color: #fff;
-    font-family: 'molla';
+    font-family: molla;
     content: '\ec2d';
     font-size: 1rem;
     line-height: 1;
@@ -12439,9 +12439,9 @@ button:focus {
 }
 
 .filter-colors a.selected,
-.filter-colors a:hover,
-.filter-colors a:focus {
-    box-shadow: 0 0 0 .1rem #cccccc
+.filter-colors a:focus,
+.filter-colors a:hover {
+    box-shadow: 0 0 0 .1rem #ccc
 }
 
 .filter-colors a.selected:after {
@@ -12463,7 +12463,7 @@ button:focus {
     color: #c96
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width:576px) {
     .toolbox-right {
         flex-direction: row
     }
@@ -12475,7 +12475,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .toolbox {
         flex-direction: row
     }
@@ -12520,16 +12520,16 @@ button:focus {
     width: 4rem;
     height: 4rem;
     color: #777;
-    font-weight: normal;
+    font-weight: 400;
     font-size: 2rem;
     line-height: 1;
     background-color: #fff;
-    box-shadow: 2px 6px 16px rgba(51, 51, 51, 0.05);
+    box-shadow: 2px 6px 16px rgba(51, 51, 51, .05);
     transition: all .35s ease
 }
 
-.btn-product-gallery:hover,
-.btn-product-gallery:focus {
+.btn-product-gallery:focus,
+.btn-product-gallery:hover {
     color: #fff;
     background-color: #c96
 }
@@ -12561,8 +12561,8 @@ button:focus {
     width: 100%
 }
 
-.product-gallery-item:before,
-.product-gallery-item:after {
+.product-gallery-item:after,
+.product-gallery-item:before {
     content: '';
     display: block;
     position: absolute;
@@ -12576,13 +12576,13 @@ button:focus {
 .product-gallery-item:before {
     opacity: 0;
     visibility: hidden;
-    border: 0.1rem solid #c96
+    border: .1rem solid #c96
 }
 
 .product-gallery-item:after {
     visibility: visible;
     opacity: 1;
-    background-color: rgba(255, 255, 255, 0.4)
+    background-color: rgba(255, 255, 255, .4)
 }
 
 .product-gallery-item.active:before {
@@ -12590,8 +12590,8 @@ button:focus {
     opacity: 1
 }
 
-.product-gallery-item:hover:after,
-.product-gallery-item.active:after {
+.product-gallery-item.active:after,
+.product-gallery-item:hover:after {
     opacity: 0;
     visibility: hidden
 }
@@ -12675,18 +12675,18 @@ button:focus {
     transition: box-shadow .3s ease
 }
 
-.product-pager-link:hover,
-.product-pager-link:focus {
+.product-pager-link:focus,
+.product-pager-link:hover {
     color: #c96
 }
 
-.product-pager-link:hover i,
-.product-pager-link:focus i {
+.product-pager-link:focus i,
+.product-pager-link:hover i {
     color: inherit
 }
 
-.product-pager-link:hover span,
-.product-pager-link:focus span {
+.product-pager-link:focus span,
+.product-pager-link:hover span {
     box-shadow: 0 1px 0 #c96
 }
 
@@ -12771,8 +12771,8 @@ button:focus {
     transition: all .35s ease
 }
 
-.product-details .product-cat a:hover,
-.product-details .product-cat a:focus {
+.product-details .product-cat a:focus,
+.product-details .product-cat a:hover {
     color: #c96;
     box-shadow: 0 1px 0 #c96
 }
@@ -12797,8 +12797,8 @@ button:focus {
 }
 
 .product-details .product-size a.active,
-.product-details .product-size a:hover,
-.product-details .product-size a:focus {
+.product-details .product-size a:focus,
+.product-details .product-size a:hover {
     color: #c96;
     border-color: #c96;
     background-color: transparent
@@ -12868,8 +12868,8 @@ button:focus {
     margin-right: .7rem
 }
 
-.size-guide:hover,
-.size-guide:focus {
+.size-guide:focus,
+.size-guide:hover {
     color: #c96
 }
 
@@ -12888,80 +12888,76 @@ button:focus {
     display: flex;
     align-items: center;
     flex-flow: row wrap;
-    margin-bottom: 3rem;
+    margin-bottom: 3rem
 }
 
-.product-details-action .btn-cart,
-.btn-add {
+.btn-add,
+.product-details-action .btn-cart {
     padding: 1rem 1.5rem;
     max-width: 198px;
-    color: white;
-    border: 0.1rem solid #445F84;
+    color: #fff;
+    border: .1rem solid #445f84
 }
 
-.product-details-action .btn-cart,
-.btn-wishlist {
-    margin-top: 40px;
+.btn-wishlist,
+.product-details-action .btn-cart {
+    margin-top: 40px
 }
 
 .disabled {
-    opacity: 0.5;
-    pointer-events: none;
+    opacity: .5;
+    pointer-events: none
 }
 
-
-.product-details-action .btn-cart,
-.btn-add {
+.btn-add,
+.product-details-action .btn-cart {
     padding: 1rem 1.5rem;
     max-width: 198px;
-    color: #445F84;
-    /* Text color */
-    background-color: white;
-    /* Background color */
-    border: 0.1rem solid #445F84;
+    color: #445f84;
+    background-color: #fff;
+    border: .1rem solid #445f84
 }
 
-.product-details-action .btn-cart,
-.btn-add span {
+.btn-add span,
+.product-details-action .btn-cart {
     font-size: 1.4rem;
     color: inherit;
     text-transform: uppercase;
     box-shadow: none;
-    transition: box-shadow .35s ease, color 0s ease;
+    transition: box-shadow .35s ease, color 0s ease
 }
 
 .product-details-action .btn-cart:before {
-    margin-right: .4rem;
+    margin-right: .4rem
 }
 
 .product-details-action .btn-add:before {
-    margin-right: .4rem;
+    margin-right: .4rem
 }
 
-.product-details-action .btn-add:hover,
-.product-details-action .btn-add:focus {
-    color: white;
-    border-color: #445F84;
-    background-color: #445F84;
+.product-details-action .btn-add:focus,
+.product-details-action .btn-add:hover {
+    color: #fff;
+    border-color: #445f84;
+    background-color: #445f84
 }
 
-.product-details-action .btn-add:hover span,
-.product-details-action .btn-add:focus span {
-    color: white;
+.product-details-action .btn-add:focus span,
+.product-details-action .btn-add:hover span {
+    color: #fff
 }
 
-.product-details-action .btn-cart:hover,
-.product-details-action .btn-cart:focus {
-    color: white;
-    border-color: #445F84;
-    background-color: #c96;
+.product-details-action .btn-cart:focus,
+.product-details-action .btn-cart:hover {
+    color: #fff;
+    border-color: #445f84;
+    background-color: #c96
 }
 
-.product-details-action .btn-cart:hover span,
-.product-details-action .btn-cart:focus span {
-    color: white;
+.product-details-action .btn-cart:focus span,
+.product-details-action .btn-cart:hover span {
+    color: #fff
 }
-
 
 .details-action-wrapper {
     display: flex;
@@ -13013,7 +13009,7 @@ button:focus {
     margin-bottom: 0
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .container-fluid .product-details-top .col-lg-7 {
         -ms-flex: 0 0 56.5%;
         flex: 0 0 56.5%;
@@ -13027,7 +13023,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 1700px) {
+@media screen and (min-width:1700px) {
     .container-fluid .product-details-action .btn-cart {
         min-width: 240px
     }
@@ -13042,15 +13038,15 @@ button:focus {
 }
 
 .product-details-tab .nav.nav-pills .nav-link {
-    color: #333333;
+    color: #333;
     font-size: 1.6rem;
     padding: .55rem 3rem;
     border-bottom-width: .2rem;
     text-transform: capitalize
 }
 
-.product-details-tab .nav.nav-pills .nav-link:hover,
-.product-details-tab .nav.nav-pills .nav-link:focus {
+.product-details-tab .nav.nav-pills .nav-link:focus,
+.product-details-tab .nav.nav-pills .nav-link:hover {
     color: #c96;
     border-bottom-color: #c96
 }
@@ -13084,7 +13080,7 @@ button:focus {
 }
 
 .product-desc-content ul {
-    color: #333333
+    color: #333
 }
 
 .product-desc-content ul li {
@@ -13106,8 +13102,8 @@ button:focus {
     transition: all .35s ease
 }
 
-.product-desc-content a:hover,
-.product-desc-content a:focus {
+.product-desc-content a:focus,
+.product-desc-content a:hover {
     color: #c96;
     border-bottom-color: #c96
 }
@@ -13166,8 +13162,8 @@ button:focus {
     color: inherit
 }
 
-.review h4 a:hover,
-.review h4 a:focus {
+.review h4 a:focus,
+.review h4 a:hover {
     color: #c96
 }
 
@@ -13193,8 +13189,8 @@ button:focus {
     transition: all .35s ease
 }
 
-.review-action a:hover,
-.review-action a:focus {
+.review-action a:focus,
+.review-action a:hover {
     color: #c96;
     box-shadow: 0 1px 0 #c96
 }
@@ -13212,9 +13208,9 @@ button:focus {
     text-align: center
 }
 
-.product-details-centered .ratings-container,
+.product-details-centered .details-filter-row,
 .product-details-centered .product-price,
-.product-details-centered .details-filter-row {
+.product-details-centered .ratings-container {
     justify-content: center
 }
 
@@ -13289,8 +13285,8 @@ button:focus {
 }
 
 .product-details-extended .nav.nav-pills .nav-link.active,
-.product-details-extended .nav.nav-pills .nav-link:hover,
-.product-details-extended .nav.nav-pills .nav-link:focus {
+.product-details-extended .nav.nav-pills .nav-link:focus,
+.product-details-extended .nav.nav-pills .nav-link:hover {
     border-color: #c96
 }
 
@@ -13328,12 +13324,12 @@ button:focus {
     margin-right: 2rem
 }
 
-@media screen and (min-width: 768px) {
-    .product-details-separator [class*="col-"] {
+@media screen and (min-width:768px) {
+    .product-details-separator [class*=col-] {
         padding-top: 1rem
     }
 
-    .product-details-separator [class*="col-"]+[class*="col-"]:before {
+    .product-details-separator [class*=col-]+[class*=col-]:before {
         content: '';
         width: .1rem;
         display: block;
@@ -13453,7 +13449,7 @@ button:focus {
     display: none
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .product-gallery-vertical .row {
         margin-left: -.5rem;
         margin-right: -.5rem;
@@ -13491,8 +13487,8 @@ button:focus {
         margin-bottom: 1rem
     }
 
-    .product-gallery-vertical .product-gallery-item:before,
-    .product-gallery-vertical .product-gallery-item:after {
+    .product-gallery-vertical .product-gallery-item:after,
+    .product-gallery-vertical .product-gallery-item:before {
         left: 0;
         right: 0
     }
@@ -13508,7 +13504,7 @@ button:focus {
         padding-top: 1rem;
         padding-bottom: 1rem;
         background-color: #fff;
-        box-shadow: -15px 0 43px rgba(51, 51, 51, 0.15)
+        box-shadow: -15px 0 43px rgba(51, 51, 51, .15)
     }
 
     .sticky-bar .row {
@@ -13570,7 +13566,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 992px) and (max-width: 1199px) {
+@media screen and (min-width:992px) and (max-width:1199px) {
     .details-action-wrapper {
         margin-left: 1rem
     }
@@ -13580,7 +13576,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 768px) and (max-width: 991px) {
+@media screen and (min-width:768px) and (max-width:991px) {
     .product-details-action {
         flex-direction: column;
         align-items: flex-start
@@ -13605,7 +13601,7 @@ button:focus {
     }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width:767px) {
     .product-desc-row {
         min-height: 380px
     }
@@ -13620,7 +13616,7 @@ button:focus {
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
     .breadcrumb-nav .d-flex {
         flex-direction: column;
         align-items: flex-start !important
@@ -13636,7 +13632,7 @@ button:focus {
     }
 }
 
-@media screen and (max-width: 580px) {
+@media screen and (max-width:580px) {
     .product-details-action {
         flex-direction: column;
         align-items: flex-start
@@ -13702,7 +13698,7 @@ button:focus {
 
 .entry-video a:after {
     content: '\ec2c';
-    font-family: "molla";
+    font-family: molla;
     display: -ms-inline-flexbox;
     display: inline-flex;
     align-items: center;
@@ -13724,11 +13720,11 @@ button:focus {
     transition: all .35s ease
 }
 
-.entry-video a:hover:after,
-.entry-video a:focus:after {
+.entry-video a:focus:after,
+.entry-video a:hover:after {
     color: #c96;
     background-color: #fff;
-    box-shadow: 0 0 0 1.6rem rgba(255, 255, 255, 0.2)
+    box-shadow: 0 0 0 1.6rem rgba(255, 255, 255, .2)
 }
 
 .entry-meta {
@@ -13750,8 +13746,8 @@ button:focus {
     transition: all .3s ease
 }
 
-.entry-meta a:hover,
-.entry-meta a:focus {
+.entry-meta a:focus,
+.entry-meta a:hover {
     color: #c96;
     box-shadow: 0 1px 0 #c96
 }
@@ -13762,7 +13758,7 @@ button:focus {
 }
 
 .entry-title {
-    color: #333333;
+    color: #333;
     font-weight: 600;
     font-size: 2.2rem;
     line-height: 1.25;
@@ -13774,8 +13770,8 @@ button:focus {
     color: inherit
 }
 
-.entry-title a:hover,
-.entry-title a:focus {
+.entry-title a:focus,
+.entry-title a:hover {
     color: #c96
 }
 
@@ -13791,8 +13787,8 @@ button:focus {
     transition: all .3s ease
 }
 
-.entry-cats a:hover,
-.entry-cats a:focus {
+.entry-cats a:focus,
+.entry-cats a:hover {
     color: #c96;
     box-shadow: 0 1px 0 #c96
 }
@@ -13811,7 +13807,7 @@ button:focus {
 }
 
 .read-more:after {
-    font-family: 'molla';
+    font-family: molla;
     content: '\f274';
     font-size: 1.5rem;
     line-height: 1;
@@ -13825,14 +13821,14 @@ button:focus {
     transform: translateX(-6px)
 }
 
-.read-more:hover,
-.read-more:focus {
+.read-more:focus,
+.read-more:hover {
     padding-right: 2.2rem;
     box-shadow: 0 1px 0 0 #c96
 }
 
-.read-more:hover:after,
-.read-more:focus:after {
+.read-more:focus:after,
+.read-more:hover:after {
     opacity: 1;
     transform: translateX(0)
 }
@@ -13864,7 +13860,7 @@ button:focus {
 
 .menu-cat a {
     display: inline-block;
-    color: #333333;
+    color: #333;
     font-weight: 300;
     font-size: 1.4rem;
     line-height: 1.5;
@@ -13873,13 +13869,13 @@ button:focus {
 }
 
 .menu-cat a span {
-    color: #cccccc;
+    color: #ccc;
     font-weight: 400;
     margin-left: .8rem
 }
 
-.menu-cat a:hover,
-.menu-cat a:focus {
+.menu-cat a:focus,
+.menu-cat a:hover {
     color: #c96
 }
 
@@ -13934,11 +13930,11 @@ button:focus {
     left: 0;
     right: 0;
     z-index: 3;
-    background: -moz-linear-gradient(top, rgba(125, 185, 232, 0) 0%, #000 100%);
-    background: -webkit-linear-gradient(top, rgba(125, 185, 232, 0) 0%, #000 100%);
-    background: linear-gradient(to bottom, rgba(125, 185, 232, 0) 0%, #000 100%);
+    background: -moz-linear-gradient(top, rgba(125, 185, 232, 0) 0, #000 100%);
+    background: -webkit-linear-gradient(top, rgba(125, 185, 232, 0) 0, #000 100%);
+    background: linear-gradient(to bottom, rgba(125, 185, 232, 0) 0, #000 100%);
     opacity: .75;
-    transition: all 0.3s;
+    transition: all .3s;
     pointer-events: none
 }
 
@@ -13946,8 +13942,8 @@ button:focus {
     margin-bottom: 0
 }
 
-.entry-mask .entry-video a:after,
-.entry-mask .entry-gallery a:after {
+.entry-mask .entry-gallery a:after,
+.entry-mask .entry-video a:after {
     width: auto;
     height: auto;
     left: 3rem;
@@ -13959,10 +13955,10 @@ button:focus {
     border: none
 }
 
-.entry-mask .entry-video a:hover:after,
-.entry-mask .entry-video a:focus:after,
+.entry-mask .entry-gallery a:focus:after,
 .entry-mask .entry-gallery a:hover:after,
-.entry-mask .entry-gallery a:focus:after {
+.entry-mask .entry-video a:focus:after,
+.entry-mask .entry-video a:hover:after {
     color: #fff;
     background-color: transparent;
     box-shadow: none
@@ -13972,7 +13968,7 @@ button:focus {
     color: #fff;
     position: absolute;
     content: '\f24d';
-    font-family: "molla";
+    font-family: molla;
     top: 2.6rem
 }
 
@@ -13984,8 +13980,8 @@ button:focus {
     z-index: 5
 }
 
-.entry-mask .entry-meta,
-.entry-mask .entry-cats {
+.entry-mask .entry-cats,
+.entry-mask .entry-meta {
     color: #ebebeb
 }
 
@@ -14045,7 +14041,7 @@ button:focus {
     right: .8rem;
     top: 50%;
     min-width: 0;
-    font-weight: normal;
+    font-weight: 400;
     font-size: 1.8rem;
     color: #666;
     padding: 0;
@@ -14058,8 +14054,8 @@ button:focus {
     margin: 0 !important
 }
 
-.widget-search .btn:hover,
-.widget-search .btn:focus {
+.widget-search .btn:focus,
+.widget-search .btn:hover {
     color: #c96
 }
 
@@ -14085,8 +14081,8 @@ button:focus {
     float: right
 }
 
-.widget-cats a:hover,
-.widget-cats a:focus {
+.widget-cats a:focus,
+.widget-cats a:hover {
     color: #c96
 }
 
@@ -14142,7 +14138,7 @@ button:focus {
 
 .posts-list span {
     display: block;
-    color: #cccccc;
+    color: #ccc;
     font-weight: 300;
     font-size: 1.4rem;
     line-height: 1.25;
@@ -14162,8 +14158,8 @@ button:focus {
     color: #333
 }
 
-.posts-list a:hover,
-.posts-list a:focus {
+.posts-list a:focus,
+.posts-list a:hover {
     color: #c96
 }
 
@@ -14201,8 +14197,8 @@ button:focus {
     transition: all .3s ease
 }
 
-.tagcloud a:hover,
-.tagcloud a:focus {
+.tagcloud a:focus,
+.tagcloud a:hover {
     color: #c96;
     background-color: #fff
 }
@@ -14211,7 +14207,7 @@ button:focus {
     margin-bottom: 0
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .entry-title {
         font-size: 2.4rem
     }
@@ -14238,7 +14234,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .sidebar {
         margin-top: -.3rem
     }
@@ -14270,9 +14266,9 @@ button:focus {
         margin-top: -2.5rem
     }
 
-    .max-col-4 .entry-grid .entry-video a:hover:after,
-    .max-col-4 .entry-grid .entry-video a:focus:after {
-        box-shadow: 0 0 0 1rem rgba(255, 255, 255, 0.2)
+    .max-col-4 .entry-grid .entry-video a:focus:after,
+    .max-col-4 .entry-grid .entry-video a:hover:after {
+        box-shadow: 0 0 0 1rem rgba(255, 255, 255, .2)
     }
 
     .entry-list {
@@ -14300,13 +14296,13 @@ button:focus {
     margin-bottom: 4rem
 }
 
-.single-entry .entry-meta,
-.single-entry .entry-cats {
+.single-entry .entry-cats,
+.single-entry .entry-meta {
     color: #ccc
 }
 
-.single-entry .entry-meta a:not(:hover):not(:focus),
-.single-entry .entry-cats a:not(:hover):not(:focus) {
+.single-entry .entry-cats a:not(:hover):not(:focus),
+.single-entry .entry-meta a:not(:hover):not(:focus) {
     color: #666
 }
 
@@ -14351,21 +14347,21 @@ button:focus {
     transition: all .35s ease
 }
 
-.editor-content a:hover,
-.editor-content a:focus {
+.editor-content a:focus,
+.editor-content a:hover {
     color: #c96;
     box-shadow: 0 1px 0 #c96
 }
 
 .editor-content blockquote {
     position: relative;
-    color: #333333;
+    color: #333;
     font-style: normal;
     font-weight: 400;
     font-size: 1.8rem;
     line-height: 1.67;
     padding: 7rem 3rem 4rem 3rem;
-    border-left: 0.1rem solid #c96;
+    border-left: .1rem solid #c96;
     background-color: #fafafa;
     margin-top: 4.2rem;
     margin-bottom: 4.2rem
@@ -14378,10 +14374,10 @@ button:focus {
 .editor-content blockquote:before {
     color: #ebebeb;
     content: '\f10e';
-    font-weight: normal;
+    font-weight: 400;
     font-size: 3rem;
     line-height: 1;
-    font-family: 'molla';
+    font-family: molla;
     position: absolute;
     left: 3rem;
     top: 4rem;
@@ -14439,8 +14435,8 @@ button:focus {
     transition: all .3s ease
 }
 
-.entry-tags a:hover,
-.entry-tags a:focus {
+.entry-tags a:focus,
+.entry-tags a:hover {
     color: #c96;
     background-color: #fff
 }
@@ -14465,8 +14461,8 @@ button:focus {
     color: inherit
 }
 
-.entry-author-details h4 a:hover,
-.entry-author-details h4 a:focus {
+.entry-author-details h4 a:focus,
+.entry-author-details h4 a:hover {
     color: #c96
 }
 
@@ -14504,8 +14500,8 @@ button:focus {
     transition: all .35s ease
 }
 
-.author-link:hover,
-.author-link:focus {
+.author-link:focus,
+.author-link:hover {
     color: #c96;
     box-shadow: 0 1px 0 #c96
 }
@@ -14543,7 +14539,7 @@ button:focus {
 .pager-link:after {
     color: #333;
     display: block;
-    font-family: 'molla';
+    font-family: molla;
     font-size: 1.5rem;
     line-height: 1;
     position: absolute;
@@ -14574,38 +14570,38 @@ button:focus {
     right: 3rem
 }
 
-.pager-link:hover,
-.pager-link:focus {
+.pager-link:focus,
+.pager-link:hover {
     color: #c96
 }
 
-.pager-link:hover:after,
-.pager-link:focus:after {
+.pager-link:focus:after,
+.pager-link:hover:after {
     color: #c96
 }
 
-.pager-link:hover.pager-link-prev,
-.pager-link:focus.pager-link-prev {
+.pager-link:focus.pager-link-prev,
+.pager-link:hover.pager-link-prev {
     padding-left: 7rem
 }
 
-.pager-link:hover.pager-link-prev:after,
-.pager-link:focus.pager-link-prev:after {
+.pager-link:focus.pager-link-prev:after,
+.pager-link:hover.pager-link-prev:after {
     left: 0
 }
 
-.pager-link:hover.pager-link-next,
-.pager-link:focus.pager-link-next {
+.pager-link:focus.pager-link-next,
+.pager-link:hover.pager-link-next {
     padding-right: 7rem
 }
 
-.pager-link:hover.pager-link-next:after,
-.pager-link:focus.pager-link-next:after {
+.pager-link:focus.pager-link-next:after,
+.pager-link:hover.pager-link-next:after {
     right: 0
 }
 
-.pager-link:hover .pager-link-title,
-.pager-link:focus .pager-link-title {
+.pager-link:focus .pager-link-title,
+.pager-link:hover .pager-link-title {
     box-shadow: 0 .1rem 0 #333
 }
 
@@ -14707,14 +14703,14 @@ button:focus {
 }
 
 .comment-reply:after {
-    font-family: 'molla';
+    font-family: molla;
     content: '\f279';
     font-size: 1.5rem;
     margin-left: .7rem
 }
 
-.comment-reply:hover,
-.comment-reply:focus {
+.comment-reply:focus,
+.comment-reply:hover {
     color: #c96;
     box-shadow: 0 1px 0 #c96
 }
@@ -14736,8 +14732,8 @@ button:focus {
     color: inherit
 }
 
-.comment-user h4 a:hover,
-.comment-user h4 a:focus {
+.comment-user h4 a:focus,
+.comment-user h4 a:hover {
     color: #c96
 }
 
@@ -14787,7 +14783,7 @@ button:focus {
     position: relative
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .entry-fullwidth .entry-body {
         padding-left: 2rem
     }
@@ -14801,7 +14797,7 @@ button:focus {
     margin-bottom: 2rem
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width:576px) {
     .pager-nav {
         flex-direction: row;
         padding-bottom: 3.5rem;
@@ -14821,7 +14817,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .single-entry .entry-title-big {
         font-size: 3.4rem
     }
@@ -14856,7 +14852,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .single-entry .entry-title-big {
         font-size: 4rem
     }
@@ -14886,7 +14882,7 @@ button:focus {
     }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
     .sticky-content.is_stuck {
         position: static !important;
         top: auto !important;
@@ -14912,8 +14908,8 @@ button:focus {
     border-bottom: .1rem solid transparent
 }
 
-.nav-filter a:hover,
-.nav-filter a:focus {
+.nav-filter a:focus,
+.nav-filter a:hover {
     color: #c96
 }
 
@@ -14968,7 +14964,7 @@ button:focus {
     position: relative;
     display: block;
     overflow: hidden;
-    outline: none !important
+    outline: 0 !important
 }
 
 .portfolio-media>a:after {
@@ -14980,10 +14976,10 @@ button:focus {
     top: 0;
     bottom: 0;
     z-index: 1;
-    background-color: #444444;
+    background-color: #444;
     visibility: hidden;
     opacity: 0;
-    transition: all 0.45s ease
+    transition: all .45s ease
 }
 
 .portfolio-media img {
@@ -15004,7 +15000,7 @@ button:focus {
 
 .portfolio-content {
     padding: 1.6rem 2rem;
-    transition: all 0.45s ease
+    transition: all .45s ease
 }
 
 .portfolio-title {
@@ -15020,8 +15016,8 @@ button:focus {
     color: inherit
 }
 
-.portfolio-title a:hover,
-.portfolio-title a:focus {
+.portfolio-title a:focus,
+.portfolio-title a:hover {
     color: #c96
 }
 
@@ -15036,8 +15032,8 @@ button:focus {
     transition: all .35s ease
 }
 
-.portfolio-tags a:hover,
-.portfolio-tags a:focus {
+.portfolio-tags a:focus,
+.portfolio-tags a:hover {
     color: #c96;
     box-shadow: 0 1px 0 #c96
 }
@@ -15070,8 +15066,8 @@ button:focus {
     color: #fff
 }
 
-.portfolio-overlay .portfolio-title a:hover,
-.portfolio-overlay .portfolio-title a:focus {
+.portfolio-overlay .portfolio-title a:focus,
+.portfolio-overlay .portfolio-title a:hover {
     color: #f1f1f1
 }
 
@@ -15079,8 +15075,8 @@ button:focus {
     color: #ccc
 }
 
-.portfolio-overlay .portfolio-tags a:hover,
-.portfolio-overlay .portfolio-tags a:focus {
+.portfolio-overlay .portfolio-tags a:focus,
+.portfolio-overlay .portfolio-tags a:hover {
     color: #fff;
     box-shadow: 0 1px 0 #fff
 }
@@ -15091,7 +15087,7 @@ button:focus {
     background-color: transparent
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
     .nav-filter {
         flex-wrap: wrap;
         justify-content: center
@@ -15136,11 +15132,11 @@ button:focus {
     margin-bottom: 4rem
 }
 
-.brands-display [class*="col-"] {
+.brands-display [class*=col-] {
     display: flex
 }
 
-.brands-display [class*="col-"] .brand {
+.brands-display [class*=col-] .brand {
     width: 100%
 }
 
@@ -15209,7 +15205,7 @@ button:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(102, 102, 102, 0.7);
+    background-color: rgba(102, 102, 102, .7);
     color: #fff;
     opacity: 0;
     visibility: hidden;
@@ -15243,7 +15239,7 @@ button:focus {
 
 .member-content,
 .member-overlay {
-    transition: all 0.45s ease
+    transition: all .45s ease
 }
 
 .member:hover .member-content {
@@ -15256,8 +15252,8 @@ button:focus {
 }
 
 .member:hover.member-anim .member-overlay .member-title,
-.member:hover.member-anim .member-overlay p,
-.member:hover.member-anim .member-overlay .social-icons {
+.member:hover.member-anim .member-overlay .social-icons,
+.member:hover.member-anim .member-overlay p {
     animation-name: fadeInUpShort;
     animation-duration: .65s;
     animation-fill-mode: both
@@ -15321,7 +15317,7 @@ button:focus {
 
 .member.member-2 .member-overlay {
     color: #333;
-    background-color: rgba(249, 249, 249, 0.7)
+    background-color: rgba(249, 249, 249, .7)
 }
 
 .member.member-2 .member-overlay .social-icons {
@@ -15383,8 +15379,8 @@ button:focus {
     color: inherit
 }
 
-.contact-list a:hover,
-.contact-list a:focus {
+.contact-list a:focus,
+.contact-list a:hover {
     color: #c96
 }
 
@@ -15414,8 +15410,8 @@ button:focus {
     color: inherit
 }
 
-.store a:not(.btn):hover,
-.store a:not(.btn):focus {
+.store a:not(.btn):focus,
+.store a:not(.btn):hover {
     color: #c96
 }
 
@@ -15445,13 +15441,13 @@ button:focus {
     margin-top: 3.2rem
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     #map {
         height: 380px
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     #map {
         height: 492px
     }
@@ -15478,8 +15474,8 @@ button:focus {
     color: inherit
 }
 
-.contact-box a:hover,
-.contact-box a:focus {
+.contact-box a:focus,
+.contact-box a:hover {
     color: #c96
 }
 
@@ -15503,7 +15499,7 @@ button:focus {
     margin-right: auto;
     background-color: #fff;
     padding: 2.2rem 2rem 4.4rem;
-    box-shadow: 0 3px 16px rgba(51, 51, 51, 0.1)
+    box-shadow: 0 3px 16px rgba(51, 51, 51, .1)
 }
 
 .form-box .btn {
@@ -15567,8 +15563,8 @@ button:focus {
     color: inherit
 }
 
-.form-tab .form-footer a:hover,
-.form-tab .form-footer a:focus {
+.form-tab .form-footer a:focus,
+.form-tab .form-footer a:hover {
     color: #c96
 }
 
@@ -15621,16 +15617,16 @@ button:focus {
 }
 
 .btn.btn-login.btn-g i {
-    color: #cc3333;
+    color: #c33;
     min-width: 2.6rem
 }
 
 .btn.btn-login.btn-f i {
-    color: #3366cc
+    color: #36c
 }
 
-.btn.btn-login:hover,
-.btn.btn-login:focus {
+.btn.btn-login:focus,
+.btn.btn-login:hover {
     background-color: #f5f6f9
 }
 
@@ -15638,7 +15634,7 @@ button:focus {
     margin-bottom: .6rem
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width:576px) {
     .form-choice .col-sm-6:not(:last-child) {
         margin-bottom: 0
     }
@@ -15649,7 +15645,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .form-box {
         padding: 3.7rem 6rem 6.4rem
     }
@@ -15684,7 +15680,7 @@ button:focus {
     top: 0;
     bottom: 0;
     transition: all .35s ease;
-    background-color: rgba(25, 25, 25, 0.3);
+    background-color: rgba(25, 25, 25, .3);
     z-index: 1;
     visibility: hidden;
     opacity: 0
@@ -15693,7 +15689,7 @@ button:focus {
 .categories-page .banner-badge .banner-link {
     padding-top: 1.45rem;
     padding-bottom: 1.45rem;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, .9);
     z-index: 5;
     bottom: 2rem
 }
@@ -15719,9 +15715,9 @@ button:focus {
     top: 0;
     bottom: 0;
     right: 0;
-    background-color: rgba(25, 25, 25, 0.25);
+    background-color: rgba(25, 25, 25, .25);
     z-index: 1000;
-    transition: all 0.4s;
+    transition: all .4s;
     visibility: hidden;
     opacity: 0
 }
@@ -15741,10 +15737,10 @@ button:focus {
     width: 100%;
     max-width: 350px;
     overflow-y: scroll;
-    box-shadow: 0.1rem 0 0.6rem 0 rgba(51, 51, 51, 0.5);
+    box-shadow: .1rem 0 .6rem 0 rgba(51, 51, 51, .5);
     will-change: transform;
     visibility: hidden;
-    transition: all 0.35s
+    transition: all .35s
 }
 
 .sidebar-filter-active .sidebar-filter {
@@ -15802,7 +15798,7 @@ button:focus {
     margin-left: auto
 }
 
-@media screen and (max-width: 380px) {
+@media screen and (max-width:380px) {
     .sidebar-filter {
         left: -300px;
         max-width: 300px
@@ -15819,7 +15815,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .checkout .col-lg-3 {
         -ms-flex: 0 0 30%;
         flex: 0 0 30%;
@@ -15912,7 +15908,7 @@ button:focus {
 
 .checkout-discount .form-control:focus {
     border-color: #c96;
-    outline: none !important
+    outline: 0 !important
 }
 
 .summary {
@@ -15929,7 +15925,7 @@ button:focus {
     font-size: 1.6rem;
     letter-spacing: 0;
     padding-bottom: 1.7rem;
-    border-bottom: .1rem solid #cccccc;
+    border-bottom: .1rem solid #ccc;
     margin-bottom: 2.1rem
 }
 
@@ -15944,13 +15940,13 @@ button:focus {
     color: inherit
 }
 
-.table.table-summary a:hover,
-.table.table-summary a:focus {
+.table.table-summary a:focus,
+.table.table-summary a:hover {
     color: #c96
 }
 
-.table.table-summary thead th,
-.table.table-summary .summary-subtotal td {
+.table.table-summary .summary-subtotal td,
+.table.table-summary thead th {
     color: #333;
     font-weight: 400;
     font-size: 1.6rem
@@ -15967,14 +15963,14 @@ button:focus {
     border-bottom: .1rem solid #ebebeb
 }
 
-.table.table-summary thead th,
-.table.table-summary tbody td {
+.table.table-summary tbody td,
+.table.table-summary thead th {
     vertical-align: middle;
     border-top: none
 }
 
-.table.table-summary thead th:last-child,
-.table.table-summary tbody td:last-child {
+.table.table-summary tbody td:last-child,
+.table.table-summary thead th:last-child {
     text-align: right;
     min-width: 100px
 }
@@ -16015,8 +16011,8 @@ button:focus {
     margin-top: 1rem
 }
 
-.accordion-summary .card-title a:hover,
-.accordion-summary .card-title a:focus {
+.accordion-summary .card-title a:focus,
+.accordion-summary .card-title a:hover {
     color: inherit
 }
 
@@ -16030,7 +16026,7 @@ button:focus {
     width: 1.6rem;
     height: 1.6rem;
     border-radius: 50%;
-    border: 0.1rem solid #c96;
+    border: .1rem solid #c96;
     right: auto;
     left: 0;
     top: .7rem;
@@ -16071,12 +16067,12 @@ button:focus {
     margin-top: .2rem
 }
 
-.paypal-link:hover,
-.paypal-link:focus {
+.paypal-link:focus,
+.paypal-link:hover {
     color: #c96 !important
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .summary {
         margin-top: 0
     }
@@ -16120,7 +16116,7 @@ button:focus {
 
 .table .action-col .btn.disabled {
     opacity: 1 !important;
-    color: #cccccc !important;
+    color: #ccc !important;
     cursor: default;
     pointer-events: none;
     background-color: #fafafa !important;
@@ -16167,8 +16163,8 @@ button:focus {
     color: inherit
 }
 
-.product-col .product-title a:hover,
-.product-col .product-title a:focus {
+.product-col .product-title a:focus,
+.product-col .product-title a:hover {
     color: #c96
 }
 
@@ -16186,17 +16182,17 @@ button:focus {
     justify-content: center;
     width: 3rem;
     height: 3rem;
-    color: #cccccc;
+    color: #ccc;
     background-color: transparent;
     font-size: 1.7rem;
     line-height: 1;
     border: none;
-    outline: none;
+    outline: 0;
     transition: all .35s
 }
 
-.btn-remove:hover,
-.btn-remove:focus {
+.btn-remove:focus,
+.btn-remove:hover {
     color: #333
 }
 
@@ -16216,18 +16212,18 @@ button:focus {
 
 .action-col .dropdown-item.active,
 .action-col .dropdown-item:active,
-.action-col .dropdown-item:hover,
-.action-col .dropdown-item:focus {
+.action-col .dropdown-item:focus,
+.action-col .dropdown-item:hover {
     color: #fff;
     background-color: #c96
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width:991px) {
 
     .table-mobile,
     .table-mobile tbody,
-    .table-mobile tr,
-    .table-mobile td {
+    .table-mobile td,
+    .table-mobile tr {
         width: 100% !important;
         display: block !important
     }
@@ -16296,13 +16292,13 @@ button:focus {
     }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width:767px) {
     .table-mobile .product-col .product-media {
         margin-right: 1.5rem
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width:575px) {
     .cart-bottom {
         flex-direction: column;
         margin-bottom: 4rem
@@ -16318,7 +16314,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .cart .col-lg-3 {
         -ms-flex: 0 0 30%;
         flex: 0 0 30%;
@@ -16367,8 +16363,8 @@ button:focus {
     position: relative
 }
 
-.input-spinner .input-group-prepend,
-.input-spinner .input-group-append {
+.input-spinner .input-group-append,
+.input-spinner .input-group-prepend {
     position: absolute;
     top: 0
 }
@@ -16395,19 +16391,19 @@ button:focus {
 
 .btn.btn-spinner {
     min-width: 0;
-    color: #333333;
+    color: #333;
     padding: 1.25rem .4rem;
     font-size: 1rem;
     border: none;
-    background: none
+    background: 0 0
 }
 
 .btn.btn-spinner i {
     margin: 0 !important
 }
 
-.btn.btn-spinner:hover,
-.btn.btn-spinner:focus {
+.btn.btn-spinner:focus,
+.btn.btn-spinner:hover {
     color: #c96
 }
 
@@ -16495,21 +16491,21 @@ button:focus {
     font-weight: 300;
     color: #999;
     font-size: 1.4rem;
-    border-bottom: 0.1rem solid #999
+    border-bottom: .1rem solid #999
 }
 
-.table.table-summary .summary-shipping-estimate a:hover,
-.table.table-summary .summary-shipping-estimate a:focus {
+.table.table-summary .summary-shipping-estimate a:focus,
+.table.table-summary .summary-shipping-estimate a:hover {
     color: #c96;
     border-bottom-color: #c96
 }
 
-.summary-cart .table.table-summary thead th:last-child,
-.summary-cart .table.table-summary tbody td:last-child {
+.summary-cart .table.table-summary tbody td:last-child,
+.summary-cart .table.table-summary thead th:last-child {
     min-width: 0
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .dashboard .col-lg-3 {
         -ms-flex: 0 0 30%;
         flex: 0 0 30%;
@@ -16570,7 +16566,7 @@ button:focus {
 }
 
 .nav-dashboard .nav-link:before {
-    font-family: "molla";
+    font-family: molla;
     content: '\f274';
     display: block;
     font-size: 1.5rem;
@@ -16583,9 +16579,9 @@ button:focus {
     opacity: 0
 }
 
-.nav-dashboard .nav-link:hover,
+.nav-dashboard .nav-link.active,
 .nav-dashboard .nav-link:focus,
-.nav-dashboard .nav-link.active {
+.nav-dashboard .nav-link:hover {
     color: #c96
 }
 
@@ -16636,7 +16632,7 @@ button:focus {
     margin-bottom: 1.4rem
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .error-content {
         padding-top: 12.5rem;
         min-height: 540px
@@ -16679,9 +16675,9 @@ button:focus {
     margin-right: auto
 }
 
+.soon-content.text-center .coming-countdown,
 .soon-content.text-center form,
-.soon-content.text-center hr,
-.soon-content.text-center .coming-countdown {
+.soon-content.text-center hr {
     margin-left: auto;
     margin-right: auto
 }
@@ -16756,7 +16752,7 @@ button:focus {
     margin-top: -1rem
 }
 
-@media screen and (min-width: 576px) {
+@media screen and (min-width:576px) {
     .soon-content {
         font-size: 1.6rem
     }
@@ -16783,7 +16779,7 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .soon-content {
         padding-right: 3rem
     }
@@ -16793,26 +16789,26 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .soon-content {
         padding-right: 0
     }
 }
 
 .mt-0 {
-    margin-top: 0rem !important
+    margin-top: 0 !important
 }
 
 .mb-0 {
-    margin-bottom: 0rem !important
+    margin-bottom: 0 !important
 }
 
 .pt-0 {
-    padding-top: 0rem !important
+    padding-top: 0 !important
 }
 
 .pb-0 {
-    padding-bottom: 0rem !important
+    padding-bottom: 0 !important
 }
 
 .mt-1 {
@@ -17055,9 +17051,9 @@ button:focus {
     padding-bottom: 15rem !important
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width:768px) {
     .mt-md-0 {
-        margin-top: 0rem !important
+        margin-top: 0 !important
     }
 
     .mt-md-1 {
@@ -17121,7 +17117,7 @@ button:focus {
     }
 
     .mb-md-0 {
-        margin-bottom: 0rem !important
+        margin-bottom: 0 !important
     }
 
     .mb-md-1 {
@@ -17185,7 +17181,7 @@ button:focus {
     }
 
     .pt-md-0 {
-        padding-top: 0rem !important
+        padding-top: 0 !important
     }
 
     .pt-md-1 {
@@ -17249,7 +17245,7 @@ button:focus {
     }
 
     .pb-md-0 {
-        padding-bottom: 0rem !important
+        padding-bottom: 0 !important
     }
 
     .pb-md-1 {
@@ -17313,9 +17309,9 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 992px) {
+@media screen and (min-width:992px) {
     .mt-lg-0 {
-        margin-top: 0rem !important
+        margin-top: 0 !important
     }
 
     .mt-lg-1 {
@@ -17379,7 +17375,7 @@ button:focus {
     }
 
     .mb-lg-0 {
-        margin-bottom: 0rem !important
+        margin-bottom: 0 !important
     }
 
     .mb-lg-1 {
@@ -17443,7 +17439,7 @@ button:focus {
     }
 
     .pt-lg-0 {
-        padding-top: 0rem !important
+        padding-top: 0 !important
     }
 
     .pt-lg-1 {
@@ -17507,7 +17503,7 @@ button:focus {
     }
 
     .pb-lg-0 {
-        padding-bottom: 0rem !important
+        padding-bottom: 0 !important
     }
 
     .pb-lg-1 {
@@ -17571,9 +17567,9 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width:1200px) {
     .mt-xl-0 {
-        margin-top: 0rem !important
+        margin-top: 0 !important
     }
 
     .mt-xl-1 {
@@ -17637,7 +17633,7 @@ button:focus {
     }
 
     .mb-xl-0 {
-        margin-bottom: 0rem !important
+        margin-bottom: 0 !important
     }
 
     .mb-xl-1 {
@@ -17701,9 +17697,9 @@ button:focus {
     }
 }
 
-@media screen and (min-width: 1600px) {
+@media screen and (min-width:1600px) {
     .mt-xxl-0 {
-        margin-top: 0rem !important
+        margin-top: 0 !important
     }
 
     .mt-xxl-1 {
@@ -17767,7 +17763,7 @@ button:focus {
     }
 
     .mb-xxl-0 {
-        margin-bottom: 0rem !important
+        margin-bottom: 0 !important
     }
 
     .mb-xxl-1 {
@@ -17832,18 +17828,18 @@ button:focus {
 }
 
 @font-face {
-    font-family: 'molla';
+    font-family: molla;
     src: url("../fonts/molla0ab2.eot?74273691");
     src: url("../fonts/molla0ab2.eot?74273691#iefix") format("embedded-opentype"), url("../fonts/molla0ab2.woff2?74273691") format("woff2"), url("../fonts/molla0ab2.woff?74273691") format("woff"), url("../fonts/molla0ab2.ttf?74273691") format("truetype"), url("../fonts/molla0ab2.svg?74273691#molla") format("svg");
-    font-weight: normal;
+    font-weight: 400;
     font-style: normal
 }
 
-[class^="icon-"]:before,
-[class*=" icon-"]:before {
-    font-family: "molla";
+[class*=" icon-"]:before,
+[class^=icon-]:before {
+    font-family: molla;
     font-style: normal;
-    font-weight: normal;
+    font-weight: 400;
     speak: none;
     display: inline-block;
     text-decoration: inherit;
@@ -19930,5 +19926,3 @@ button:focus {
 .icon-yarn:before {
     content: '\f7e3'
 }
-
-/*# sourceMappingURL=style.css.map */
