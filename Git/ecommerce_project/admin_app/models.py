@@ -6,6 +6,8 @@ from user_app.models import *
 from django.db.models import F
 from django.utils import timezone
 from django.dispatch import receiver
+from django.utils.text import slugify
+from django.db.models.signals import post_save, post_delete
 
 
 
@@ -113,33 +115,26 @@ class ProductOffer(models.Model):
 
 
 class Coupon(models.Model):
-    coupon_code = models.CharField(primary_key=True, unique=True, max_length=12)
+    coupon_code = models.CharField(primary_key=True, unique=True, max_length=100)
     name = models.CharField(max_length=100)
-    product_color_image = models.ForeignKey(ProductColorImage, on_delete=models.CASCADE)
     discount_percentage = models.PositiveBigIntegerField()
-    coupon_price = models.PositiveBigIntegerField(blank=True)
+    minimum_amount = models.PositiveBigIntegerField(blank=True, default=0)
+    maximum_amount = models.PositiveBigIntegerField(blank=True)
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField() 
-    
-    
+
+    def __str__(self):
+        return f"{self.coupon_code} - {self.name} : {self.discount_percentage}% off | Start Date : {self.start_date} End Date : {self.end_date}"
+
     def save(self, *args, **kwargs):
         if not self.coupon_code:
-            first_part = 'SNKHS'
-            name = self.product_color_image.products.name.replace(' ', '').upper()
-            second_part = name[:5]
-            third_part = self.discount_percentage
-            self.coupon_code = f"{first_part}{second_part}{third_part}"
-            
-        if self.product_color_image and self.discount_percentage:
-            discount_price = round((self.product_color_image.price * self.discount_percentage) / 100)
-            self.coupon_price = (self.product_color_image.price - discount_price)
-        super(Coupon, self).save(*args, **kwargs)
-        
-        
-    def __str__(self):
-        return f"{self.coupon_code} - {self.name} : {self.discount_percentage}% off for {self.product_color_image.products.name} | Price after applying coupon : {self.coupon_price}"
- 
- 
+            self.generate_coupon_code()
+        super().save(*args, **kwargs)
+
+    def generate_coupon_code(self):
+        self.coupon_code = slugify(self.name)
+
+
 
 
   
@@ -238,11 +233,7 @@ class Wallet(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.user.email} | Balance : {self.balance}"
 
-@receiver(post_save, sender=User)
-def create_wallet(sender, instance, created, **kwargs):
-    if created:
-        Wallet.objects.create(user=instance)
-    
+
     
 
     
@@ -293,10 +284,7 @@ class Wishlist(models.Model):
     def __str__(self):
         return f"{self.id} : {self.customer.user.first_name} {self.customer.user.last_name}"
 
-@receiver(post_save, sender=Customer)
-def create_wishlist(sender, instance, created, **kwargs):
-    if created:
-        Wishlist.objects.create(customer=instance)
+
 
 
 class WishlistItem(models.Model):
@@ -310,16 +298,14 @@ class WishlistItem(models.Model):
     
 class Cart(models.Model):
     customer = models.OneToOneField(Customer, on_delete = models.CASCADE)
+    coupon_applied = models.BooleanField(default=False)
+    coupon = models.CharField(blank=True, null=True)
     
     def __str__(self):
         return f"{self.customer.user.first_name} {self.customer.user.last_name}"
     
+
     
-    
-@receiver(post_save, sender=Customer)
-def create_cart(sender, instance, created, **kwargs):
-    if created:
-        Cart.objects.create(customer=instance)
 
     
 
@@ -328,6 +314,7 @@ class CartProducts(models.Model):
     product = models.ForeignKey(ProductSize, on_delete=models.CASCADE)
     quantity = models.PositiveBigIntegerField(default=1)
     in_stock = models.BooleanField(default = True)
+    
     
     def __str__(self):
         return f"{self.cart.customer.user.first_name} {self.cart.customer.user.last_name} :  {self.product.product_color_image.color} - {self.product.product_color_image.products.name}"
@@ -339,3 +326,9 @@ class CartProducts(models.Model):
             return self.quantity * offer.offer_price
         else:
             return self.quantity * self.product.product_color_image.price
+
+
+
+
+
+

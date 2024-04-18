@@ -6,6 +6,31 @@ from admin_app.models import *
 
 
 
+
+@receiver(post_save, sender=Customer)
+def create_cart(sender, instance, created, **kwargs):
+    if created:
+        Cart.objects.create(customer=instance)
+
+
+
+
+@receiver(post_save, sender=Customer)
+def create_wishlist(sender, instance, created, **kwargs):
+    if created:
+        Wishlist.objects.create(customer=instance)
+        
+        
+
+
+@receiver(post_save, sender=User)
+def create_wallet(sender, instance, created, **kwargs):
+    if created:
+        Wallet.objects.create(user=instance)
+    
+
+
+
 @receiver(post_save, sender=Category)
 def update_products_on_category_change(sender, instance, **kwargs):
     products = Products.objects.filter(category=instance)
@@ -55,3 +80,14 @@ def update_product_color_in_stock_on_product_size_quantity_change(sender, instan
         ProductColorImage.objects.filter(pk=product_color_image.pk).update(in_stock=True)
 
 
+
+@receiver(post_save, sender=CartProducts)
+@receiver(post_delete, sender=CartProducts)
+def update_cart_coupon_status(sender, instance, **kwargs):
+    cart = instance.cart
+    cart.coupon_applied = False
+    cart.coupon = None
+    try:
+        cart.save()
+    except Exception as e:
+        print("Error saving cart:", e)

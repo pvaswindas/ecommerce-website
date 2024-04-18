@@ -1425,9 +1425,7 @@ def coupon_page_view(request):
 @never_cache
 def add_coupon_page(request):
     if request.user.is_superuser:
-        product_color = ProductColorImage.objects.all()
         context = {
-            'product_color' : product_color,
             'is_active_coupon' : is_active_coupon
         }
         return render(request, 'pages/coupons/add_coupon.html', context)
@@ -1442,18 +1440,19 @@ def add_coupon(request):
     if request.user.is_superuser:
         if request.method == 'POST':
             name = request.POST.get('coupon_name')
-            product_color_image_id = request.POST.get('offer_name')
             discount_percentage = request.POST.get('offer_discount')
             end_date = request.POST.get('offer_end_date')
+            minimum_amount = request.POST.get('minimum_amount')
+            maximum_amount = request.POST.get('maximum_amount')
             
-            if name and product_color_image_id and discount_percentage and end_date:
+            if name and discount_percentage and end_date:
                 try:
-                    product_color_image = ProductColorImage.objects.get(pk = product_color_image_id)
                     Coupon.objects.create(
                         name = name,
-                        product_color_image = product_color_image,
                         discount_percentage = int(discount_percentage),
                         end_date = end_date,
+                        minimum_amount = minimum_amount,
+                        maximum_amount = maximum_amount,
                     )
                     messages.success(request, 'Coupon Added Successfully')
                 except ProductColorImage.DoesNotExist:
@@ -1478,9 +1477,7 @@ def coupon_edit_page(request, coupon_id):
     if request.user.is_superuser:
         try:
             coupon = Coupon.objects.get(pk=coupon_id)
-            product_color = ProductColorImage.objects.all()
             context = {
-                'product_color': product_color,
                 'coupon': coupon,
             }
             return render(request, 'pages/coupons/coupon_edit_page.html', context)
@@ -1506,22 +1503,23 @@ def update_coupon(request, coupon_id):
                 coupon = Coupon.objects.get(pk=coupon_id)
 
                 name = request.POST.get('coupon_name')
-                product_color_image_id = request.POST.get('offer_name')
                 discount_percentage = request.POST.get('offer_discount')
                 start_date = request.POST.get('offer_start_date')
                 end_date = request.POST.get('offer_end_date')
+                minimum_amount = request.POST.get('minimum_amount')
+                maximum_amount = request.POST.get('maximum_amount')
 
                 start_date = make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
                 end_date = make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
 
-                product_color_image = ProductColorImage.objects.get(pk=product_color_image_id)
 
                 if start_date < end_date:
                     coupon.name = name
-                    coupon.product_color_image = product_color_image
                     coupon.discount_percentage = int(float(discount_percentage))
                     coupon.start_date = start_date
                     coupon.end_date = end_date
+                    coupon.minimum_amount = minimum_amount
+                    coupon.maximum_amount = maximum_amount
                     coupon.save()
                     messages.success(request, 'Coupon has been updated successfully')
                     return redirect('coupon_page_view')

@@ -15,15 +15,9 @@
     <form action="{% url 'update_coupon' coupon.coupon_code %}" method="post">
         {% csrf_token %}
         <div class="form-group">
-            <label for="coupon_name">Discount Percentage</label>
+            <label for="coupon_name">Coupon Name</label>
             <input type="text" class="form-control" id="coupon_name" value="{{ coupon.name }}" name="coupon_name" required />
         </div>
-        <label for="product">Product</label>
-        <select name="offer_name" id="productSelect">
-            {% for product in product_color %}
-                <option {% if product == coupon.product_color_image %}selected{% endif %} value="{{ product.id }}">{{ product.products.name }} - {{ product.color }}</option>
-            {% endfor %}
-        </select>
         <div class="form-group">
             <label for="offer_discount">Discount Percentage</label>
             <input type="number" class="form-control" id="offer_discount" value="{{ coupon.discount_percentage|floatformat:"2" }}" name="offer_discount" required />
@@ -35,6 +29,14 @@
         <div class="form-group">
             <label for="offer_end_date">End Date</label>
             <input type="date" class="form-control" id="offer_end_date" value="{{ coupon.end_date|date:'Y-m-d' }}" name="offer_end_date" required />
+        </div>
+        <div class="form-group">
+            <label for="minimum_amount">Minimum Amount*</label>
+            <input type="number" class="form-control" id="minimum_amount" value="{{coupon.minimum_amount}}" name="minimum_amount" required />
+        </div>
+        <div class="form-group">
+            <label for="maximum_amount">Maximum Amount*</label>
+            <input type="number" class="form-control" id="maximum_amount" value="{{coupon.maximum_amount}}" name="maximum_amount" required />
         </div>
         {% if messages %}
             <div class="text-center py-2 mb-4">

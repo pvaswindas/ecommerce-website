@@ -1250,27 +1250,27 @@ def checkout_page(request):
         customer = Customer.objects.get(user=user)
         cart = Cart.objects.get(customer=customer)
         cart_items = CartProducts.objects.filter(cart=cart, in_stock=True)
-
+        
         if cart_items:
-            applied_coupon = request.session.get('applied_coupon')
-            if applied_coupon:
+            total_price = sum(item.total_price for item in cart_items)
+            coupon = None
+            if cart.coupon_applied:
+                print("Entered inside the cart coupon applied")
                 try:
-                    coupon = Coupon.objects.get(coupon_code=applied_coupon)
-                    product_id = coupon.product_color_image.id
-                    coupon_product = ProductColorImage.objects.get(pk=product_id)
-                    if not any(item.product.product_color_image == coupon_product for item in cart_items):
-                        applied_coupon = None
-                        request.session.pop('applied_coupon', None)
+                    coupon = Coupon.objects.get(coupon_code=cart.coupon)
                 except Coupon.DoesNotExist:
-                    applied_coupon = None
-                    request.session.pop('applied_coupon', None)
+                    cart.coupon_applied = False
+                    cart.coupon = None
 
-            total_charge_discounted = calculate_total_charge_discounted(cart_items, applied_coupon)
+            total_charge_discounted = calculate_total_charge_discounted(cart_items, cart)
+            
+            
 
-            available_coupons = Coupon.objects.filter(product_color_image__in=[item.product.product_color_image for item in cart_items])
+
+            available_coupons = Coupon.objects.filter(Q(minimum_amount__lte = total_price) & Q(maximum_amount__gte = total_price))
             context = {
+                'coupon' : coupon,
                 'available_coupons': available_coupons,
-                'applied_coupon': applied_coupon,
                 'total_charge_discounted': total_charge_discounted,
             }
             cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
@@ -1283,10 +1283,10 @@ def checkout_page(request):
         return redirect('index_page')
 
 
-def calculate_total_charge_discounted(cart_items, applied_coupon):
-    if applied_coupon:
+def calculate_total_charge_discounted(cart_items, cart):
+    if cart.coupon_applied:
         try:
-            coupon = Coupon.objects.get(coupon_code=applied_coupon)
+            coupon = Coupon.objects.get(coupon_code=cart.coupon)
             total_charge_discounted = calculate_discounted_total_charge(cart_items, coupon)
         except Coupon.DoesNotExist:
             total_charge_discounted = None
@@ -1299,26 +1299,28 @@ def calculate_total_charge_discounted(cart_items, applied_coupon):
 
 
 def calculate_discounted_total_charge(cart_items, coupon):
-    cart_total = 0
-    product_offer = ProductOffer.objects.filter(product_color_image__in=[item.product.product_color_image for item in cart_items]).first()
+    cart_total_with_offer = 0
+    cart_total_without_offer = 0
     
-    if product_offer:
-        for item in cart_items:
-            if not item.product.product_color_image == product_offer.product_color_image:
-                cart_total += item.product.product_color_image.price
-        if coupon:
-            discount_amount = round((product_offer.offer_price * coupon.discount_percentage) / 100 )
-            discount_amount = product_offer.offer_price - discount_amount
-        total_charge_discounted = cart_total + discount_amount
+    for item in cart_items:
+        if item.product.product_color_image.productoffer.exists():
+            product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image)
+            offer_price = product_offer.offer_price
+            cart_total_with_offer += offer_price
+        else:
+            cart_total_without_offer += item.product.product_color_image.price
+    print("Cart Total With Offer :", cart_total_with_offer)
+    print("Cart Total With Offer :", cart_total_without_offer)
+    cart_total = cart_total_with_offer + cart_total_without_offer
+    
+    if coupon:
+        discount_amount = round((cart_total * coupon.discount_percentage) / 100)
+        total_charge_discounted = cart_total - discount_amount
     else:
-        for item in cart_items:
-            if not item.product.product_color_image == coupon.product_color_image:
-                cart_total += item.product.product_color_image.price
-        if coupon:
-            discount_amount = coupon.coupon_price
-            total_charge_discounted = cart_total + discount_amount
-            
+        total_charge_discounted = cart_total
+    
     return total_charge_discounted
+
 
 
 
@@ -1333,14 +1335,10 @@ def apply_coupon(request):
                 user = request.user
                 customer = Customer.objects.get(user=user)
                 cart = Cart.objects.get(customer=customer)
-                cart_items = CartProducts.objects.filter(cart=cart)
-                coupon = Coupon.objects.get(pk = coupon_code)
-                product_id = coupon.product_color_image.id
-                coupon_products = ProductColorImage.objects.get(pk=product_id)
-                if any(item.product.product_color_image == coupon_products for item in cart_items):
-                    request.session['applied_coupon'] = coupon_code
-                else:
-                    request.session.pop('applied_coupon', None)
+                cart.coupon_applied = True
+                cart.coupon = coupon_code
+                cart.save()
+                
                 return redirect('checkout_page')
         except Exception as e:
             return redirect('checkout_page')
@@ -1375,25 +1373,22 @@ def place_order(request):
                 cart = Cart.objects.get(customer=customer)
                 cart_items = CartProducts.objects.filter(cart=cart)
                 if cart_items:
-                    item_count = 0
-                    subtotal = 0
-                    for items in cart_items:
-                        item_count += 1
-                        if items.product.product_color_image.productoffer.exists():
-                            offer = items.product.product_color_image.productoffer.first()
-                            each_price = offer.offer_price
-                        else:
-                            each_price = items.product.product_color_image.price
-                        subtotal = subtotal + each_price
-                    if subtotal <= 2500:
-                        shipping_charge = 99
-                        total_charge = subtotal + shipping_charge
-                    else:
-                        shipping_charge = 0
-                        total_charge = subtotal
+                    total_charge_discounted = request.POST.get('total_charge_discounted')
+                    print("TOTAL CHARGE DISCOUNTED :", total_charge_discounted)
+                    total_money = request.POST.get('total_charge')
                     
-                    applied_coupon = request.POST.get('applied_coupon')
-                    print(applied_coupon)
+                    if total_charge_discounted is not None:
+                        total_charge = total_charge_discounted
+                    else:
+                        total_charge = total_money
+                    item_count = 0
+                    for item in cart_items:
+                        item_count += 1
+                    
+                    
+                    subtotal = request.POST.get('subtotal')
+                    shipping_charge = request.POST.get('shipping_charge')
+                    
                     address_id = request.POST.get('delivery_address')
                     payment_method = request.POST.get('payment_method')
                     
@@ -1405,6 +1400,7 @@ def place_order(request):
                         try:
                             callback_params = {
                                 'address_id': address_id,
+                                'total_charge' : total_charge,
                             }
                             callback_query_string = urlencode(callback_params)
                             callback_url = request.build_absolute_uri(reverse('razorpay_payment', kwargs={'user_id': user.id})) + '?' + callback_query_string
