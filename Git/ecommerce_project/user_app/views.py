@@ -1192,7 +1192,6 @@ def update_total_price(request):
                         total_price = offer.offer_price * quantity
                     else:
                         total_price = product.product_color_image.price * quantity
-                    print(total_price)
                     return JsonResponse({'total_price': total_price})
                 else:
                     return JsonResponse({'error': f'Only {available_quantity} units available'})
@@ -1255,7 +1254,6 @@ def checkout_page(request):
             total_price = sum(item.total_price for item in cart_items)
             coupon = None
             if cart.coupon_applied:
-                print("Entered inside the cart coupon applied")
                 try:
                     coupon = Coupon.objects.get(coupon_code=cart.coupon)
                 except Coupon.DoesNotExist:
@@ -1309,8 +1307,6 @@ def calculate_discounted_total_charge(cart_items, coupon):
             cart_total_with_offer += offer_price
         else:
             cart_total_without_offer += item.product.product_color_image.price
-    print("Cart Total With Offer :", cart_total_with_offer)
-    print("Cart Total With Offer :", cart_total_without_offer)
     cart_total = cart_total_with_offer + cart_total_without_offer
     
     if coupon:
@@ -1374,13 +1370,44 @@ def place_order(request):
                 cart_items = CartProducts.objects.filter(cart=cart)
                 if cart_items:
                     total_charge_discounted = request.POST.get('total_charge_discounted')
-                    print("TOTAL CHARGE DISCOUNTED :", total_charge_discounted)
                     total_money = request.POST.get('total_charge')
                     
+                    cart_total = 0
+                    cart_total_with_offer = 0
+                    cart_total_without_offer = 0
+                    for item in cart_items:
+                        print('Entered inside the cart items')
+                        if item.product.product_color_image.productoffer.exists():
+                            product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image)
+                            offer_price = product_offer.offer_price
+                            cart_total_with_offer += offer_price
+                        else:
+                            cart_total_without_offer += item.product.product_color_image.price
+                    cart_total = cart_total_with_offer + cart_total_without_offer
+                    
+                    print('Cart total :', cart_total)
+                    
+                    total_charge = 0
                     if total_charge_discounted is not None:
                         total_charge = total_charge_discounted
                     else:
                         total_charge = total_money
+                    
+                    print('Total charge :', total_charge)
+                    
+                    if_coupon_applied = False
+                    coupon_name = None
+                    discount_price = None
+                    if cart.coupon_applied:
+                        coupon = Coupon.objects.get(coupon_code = cart.coupon)
+                        discount_price = int(cart_total) - int(total_charge)
+                        if_coupon_applied = True
+                        coupon_name = cart.coupon
+                        discount_percentage = coupon.discount_percentage
+                        minimum_amount = coupon.minimum_amount
+                        maximum_amount = coupon.maximum_amount
+                    
+                    
                     item_count = 0
                     for item in cart_items:
                         item_count += 1
@@ -1393,14 +1420,16 @@ def place_order(request):
                     payment_method = request.POST.get('payment_method')
                     
                     address = Address.objects.get(pk=address_id)
-
+                    
+                    
+                    print("Coupon : ", coupon_name)
+                    
                     razorpay = None
                     
                     if payment_method == 'Razorpay':
                         try:
                             callback_params = {
                                 'address_id': address_id,
-                                'total_charge' : total_charge,
                             }
                             callback_query_string = urlencode(callback_params)
                             callback_url = request.build_absolute_uri(reverse('razorpay_payment', kwargs={'user_id': user.id})) + '?' + callback_query_string
@@ -1436,16 +1465,26 @@ def place_order(request):
                             number_of_orders=item_count,
                             subtotal=subtotal,
                             shipping_charge=shipping_charge,
-                            total_charge=total_charge
+                            total_charge=total_charge,
+                            coupon_applied = if_coupon_applied,
+                            coupon_name = coupon_name,
+                            coupon_discount_percent = discount_percentage,
+                            discount_price = discount_price,
+                            coupon_minimum_amount = minimum_amount,
+                            coupon_maximum_amount = maximum_amount,
                         )
                         order.save()
                         
                         for item in cart_items:
+                            price_of_each = 0
                             if item.product.product_color_image.productoffer.exists():
-                                offer = item.product.product_color_image.productoffer.first()
+                                offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image)
                                 price_of_each = offer.offer_price
                             else:
+                                print(item.product.product_color_image.price)
                                 price_of_each = item.product.product_color_image.price
+    
+                            print("PRICE OF EACH : ", price_of_each)
                             order_item = OrderItem.objects.create(
                                 order=order,
                                 product=item.product,
@@ -1454,17 +1493,18 @@ def place_order(request):
                                 each_price=price_of_each,
                             )
                             order_item.save()
-                            
+                            print(order_item)
                             product_size_id = item.product.id
                             product_size = ProductSize.objects.get(pk=product_size_id)
                             product_size.quantity -= item.quantity
                             product_size.save()
-                            cart_items.delete()
+                        cart_items.delete()
                             
-                            time.sleep(2)
+                        time.sleep(2)
                             
-                            return render(request, 'order_placed.html', {'order': order})
-                return redirect('index_page')
+                        return render(request, 'order_placed.html', {'order': order})
+                else:
+                    return redirect('index_page')
         except Exception as e:
             logging.error("An error occurred: %s", str(e))
             return redirect('index_page')

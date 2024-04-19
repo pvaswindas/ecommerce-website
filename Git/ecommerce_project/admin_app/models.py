@@ -172,6 +172,12 @@ class Orders(models.Model):
     razorpay_id = models.CharField(max_length=100, blank=True, null = True)
     paid = models.BooleanField(default=False)
     placed_at = models.DateTimeField(default=timezone.now)
+    coupon_applied = models.BooleanField(default=False)
+    coupon_name = models.CharField(blank=True, null=True)
+    coupon_discount_percent = models.PositiveBigIntegerField(blank=True, null=True)
+    discount_price = models.PositiveBigIntegerField(blank=True, null=True)
+    coupon_minimum_amount = models.PositiveBigIntegerField(blank=True, null=True)
+    coupon_maximum_amount = models.PositiveBigIntegerField(blank=True, null=True)
 
     def __str__(self):
         paid_status = "- Paid" if self.paid else ""
