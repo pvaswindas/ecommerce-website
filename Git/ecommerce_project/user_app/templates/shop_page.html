@@ -58,7 +58,7 @@
 
         {% include 'shop_products.html' %}
 
-        {% include 'shop_page/shop_page_navigation.html' %}
+        {% comment %} {% include 'shop_page/shop_page_navigation.html' %} {% endcomment %}
       </div>
       {% include 'shop_page/left_filter_bar.html' %}
     </div>
@@ -70,12 +70,8 @@
   <script src="{% static 'user/assets/js/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'user/assets/js/jquery.hoverIntent.min.js' %}"></script>
   <script src="{% static 'user/assets/js/jquery.waypoints.min.js' %}"></script>
-  <script src="{% static 'user/assets/js/superfish.min.js' %}"></script>
   <script src="{% static 'user/assets/js/owl.carousel.min.js' %}"></script>
-  <script src="{% static 'user/assets/js/wNumb.js' %}"></script>
-  <script src="{% static 'user/assets/js/bootstrap-input-spinner.js' %}"></script>
   <script src="{% static 'user/assets/js/jquery.magnific-popup.min.js' %}"></script>
-  <script src="{% static 'user/assets/js/nouislider.min.js' %}"></script>
   <script>
     $(document).ready(function() {
         $('#sortby').change(function() {

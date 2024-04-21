@@ -2,7 +2,7 @@
   <div class="sidebar sidebar-shop">
     <div class="widget widget-clean">
       <label>Filters:</label>
-      <a href="#" class="sidebar-filter-clear">Clean All</a>
+      <a href="{% url 'clean_all' %}">Clean All</a>
     </div>
 
     <div class="widget widget-collapsible">
@@ -12,15 +12,17 @@
         <div class="widget-body">
           <div class="filter-items filter-items-count">
             {% for category in category_list %}
-                <form method="GET" action="">
-                    <div class="filter-item">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="cat-{{ forloop.counter }}" name="category" value="{{ category.name }}" {% if request.GET.category == category.name %}checked{% endif %} onchange="this.form.submit()" />
-                            <label class="custom-control-label" for="cat-{{ forloop.counter }}">{{ category.name }}</label>
-                        </div>
-                        <span class="item-count">{{ category.product_count }}</span>
-                    </div>
-                </form>
+              <form method="post" action="{% url 'category_wise' %}">
+                  {% csrf_token %}
+                  <div class="filter-item">
+                      <div class="custom-control custom-checkbox">
+                          <input type="checkbox" class="custom-control-input" id="cat-{{ forloop.counter }}" name="category_wise" value="{{ category.name }}" {% if category.name in selected_category %}checked{% endif %} onchange="this.form.submit()" />
+                          <label class="custom-control-label" for="cat-{{ forloop.counter }}">{{ category.name }}</label>
+                      </div>
+                      <span class="item-count">{{ category.product_count }}</span>
+                  </div>
+                  <input type="hidden" name="category_wise" value="{{ category.name }}">
+              </form>
             {% endfor %}
           </div>
         </div>
@@ -53,14 +55,16 @@
         <div class="widget-body">
           <div class="filter-items">
             {% for brand in brand_list %}
-              <form action="" method="get">
-                <div class="filter-item filter-items-count">
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="brand-{{ forloop.counter }}" />
-                    <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
+              <form action="{% url 'brand_wise' %}" method="post">
+                  {% csrf_token %}
+                  <div class="filter-item filter-items-count">
+                      <div class="custom-control custom-checkbox">
+                          <input type="checkbox" class="custom-control-input" name="brand_wise" value="{{ brand.name }}" id="brand-{{ forloop.counter }}" {% if brand.name in selected_brand %}checked{% endif %} onchange="this.form.submit()" />
+                          <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
+                      </div>
+                      <span class="item-count">{{ brand.product_count }}</span>
                   </div>
-                  <span class="item-count">{{ brand.product_count }}</span>
-                </div>
+                  <input type="hidden" name="brand_wise" value="{{ brand.name }}">
               </form>
             {% endfor %}
           </div>

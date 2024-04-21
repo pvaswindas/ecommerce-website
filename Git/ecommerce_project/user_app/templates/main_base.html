@@ -66,6 +66,9 @@
                                       <a class="text-dark fw-medium" href="{% url 'user_dashboard' user.id %}">Account</a>
                                     </li>
                                     <li>
+                                      <a class="text-dark fw-medium" href="{% url 'wallet_page_view' user.id %}">Wallet</a>
+                                    </li>
+                                    <li>
                                       <form action="{% url 'logout' %}" method="post">
                                         {% csrf_token %}
                                         <button class="border-0 bg-white text-dark fw-medium" type="submit">LOGOUT</button>

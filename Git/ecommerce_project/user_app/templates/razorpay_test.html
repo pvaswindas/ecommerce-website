@@ -58,7 +58,13 @@
               <tbody>
                 <tr>
                   <td>Subtotal:</td>
-                  <td>₹ {{ subtotal }}.00</td>
+                  <td>₹ 
+                  {% if cart.coupon_applied %}
+                    {{ total_charge_discounted }}
+                  {% else %}
+                    {{ subtotal }}
+                  {% endif %}
+                    .00</td>
                 </tr>
                 <tr>
                   <td>Shipping:</td>

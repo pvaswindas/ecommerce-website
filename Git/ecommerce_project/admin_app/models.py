@@ -7,6 +7,10 @@ from django.db.models import F
 from django.utils import timezone
 from django.dispatch import receiver
 from django.utils.text import slugify
+from django.db import transaction
+import logging
+logger = logging.getLogger(__name__)
+
 from django.db.models.signals import post_save, post_delete
 
 
@@ -204,7 +208,8 @@ class OrderItem(models.Model):
     cancel_product = models.BooleanField(default=False)
     return_product = models.BooleanField(default=False)
     request_return = models.BooleanField(default=False)
-    delivery_date = models.DateField(null=True)
+    delivery_date = models.DateField(null=True, blank=True)
+    total_price = models.PositiveBigIntegerField(default=0)
     
     
     def __str__(self):
@@ -213,6 +218,7 @@ class OrderItem(models.Model):
         return f"{customer_name}: {self.order.order_id} - {self.order_items_id} - {product_name}"
     
     def save(self, *args, **kwargs):
+        self.total_price = self.each_price * self.quantity
         if not self.order_items_id:
             first_part = 'ODIN'
             random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
@@ -232,39 +238,46 @@ class OrderItem(models.Model):
 
 
 class Wallet(models.Model):
-    user = models.OneToOneField(User, on_delete = models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     balance = models.PositiveBigIntegerField(blank=True, default=0)
-    
-    
+
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.user.email} | Balance : {self.balance}"
 
 
-    
-
-    
-        
 class WalletTransaction(models.Model):
-    wallet = models.ForeignKey(Wallet, on_delete = models.CASCADE)
-    transaction_id = models.CharField(primary_key=True, max_length=12,unique=True)
-    money_deposit = models.PositiveBigIntegerField(blank=True)
-    money_withdrawn = models.PositiveBigIntegerField(blank=True)
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    transaction_id = models.CharField(primary_key=True, max_length=12, unique=True)
+    money_deposit = models.PositiveBigIntegerField(blank=True, default=0)
+    money_withdrawn = models.PositiveBigIntegerField(blank=True, default=0)
     time_of_transaction = models.DateTimeField(auto_now_add=True)
-    
+
     def __str__(self):
         if self.money_deposit:
             money = "+{}".format(self.money_deposit)
         elif self.money_withdrawn:
-            money = "-{}".format(self.money_deposit)
-            
+            money = "-{}".format(self.money_withdrawn)
+
         return f"{self.transaction_id} - {self.wallet.user.first_name} {self.wallet.user.last_name} : {self.time_of_transaction} | {money}"
-    
+
     def save(self, *args, **kwargs):
         if not self.transaction_id:
             first_part = 'TRNSCT'
             random_numbers = ''.join(random.choices(string.digits, k=6))
             self.transaction_id = f"{first_part}{random_numbers}"
-        super.save(*args, **kwargs)
+
+        try:
+            with transaction.atomic():
+                if self.money_deposit or self.money_withdrawn:
+                    wallet = self.wallet
+                    if self.money_deposit:
+                        wallet.balance += self.money_deposit
+                    elif self.money_withdrawn:
+                        wallet.balance -= self.money_withdrawn
+                    wallet.save()
+                super().save(*args, **kwargs)
+        except Exception as e:
+            logger.error(f"Error occurred while saving WalletTransaction: {e}")
 
 
 

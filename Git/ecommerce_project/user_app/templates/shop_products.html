@@ -1,4 +1,5 @@
 {% load static %}
+{% if product_color_list %}
 <div class="products mb-3">
   <div class="row">
     {% for product_color in product_color_list %}
@@ -44,3 +45,7 @@
     {% endfor %}
   </div>
 </div>
+{% else %}
+  <div class="no-products-message text-center">No products available</div>
+{% endif %}
+

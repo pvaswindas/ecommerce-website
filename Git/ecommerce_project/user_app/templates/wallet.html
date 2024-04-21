@@ -41,20 +41,26 @@
         <table class="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
-              <th scope="col">Date</th>
-              <th scope="col">Transaction Id</th>
-              <th scope="col">Amount</th>
+              <th scope="col"><strong>#</strong></th>
+              <th scope="col"><strong>Date</strong></th>
+              <th scope="col"><strong>Transaction Id</strong></th>
+              <th scope="col"><strong>Amount</strong></th>
             </tr>
           </thead>
           <tbody>
-            {% for transaction in wallet.transactions.all %}
-            <tr>
-              <th scope="row">{{ forloop.counter }}</th>
-              <td>{{ transaction.date }}</td>
-              <td>{{ transaction.description }}</td>
-              <td>{{ transaction.amount }}</td>
-            </tr>
+            {% for transaction in wallet_transactions %}
+              <tr>
+                <td class="text-dark-emphasis" scope="row"><strong>{{ forloop.counter }}</strong></td>
+                <td class="text-dark"><strong>{{ transaction.time_of_transaction|date:"D d M Y" }}</strong></td>
+                <td class="text-dark"><strong>{{ transaction.transaction_id }}</strong></td>
+                <td>
+                  {% if transaction.money_deposit > 0 %}
+                    <strong class="text-success">+{{ transaction.money_deposit }}</strong>
+                  {% elif transaction.money_withdrawn > 0 %}
+                    <strong class="text-danger">-{{ transaction.money_withdrawn }}</strong>
+                  {% endif %}
+                </td>
+              </tr>
             {% endfor %}
           </tbody>
         </table>

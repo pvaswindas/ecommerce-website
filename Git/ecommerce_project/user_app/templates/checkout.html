@@ -141,24 +141,45 @@
                       </td>
                       <td>
                         {% if item.product.product_color_image.productoffer.exists %}
-                          ₹{{ item.product.product_color_image.productoffer.first.offer_price }}.00
+                          {% if item.quantity > 1 %}
+                            ₹{{ item.product.product_color_image.productoffer.first.offer_price }}.00 × {{item.quantity}}
+                          {% endif %}
                         {% else %}
-                          ₹{{ item.product.product_color_image.price }}.00
+                          {% if item.quantity > 1 %}
+                            ₹{{ item.product.product_color_image.price }}.00 × {{item.quantity}}
+                          {% endif %}
                         {% endif %}
                       </td>
                     </tr>
                   {% endfor %}
 
+                  {% if cart.coupon_applied %}
+                  <tr class="summary-subtotal">
+                    <td>Discount:</td>
+                    <td>₹ {{ discount_amount }} .00</td>
+                  </tr>
+                  {% endif %}
+
                   <tr class="summary-subtotal">
                     <td>Subtotal:</td>
                     <td>₹
+                      {% if cart.coupon_applied %}
+                        {{ sub_charge }}
+                      {% else %}
                         {{ subtotal }}
+                      {% endif %}
                       .00
                     </td>
                   </tr>
                   <tr>
                     <td>Shipping:</td>
-                    <td>₹ {{ shipping_charge }}.00</td>
+                    <td>₹ 
+                      {% if cart.coupon_applied %}
+                        {{ charge_for_shipping }}
+                      {% else %}
+                        {{ shipping_charge }}
+                      {% endif %}
+                      .00</td>
                   </tr>
                   <tr class="summary-total">
                     <td>Total:</td>

@@ -16,13 +16,26 @@
     <div class="row">
       <div class="col-lg-6">
         <div class="order-details">
-          <h2>Order ID : {{ order_items.order_items_id }}</h2>
+          <h2>Order ITEM ID : {{ order_items.order_items_id }}</h2>
+          <h6>Order ID : {{ order_items.order.order_id }}</h6>
           <p>Order Status : {{ order_items.order_status }}</p>
           <p>Total Quantity : {{ order_items.quantity }}</p>
-          <p>Price : ₹{{ order_items.each_price }}</p>
+          
+          {% if order_items.order.coupon_applied %}
+            <p>Coupon Code : {{ order_items.order.coupon_name }} </p>
+            {% if order_items.order.number_of_orders == 1 %}
+              <p>Price : ₹{{ order_items.order.total_charge }}</p>
+            {% else %}
+              <p>Price : ₹{{ order_items.total_price }}</p>
+            {% endif %}
+          {% else %}
+            <p>Price : ₹{{ order_items.total_price }}</p>
+          {% endif %}
+
           {% if order_items.order.shipping_charge > 0 %}
             <p>Shipping Charge : ₹{{ order_items.order.shipping_charge }}.00</p>
           {% endif %}
+
         </div>
         <div class="order-address">
           <h2>Delivery Address</h2>
@@ -89,6 +102,12 @@
                 <div class="tracking-text">Cancelled</div>
               </div>
             </div>
+            {% if order_items.order.payment.method_name == 'Razorpay' %}
+            <div class="refund-processed text-center">
+              <div class="refund-icon"></div>
+              <div class="refund-text"><strong>Refund Processed Successfully</strong></div>
+            </div>
+            {% endif %}
           {% endif %}
         {% else %}
           <div class="order-status m-5">
@@ -136,21 +155,33 @@
           <div class="table-responsive">
             <table class="order-items-table">
               <thead>
-                <tr>
+                <tr class="text-center">
                   <th>Image</th>
                   <th>Product</th>
                   <th>Quantity</th>
                   <th>Price</th>
+                  {% if order_items.order.coupon_applied %}
+                    {% if order_items.order.number_of_orders == 1 %}
+                      <th>Coupon Discount</th>
+                    {% endif %}
+                  {% endif %}
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>
-                    <img src="{{ order_items.product.product_color_image.main_image.url }}" alt="{{ item.product.product_color_image.products.name }}" />
+                <tr class="text-center">
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center">
+                        <img src="{{ order_items.product.product_color_image.main_image.url }}" alt="{{ item.product.product_color_image.products.name }}" />
+                    </div>
                   </td>
                   <td>{{ order_items.product.product_color_image.products.name }}</td>
                   <td>{{ order_items.quantity }}</td>
-                  <td>₹{{ order_items.each_price }}</td>
+                  <td>₹{{ order_items.total_price }}.00</td>
+                  {% if order_items.order.coupon_applied %}
+                    {% if order_items.order.number_of_orders == 1 %}
+                      <td>₹{{ order_items.order.total_charge }}.00</td>
+                    {% endif %}
+                  {% endif %}
                 </tr>
               </tbody>
             </table>
