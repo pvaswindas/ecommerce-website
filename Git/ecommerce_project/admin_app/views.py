@@ -1,3 +1,4 @@
+import calendar
 from django.shortcuts import render, redirect
 
 from django.contrib.auth.models import User
@@ -16,7 +17,7 @@ from django.views.decorators.cache import never_cache
 import datetime
 import xlsxwriter # type: ignore
 
-
+from django.db.models import Q
 
 from reportlab.lib.pagesizes import letter # type: ignore
 from reportlab.lib import colors # type: ignore
@@ -1290,16 +1291,117 @@ def return_product(request, order_items_id):
     
 # ----------------------------------------------------------------  SALES REPORT PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
     
+
+
+weekly_filter = False
+monthly_filter = False
+yearly_filter = False
+custom_date_filter = False
+
+current_date = timezone.now()
+start_date = current_date - timedelta(days=current_date.weekday())
+end_date = start_date + timedelta(days=6)
+
+now = timezone.now()
+current_year_and_month = now.strftime("%Y-%m")
+first_day_of_month = None
+last_day_of_month = None
+
+current_year = now.strftime("%Y")
+custom_start_date = None
+custom_end_date = None
+
+@never_cache
+def sales_report_filtering(request):
+    if request.user.is_superuser:
+        global weekly_filter, monthly_filter, yearly_filter, custom_date_filter, current_year_and_month, current_year, custom_start_date, custom_end_date, first_day_of_month, last_day_of_month
+        if request.method == 'POST':
+            filter = request.POST.get('filter')
+            
+            if filter == "weekly":
+                weekly_filter = True
+                
+                monthly_filter = False
+                yearly_filter = False
+                custom_date_filter = False
+                
+            elif filter == 'monthly':
+                monthly_filter = True
+                
+                weekly_filter = False
+                yearly_filter = False
+                custom_date_filter = False
+                
+                current_year_and_month = request.POST.get('year_month')
+                year, month = map(int, current_year_and_month.split('-'))
+                
+                first_day_of_month = timezone.datetime(year, month, 1).replace(hour=0, minute=0, second=0, microsecond=0)
+                last_day_of_month = timezone.datetime(year, month, calendar.monthrange(year, month)[1], 23, 59, 59, 999999)
+                
+            elif filter == 'yearly':
+                yearly_filter = True
+                
+                weekly_filter = False
+                monthly_filter = False
+                custom_date_filter = False
+                
+                current_year = request.POST.get('year')
+            elif filter == 'custom':
+                custom_date_filter = True
+                
+                weekly_filter = False
+                weekly_filter = False
+                monthly_filter = False
+                
+                
+                custom_start_date = request.POST.get('start_date')
+                custom_end_date = request.POST.get('end_date')
+                
+            return redirect('sales_report_page')
+    else:
+        return redirect('admin_login_page')
+                
+                
+                
+
     
 
 @never_cache
 def sales_report_page(request):
     if request.user.is_superuser:
-        sales_data = OrderItem.objects.filter(cancel_product=False, return_product = False, order_status = 'Delivered')
+        global weekly_filter, monthly_filter, yearly_filter, custom_date_filter, current_year_and_month, current_year, custom_start_date, custom_end_date, first_day_of_month, last_day_of_month
+
+        
+        today = timezone.now().date()
+        
+        sales_data = OrderItem.objects.filter(
+            Q(cancel_product=False) & 
+            Q(return_product=False) & 
+            Q(order_status='Delivered') & 
+            Q(order__placed_at__date = today)
+        )
+        
+        if weekly_filter:
+            sales_data = OrderItem.objects.filter(
+                Q(cancel_product=False) & 
+                Q(return_product=False) & 
+                Q(order_status='Delivered') & 
+                Q(order__placed_at__range=(start_date, end_date))
+            )
+            
+        if monthly_filter:
+            sales_data = OrderItem.objects.filter(
+                Q(cancel_product=False) & 
+                Q(return_product=False) & 
+                Q(order_status='Delivered') & 
+                Q(order__placed_at__range=(first_day_of_month, last_day_of_month))
+            )
+            
         
         overall_sales_count = sales_data.count()
-        overall_order_amount = sales_data.aggregate(total_amount=Sum('total_price'))['total_amount']
-        overall_discount = sales_data.aggregate(total_discount=Sum('order__discount_price'))['total_discount']
+        overall_order_amount = sales_data.aggregate(total_amount=Sum('total_price'))['total_amount'] if sales_data else 0
+        overall_discount = sales_data.aggregate(total_discount=Sum('order__discount_price'))['total_discount'] if sales_data else 0
+        
         
         context = {
             'sales_data': sales_data,
