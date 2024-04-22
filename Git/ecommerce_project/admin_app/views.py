@@ -16,6 +16,16 @@ from django.views.decorators.cache import never_cache
 import datetime
 import xlsxwriter # type: ignore
 
+
+
+from reportlab.lib.pagesizes import letter # type: ignore
+from reportlab.lib import colors # type: ignore
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle # type: ignore
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle # type: ignore
+from reportlab.lib.units import inch # type: ignore
+from reportlab.platypus import Paragraph, Spacer # type: ignore
+
+
 from reportlab.platypus import Paragraph # type: ignore
 from reportlab.lib.styles import getSampleStyleSheet # type: ignore
 
@@ -1285,7 +1295,7 @@ def return_product(request, order_items_id):
 @never_cache
 def sales_report_page(request):
     if request.user.is_superuser:
-        sales_data = OrderItem.objects.filter(cancel_product=False)
+        sales_data = OrderItem.objects.filter(cancel_product=False, return_product = False, order_status = 'Delivered')
         
         overall_sales_count = sales_data.count()
         overall_order_amount = sales_data.aggregate(total_amount=Sum('total_price'))['total_amount']
@@ -1302,21 +1312,36 @@ def sales_report_page(request):
         if request.method == 'POST':
             if 'sales_report' in request.POST and request.POST['sales_report'] == 'pdf':
                 buffer = BytesIO()
-                report = canvas.Canvas(buffer, pagesize=letter)
+
+
+                doc = SimpleDocTemplate(buffer, pagesize=letter)
+
                 
-                report.setFont("Helvetica-Bold", 16)
-                report.drawString(50, 750, "Sales Report")
+                styles = getSampleStyleSheet()
+                centered_style = ParagraphStyle(name='Centered', parent=styles['Heading1'], alignment=1)
+
                 
-                column_headings = ["Product", "Quantity", "Price", "Total Price", "Date"]
-                data = [column_headings]
+                today_date = datetime.datetime.now().strftime("%Y-%m-%d")
+
                 
+                content = []
+
+                
+                company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {today_date}"
+                content.append(Paragraph(company_details, styles['Normal']))
+                content.append(Spacer(1, 0.5 * inch))
+
+                content.append(Paragraph("<b>Sales Report</b>", centered_style))
+                content.append(Spacer(1, 0.5 * inch))
+
+                data = [["Product", "Quantity", "Price", "Total Price", "Date"]]
                 for sale in sales_data:
                     formatted_date = sale.order.placed_at.strftime("%a, %d %b %Y")
                     data.append([sale.product, sale.quantity, sale.each_price, sale.total_price, formatted_date])
-                
+
                 table = Table(data, repeatRows=1)
-                style = TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+                table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
                     ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
                     ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                     ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
@@ -1324,21 +1349,28 @@ def sales_report_page(request):
                     ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                     ('BACKGROUND', (0, 1), (-1, -1), colors.white),
                     ('GRID', (0, 0), (-1, -1), 1, colors.black)
-                ])
-                table.setStyle(style)
+                ]))
+
+                content.append(table)
+
+                content.append(Spacer(1, 0.5 * inch))
+
+                overall_sales_count_text = f"<b>Overall Sales Count:</b> {overall_sales_count}"
+                overall_order_amount_text = f"<b>Overall Order Amount:</b> {overall_order_amount}"
+                overall_discount_amount_text = f"<b>Overall Discount:</b> {overall_discount}"
                 
-                table_width, table_height = table.wrap(0, 0)
-                x = (report._pagesize[0] - table_width) / 2
-                
-                table.wrapOn(report, 600, 200)
-                table.drawOn(report, x, 500)
+                content.append(Paragraph(overall_sales_count_text, styles['Normal']))
+                content.append(Paragraph(overall_order_amount_text, styles['Normal']))
+                content.append(Paragraph(overall_discount_amount_text, styles['Normal']))
+
+                doc.build(content)
+
                 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-                file_name = f"Sales Report {current_time}.pdf"
-                report.save()
-                
+                file_name = f"Sales_Report_{current_time}.pdf"
+
                 response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
                 response['Content-Disposition'] = f'attachment; filename="{file_name}"'
-                
+
                 return response
             
             
@@ -1390,9 +1422,6 @@ def sales_report_page(request):
                 response['Content-Disposition'] = f'attachment; filename="{file_name}"'
                 
                 return response
-
-
-
 
         
         return render(request, 'admin_sales_report.html', context)
