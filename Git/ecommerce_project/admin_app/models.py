@@ -85,7 +85,7 @@ class ProductSize(models.Model):
     in_stock = models.BooleanField(default=True)
     
     def __str__(self):
-        return f"Size : {self.size} - {self.product_color_image.products.name}, {self.product_color_image.color}"
+        return f"{self.product_color_image.products.name} ({self.product_color_image.color}) : Size {self.size}"
 
     def save(self, *args, **kwargs):
         if int(self.quantity) <= 0:
@@ -179,7 +179,7 @@ class Orders(models.Model):
     coupon_applied = models.BooleanField(default=False)
     coupon_name = models.CharField(blank=True, null=True)
     coupon_discount_percent = models.PositiveBigIntegerField(blank=True, null=True)
-    discount_price = models.PositiveBigIntegerField(blank=True, null=True)
+    discount_price = models.PositiveBigIntegerField(blank=True, default=0)
     coupon_minimum_amount = models.PositiveBigIntegerField(blank=True, null=True)
     coupon_maximum_amount = models.PositiveBigIntegerField(blank=True, null=True)
 

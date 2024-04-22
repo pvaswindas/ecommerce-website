@@ -1,0 +1,78 @@
+{% extends 'admin_base.html' %}
+
+{% load static %}
+
+{% block custom_css %}
+    <link rel="shortcut icon" href="{% static 'images/Sneakerheads.png' %}" />
+{% endblock  %}
+
+{% block content %}
+<div class="row">
+    <div class="container sales-report-container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="sales-report-section">
+            <h2>Sales Report</h2>
+            <form method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary btn-update rounded-1">Update Report</button>
+            </form>
+
+            <table class="table sales-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Discount Deduction</th>
+                  <th>Total Amount</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sale in sales_data %}
+                  <tr>
+                    <td>{{ sale.product }}</td>
+                    <td>{{ sale.quantity }}</td>
+                    <td>{{ sale.each_price }}</td>
+                    <td>
+                        {% if sale.order.discount_price > 0 %}
+                            {{ sale.order.discount_price }}
+                        {% else %}
+                            None
+                        {% endif %}
+                    </td>
+                    <td>{{ sale.total_price }}</td>
+                    <td>{{ sale.order.placed_at|date:"D, d M Y" }}</td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="8" class="no-data">No sales data available.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <h5>Overall Sales Count : {{ overall_sales_count }} </h5>
+            <h5>Overall Order Amount : {{ overall_order_amount }} </h5>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="download-report-section">
+            <h2 class="mt-5 mb-3">Download Report</h2>
+            <form method="post" action="{% url 'sales_report_page' %}">
+              {% csrf_token %}
+              <label for="sales_report">Format:</label>
+              <select name="sales_report" id="sales_report" class="form-control w-25">
+                <option value="pdf">PDF</option>
+                <option value="excel">Excel</option>
+              </select>
+              <button type="submit" class="btn btn-success rounded rounded-1 my-3">Download Report</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

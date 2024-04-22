@@ -1,11 +1,17 @@
 {
     "cSpell.words": [
         "allauth",
+        "BOTTOMPADDING",
         "ecommerce",
+        "FONTNAME",
         "globalstatic",
+        "officedocument",
+        "openxmlformats",
+        "pagesizes",
         "paise",
         "paymentfail",
         "paymentsuccess",
+        "pdfgen",
         "Pincode",
         "productoffer",
         "productsize",
@@ -14,8 +20,13 @@
         "SNKH",
         "SNKHS",
         "socialaccount",
+        "spreadsheetml",
+        "TEXTCOLOR",
+        "TOPPADDING",
         "TRNSCT",
         "updation",
-        "XHVC"
+        "whitesmoke",
+        "XHVC",
+        "xlsxwriter"
     ]
 }

@@ -1203,6 +1203,9 @@ def cancel_order(request, order_items_id):
             order_item.cancel_product = True
             order_item.order_status = 'Cancelled'
             order_item.save()
+            
+            time.sleep(2)
+            
             return redirect('order_detail', order_items_id)
         except Exception as e:
             return redirect(index_page)
@@ -1550,7 +1553,7 @@ def place_order(request):
                     
                     if_coupon_applied = False
                     coupon_name = None
-                    discount_price = None
+                    discount_price = 0
                     discount_percentage = None
                     minimum_amount = None
                     maximum_amount = None
@@ -1713,7 +1716,7 @@ def razorpay_payment(request, user_id):
             total_charge = subtotal
             if_coupon_applied = False
             coupon_name = None
-            discount_price = None
+            discount_price = 0
             discount_percentage = None
             minimum_amount = None
             maximum_amount = None

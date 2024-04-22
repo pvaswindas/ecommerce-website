@@ -76,6 +76,14 @@
       </div>
     </li>
 
+    <li class="nav-item {% if is_active_sales %}active{% endif %}">
+      <a class="nav-link" href="{% url 'sales_report_page' %}">
+        <i class="bi bi-grid-fill"></i>
+        <span class="menu-title px-3">Sales Report</span>
+      </a>
+    </li>
+    
+
     <li class="nav-item {% if is_active_product_offer %}active{% endif %} ">
       <a class="nav-link" data-toggle="collapse" href="#offers" aria-expanded="false" aria-controls="offers">
         <i class="bi bi-receipt"></i>

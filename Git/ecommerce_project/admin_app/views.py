@@ -13,6 +13,20 @@ from django.utils.timezone import make_aware
 from django.contrib.auth.decorators import login_required 
 from django.views.decorators.cache import never_cache
 
+import datetime
+import xlsxwriter # type: ignore
+
+from reportlab.platypus import Paragraph # type: ignore
+from reportlab.lib.styles import getSampleStyleSheet # type: ignore
+
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from reportlab.pdfgen import canvas # type: ignore
+from reportlab.lib.pagesizes import letter # type: ignore
+from reportlab.lib import colors # type: ignore
+from reportlab.platypus import Table, TableStyle # type: ignore
+from io import BytesIO
+
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.db.models import Sum
@@ -31,6 +45,7 @@ is_active_order = True
 is_active_product_offer = True
 is_active_coupon = True
 is_active_banner = True
+is_active_sales  = True
 
 
 five_days_ago = timezone.now() - timedelta(days=5)
@@ -143,10 +158,6 @@ def admin_check_login(request):
 def admin_dashboard(request):
     if request.user.is_superuser:
         context = {}
-        
-        sales_data = OrderItem.objects.all() 
-        
-        context['sales_data'] = sales_data
         
         collect_data = get_data(request)
         context.update({**collect_data, 'is_active_dashboard': is_active_dashboard})
@@ -1261,6 +1272,136 @@ def return_product(request, order_items_id):
     else:
         return redirect(admin_login_page)
     
+    
+    
+    
+    
+    
+    
+# ----------------------------------------------------------------  SALES REPORT PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+    
+    
+
+@never_cache
+def sales_report_page(request):
+    if request.user.is_superuser:
+        sales_data = OrderItem.objects.filter(cancel_product=False)
+        
+        overall_sales_count = sales_data.count()
+        overall_order_amount = sales_data.aggregate(total_amount=Sum('total_price'))['total_amount']
+        overall_discount = sales_data.aggregate(total_discount=Sum('order__discount_price'))['total_discount']
+        
+        context = {
+            'sales_data': sales_data,
+            'is_active_sales': is_active_sales,
+            'overall_sales_count': overall_sales_count,
+            'overall_order_amount': overall_order_amount,
+            'overall_discount': overall_discount,
+        }
+        
+        if request.method == 'POST':
+            if 'sales_report' in request.POST and request.POST['sales_report'] == 'pdf':
+                buffer = BytesIO()
+                report = canvas.Canvas(buffer, pagesize=letter)
+                
+                report.setFont("Helvetica-Bold", 16)
+                report.drawString(50, 750, "Sales Report")
+                
+                column_headings = ["Product", "Quantity", "Price", "Total Price", "Date"]
+                data = [column_headings]
+                
+                for sale in sales_data:
+                    formatted_date = sale.order.placed_at.strftime("%a, %d %b %Y")
+                    data.append([sale.product, sale.quantity, sale.each_price, sale.total_price, formatted_date])
+                
+                table = Table(data, repeatRows=1)
+                style = TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('TOPPADDING', (0, 0), (-1, 0), 12),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                ])
+                table.setStyle(style)
+                
+                table_width, table_height = table.wrap(0, 0)
+                x = (report._pagesize[0] - table_width) / 2
+                
+                table.wrapOn(report, 600, 200)
+                table.drawOn(report, x, 500)
+                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                file_name = f"Sales Report {current_time}.pdf"
+                report.save()
+                
+                response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                
+                return response
+            
+            
+            elif 'sales_report' in request.POST and request.POST['sales_report'] == 'excel':
+                output = BytesIO()
+                workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+                worksheet = workbook.add_worksheet('Sales Report')
+                
+                headings = ["Product", "Color", "Quantity", "Price", "Total Price", "Date", "Size"]
+                for col, heading in enumerate(headings):
+                    worksheet.write(0, col, heading)
+                
+                for row, sale in enumerate(sales_data, start=1):
+                    formatted_date = sale.order.placed_at.strftime("%a, %d %b %Y")
+                    color = sale.product.product_color_image.color
+                    size = sale.product.size
+                    
+                    worksheet.write(row, 0, sale.product.product_color_image.products.name)
+                    worksheet.write(row, 1, color)
+                    worksheet.write(row, 2, sale.quantity)
+                    worksheet.write(row, 3, sale.each_price)
+                    worksheet.write(row, 4, sale.total_price)
+                    worksheet.write(row, 5, formatted_date)
+                    worksheet.write(row, 6, size)
+                
+                overall_row = len(sales_data) + 2
+                worksheet.write(overall_row, 0, "Overall Sales Count:")
+                worksheet.write(overall_row, 1, overall_sales_count)
+                worksheet.write(overall_row + 1, 0, "Overall Order Amount:")
+                worksheet.write(overall_row + 1, 1, overall_order_amount)
+                worksheet.write(overall_row + 2, 0, "Overall Discount:")
+                worksheet.write(overall_row + 2, 1, overall_discount)
+                
+                for i, heading in enumerate(headings):
+                    max_length = max([len(str(getattr(row, heading.lower(), ""))) for row in sales_data] + [len(heading)])
+                    worksheet.set_column(i, i, max_length + 2)
+                
+                date_width = max([len(sale.order.placed_at.strftime("%a, %d %b %Y")) for sale in sales_data])
+                worksheet.set_column(5, 5, date_width + 2)
+                color_width = max([len(color) for color in [sale.product.product_color_image.color for sale in sales_data]])
+                worksheet.set_column(1, 1, color_width + 2)
+                
+                workbook.close()
+                
+                output.seek(0)
+                response = HttpResponse(output.getvalue(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                file_name = f"Sales Report {current_time}.xlsx"
+                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                
+                return response
+
+
+
+
+        
+        return render(request, 'admin_sales_report.html', context)
+    else:
+        return redirect('admin_login_page')
+
+
+        
+        
     
     
 # ---------------------------------------------------------------- PRODUCT OFFER MODULE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------

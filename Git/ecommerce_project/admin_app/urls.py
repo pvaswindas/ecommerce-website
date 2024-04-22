@@ -84,6 +84,9 @@ urlpatterns = [
     path('sneakerheads/admin/order/return_product<str:order_items_id>/', return_product, name='return_product'),
     
     
+    path('sneakerheads/admin/sales-report-page', sales_report_page, name='sales_report_page'),
+    
+    
     
     path('sneakerheads/admin/offer/product_offer_module_view/', product_offer_module_view, name='product_offer_module_view'),
     path('sneakerheads/admin/offer/product_offer_edit_page/<int:product_offer_id>/', product_offer_edit_page, name='product_offer_edit_page'),
