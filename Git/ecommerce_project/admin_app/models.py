@@ -215,10 +215,11 @@ class OrderItem(models.Model):
     def __str__(self):
         customer_name = f"{self.order.customer.user.first_name} {self.order.customer.user.last_name}"
         product_name = self.product.product_color_image.products.name
-        return f"{customer_name}: {self.order.order_id} - {self.order_items_id} - {product_name}"
+        return f"{customer_name}: {self.order.order_id} - {self.order_items_id} - {product_name} | {self.total_price}"
     
     def save(self, *args, **kwargs):
-        self.total_price = self.each_price * self.quantity
+        if not self.total_price:
+            self.total_price = self.each_price * self.quantity
         if not self.order_items_id:
             first_part = 'ODIN'
             random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
@@ -247,6 +248,7 @@ class Wallet(models.Model):
 
 class WalletTransaction(models.Model):
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, blank=True, null=True)
     transaction_id = models.CharField(primary_key=True, max_length=12, unique=True)
     money_deposit = models.PositiveBigIntegerField(blank=True, default=0)
     money_withdrawn = models.PositiveBigIntegerField(blank=True, default=0)
@@ -258,26 +260,14 @@ class WalletTransaction(models.Model):
         elif self.money_withdrawn:
             money = "-{}".format(self.money_withdrawn)
 
-        return f"{self.transaction_id} - {self.wallet.user.first_name} {self.wallet.user.last_name} : {self.time_of_transaction} | {money}"
+        return f"{self.transaction_id} | {self.order_item} - {self.wallet.user.first_name} {self.wallet.user.last_name} : {self.time_of_transaction} | {money}"
 
     def save(self, *args, **kwargs):
         if not self.transaction_id:
             first_part = 'TRNSCT'
             random_numbers = ''.join(random.choices(string.digits, k=6))
             self.transaction_id = f"{first_part}{random_numbers}"
-
-        try:
-            with transaction.atomic():
-                if self.money_deposit or self.money_withdrawn:
-                    wallet = self.wallet
-                    if self.money_deposit:
-                        wallet.balance += self.money_deposit
-                    elif self.money_withdrawn:
-                        wallet.balance -= self.money_withdrawn
-                    wallet.save()
-                super().save(*args, **kwargs)
-        except Exception as e:
-            logger.error(f"Error occurred while saving WalletTransaction: {e}")
+        super().save(*args, **kwargs)
 
 
 

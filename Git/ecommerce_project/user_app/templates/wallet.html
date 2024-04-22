@@ -41,7 +41,6 @@
         <table class="table">
           <thead>
             <tr>
-              <th scope="col"><strong>#</strong></th>
               <th scope="col"><strong>Date</strong></th>
               <th scope="col"><strong>Transaction Id</strong></th>
               <th scope="col"><strong>Amount</strong></th>
@@ -50,7 +49,6 @@
           <tbody>
             {% for transaction in wallet_transactions %}
               <tr>
-                <td class="text-dark-emphasis" scope="row"><strong>{{ forloop.counter }}</strong></td>
                 <td class="text-dark"><strong>{{ transaction.time_of_transaction|date:"D d M Y" }}</strong></td>
                 <td class="text-dark"><strong>{{ transaction.transaction_id }}</strong></td>
                 <td>

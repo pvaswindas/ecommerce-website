@@ -103,10 +103,28 @@
               </div>
             </div>
             {% if order_items.order.payment.method_name == 'Razorpay' %}
-            <div class="refund-processed text-center">
-              <div class="refund-icon"></div>
-              <div class="refund-text"><strong>Refund Processed Successfully</strong></div>
-            </div>
+              <div class="card refund-card">
+                  <div class="card-body">
+                      <div class="refund-icon w-25">
+                        <img class="img-fluid w-25 py-3" src="{% static 'user/images/payment_logo/cash-back.png' %}" alt="Refund Icon">
+                      </div>
+                      <div class="refund-text fs-3">
+                          <h4 class="py-2">Refund Processed Successfully</h4>
+                          <strong>Refund Details</strong>
+                          <div class="refund-details">
+                              <p>
+                                  <strong>Transaction ID :</strong> {{ wallet_transaction.transaction_id }}
+                              </p>
+                              <p>
+                                  <strong>Refund Amount :</strong> ₹{{ wallet_transaction.money_deposit }}.00
+                              </p>
+                              <p>
+                                  <strong>Refund Date :</strong> {{ wallet_transaction.time_of_transaction|date:"D, d M Y" }}
+                              </p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
             {% endif %}
           {% endif %}
         {% else %}

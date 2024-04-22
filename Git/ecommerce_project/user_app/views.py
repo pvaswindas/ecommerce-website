@@ -881,7 +881,7 @@ def wallet_page_view(request, user_id):
             user = request.user
             if user.id == user_id:
                 wallet = Wallet.objects.get(user=user)
-                wallet_transactions = WalletTransaction.objects.filter(wallet = wallet)
+                wallet_transactions = WalletTransaction.objects.filter(wallet = wallet).order_by('-time_of_transaction')
                 cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
                 context.update(cart_wishlist_address_order_data)
                 context.update({
@@ -1076,7 +1076,12 @@ def order_detail(request, order_id):
                 delivery = True
             if order_items.order_status == 'Delivered':
                 delivered = True
-            
+            user = request.user
+            wallet = Wallet.objects.get(user = user)
+            if order_items.cancel_product == True:
+                wallet_transaction = WalletTransaction.objects.get(wallet = wallet, order_item = order_items)
+            else:
+                wallet_transaction = None    
             context = {
                 'return_end_date_only_date' : return_end_date_only_date,
                 'can_return_product' : can_return_product,
@@ -1085,6 +1090,8 @@ def order_detail(request, order_id):
                 'shipped' : shipped,
                 'delivery' : delivery,
                 'delivered' : delivered,
+                'wallet' : wallet,
+                'wallet_transaction' : wallet_transaction,
             }
             return render(request, 'dashboard/orders/order_detailed_page.html', context)
         except Exception as e:
@@ -1104,29 +1111,98 @@ def order_detail(request, order_id):
 def cancel_order(request, order_items_id):
     if request.user.is_authenticated:
         try:
-            order_items = OrderItem.objects.get(pk = order_items_id)
-            order = order_items.order
+            order_item = OrderItem.objects.get(pk = order_items_id)
+            product_size = order_item.product
+            order = order_item.order
+            user = request.user
+            wallet = Wallet.objects.get(user = user)
+            
             if order.payment.method_name == "Razorpay":
                 refund_money = 0
+                other_item_price = 0
+                sum_of_all_other = 0
                 if order.number_of_orders > 1:
-                    print('Entered inside more than 1')
-                    if order_items.order.coupon_applied:
+                    if order_item.order.coupon_applied:
                         minimum_amount = order.coupon_minimum_amount
                         maximum_amount = order.coupon_maximum_amount
+                        item_price = order_item.total_price
+                        discount_price = round((item_price * order.coupon_discount_percent) / 100)
+                        coupon_applied_price = item_price - discount_price
+                        total_after_reducing = order.total_charge - coupon_applied_price
                         
+                        
+                        other_order_items = OrderItem.objects.filter(order=order).exclude(pk=order_items_id)
+                        
+                        if minimum_amount <= total_after_reducing <= maximum_amount:
+                            for item in other_order_items:
+                                other_item_price = item.total_price
+                                discount_for_other_item = round((other_item_price * order.coupon_discount_percent) / 100)
+                                other_item_coupon_applied_price = other_item_price - discount_for_other_item
+                                
+                                item.total_price = other_item_coupon_applied_price
+                                item.save()
+                                
+                            order.total_charge = total_after_reducing
+                            order.save()
+                            refund_money = coupon_applied_price
+                            wallet_transaction = WalletTransaction.objects.create(
+                                wallet = wallet,
+                                order_item = order_item,
+                                money_deposit = refund_money
+                            )
+                            wallet_transaction.save()
+                            
+                        else:
+                            order_total = order.total_charge
+                            for item in other_order_items:
+                                other_item_price = item.each_price * item.quantity
+                                sum_of_all_other += other_item_price
+                                item.total_price = other_item_price
+                                item.save()
+                                
+                            refund_money = order_total - sum_of_all_other
+                            
+                            wallet_transaction = WalletTransaction.objects.create(
+                                wallet = wallet,
+                                order_item = order_item,
+                                money_deposit = refund_money
+                            )
+                            wallet_transaction.save()
+                            
+                            order.total_charge = sum_of_all_other
+                            order.coupon_applied = False
+                            order.coupon_name = None
+                            order.discount_price = None
+                            order.coupon_discount_percent = None
+                            order.coupon_minimum_amount = None
+                            order.coupon_maximum_amount = None
+                            order.save()
+                    else:
+                        item_price = order_item.total_price
+                        refund_money = item_price
+                        wallet_transaction = WalletTransaction.objects.create(
+                            wallet = wallet,
+                            order_item = order_item,
+                            money_deposit = refund_money,
+                        )
+                        wallet_transaction.save()  
                 else:
-                    user = request.user
                     refund_money = order.total_charge
-                    wallet = Wallet.objects.get(user = user)
                     wallet_transaction = WalletTransaction.objects.create(
                         wallet=wallet,
+                        order_item = order_item,
                         money_deposit=refund_money,
                     )
                     wallet_transaction.save()
-                    
-            order_items.cancel_product = True
-            order_items.order_status = 'Cancelled'
-            order_items.save()
+            new_wallet_balance = wallet.balance + refund_money
+            wallet.balance = new_wallet_balance   
+            wallet.save()
+        
+            product_size.quantity += order_item.quantity
+            product_size.save()        
+            order_item.cancel_product = True
+            order_item.order_status = 'Cancelled'
+            order_item.save()
             return redirect('order_detail', order_items_id)
         except Exception as e:
             return redirect(index_page)
@@ -1333,9 +1409,15 @@ def checkout_page(request):
                 charge_for_shipping = 99
                 total_charge_discounted = total_charge_discounted + charge_for_shipping
             
+            orders_with_coupon = Orders.objects.filter(customer = customer, coupon_applied = True)
             
+            used_coupons = orders_with_coupon.values_list('coupon_name', flat=True)
 
-            available_coupons = Coupon.objects.filter(Q(minimum_amount__lte = total_price) & Q(maximum_amount__gte = total_price))
+            available_coupons = Coupon.objects.filter(
+                Q(minimum_amount__lte = total_price) & 
+                Q(maximum_amount__gte = total_price) &
+                ~Q(coupon_code__in = used_coupons)
+                )
             context = {
                 'coupon' : coupon,
                 'available_coupons': available_coupons,

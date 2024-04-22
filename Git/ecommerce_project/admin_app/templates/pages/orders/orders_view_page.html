@@ -25,9 +25,9 @@
         <tr>
           <th class="customer-column">Customer</th>
           <th class="order-id-column">Order ID</th>
+          <th class="order-product">Product</th>
           <th class="status-column">Status</th>
           <th class="price-column">Price</th>
-          <th class="quantity-column">Quantity</th>
           <th class="size-column">Size</th>
         </tr>
       </thead>
@@ -47,9 +47,9 @@
                 {% endif %}
               {% endif %}
             </td>
+            <td>{{ item.product}}</td>
             <td>{{ item.order_status }}</td>
-            <td>{{ item.each_price }}</td>
-            <td>{{ item.quantity }}</td>
+            <td>{{ item.total_price }}</td>
             <td>{{ item.product.size }}</td>
           </tr>
         {% endfor %}
