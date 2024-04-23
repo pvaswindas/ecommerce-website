@@ -120,6 +120,10 @@
 
               <form method="post" action="{% url 'sales_report_page' %}">
                 {% csrf_token %}
+                <input type="hidden" name="sales_data_json" value="{{ sales_data_json }}">
+                <input type="hidden" name="overall_sales_count" value="{{ overall_sales_count }}">
+                <input type="hidden" name="overall_order_amount" value="{{ overall_order_amount }}">
+                <input type="hidden" name="overall_discount" value="{{ overall_discount }}">
                 <label for="sales_report">Format:</label>
                 <select name="sales_report" id="sales_report" class="form-control w-25">
                   <option value="pdf">PDF</option>

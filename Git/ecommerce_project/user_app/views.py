@@ -422,7 +422,7 @@ def verify_email(request):
                 messages.error(request, 'User does not exist. Please try with a correct email.')
                 return redirect(forgot_password_page)
     else:
-        return redirect('sign_in')
+        return redirect('sign_in_page')
                 
 
 # ---------------------------------------------------------------------------------- CC_USER_LOGOUT PASSWORD FUNCTIONS ----------------------------------------------------------------------------------
@@ -439,7 +439,7 @@ def logout(request):
     
     
     else:
-        return redirect('sign_in')
+        return redirect('sign_in_page')
     
 
 
@@ -1097,7 +1097,7 @@ def order_detail(request, order_id):
         except Exception as e:
             return redirect(index_page)
     else:
-        return render(sign_in)
+        return redirect(sign_in)
 
 
 
@@ -1497,7 +1497,7 @@ def apply_coupon(request):
         except Exception as e:
             return redirect('checkout_page')
     else:
-        return redirect('sign_in')
+        return redirect('sign_in_page')
 
     
             
@@ -1670,7 +1670,7 @@ def place_order(request):
                 else:
                     return redirect('index_page')
     else:
-        return redirect('sign_in')
+        return redirect('sign_in_page')
 
                 
                 

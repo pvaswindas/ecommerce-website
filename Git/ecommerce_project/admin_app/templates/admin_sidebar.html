@@ -85,12 +85,12 @@
     
 
     <li class="nav-item {% if is_active_product_offer %}active{% endif %} ">
-      <a class="nav-link" data-toggle="collapse" href="#offers" aria-expanded="false" aria-controls="offers">
+      <a class="nav-link" data-toggle="collapse" href="#offer_module" aria-expanded="false" aria-controls="offer_module">
         <i class="bi bi-receipt"></i>
         <span class="menu-title px-3">Offers</span>
         <i class="menu-arrow"></i>
       </a>
-      <div class="collapse" id="offers">
+      <div class="collapse" id="offer_module">
         <ul class="nav flex-column sub-menu">
           <li class="nav-item">
             <a class="nav-link" href="{% url 'product_offer_module_view' %}">Product Offers</a>

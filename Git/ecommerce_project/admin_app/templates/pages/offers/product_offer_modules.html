@@ -33,7 +33,7 @@
         {% for offer in product_offer %}
           <tr>
             <td>
-              <a href="{% url 'product_offer_edit_page' offer.id %}">{{ offer.product_color_image.products.name }}</a>
+              <a href="{% url 'product_offer_edit_page' offer.id %}">{{ offer.product_color_image.products.name }} ({{ offer.product_color_image.color }})</a>
             </td>
             <td>{{ offer.discount_percentage }}%</td>
             <td>{{ offer.start_date }}</td>

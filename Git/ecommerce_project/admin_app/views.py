@@ -609,7 +609,7 @@ def edit_product_update(request, p_id):
             messages.success(request, 'Product Updated successfully!')
             return redirect(list_product_page)
     else:
-        return redirect(admin_login_page)
+        return redirect('admin_login_page')
 
             
 
@@ -1586,39 +1586,70 @@ def product_offer_update(request, product_offer_id):
             product_offer = ProductOffer.objects.get(pk=product_offer_id)
             
             if request.method == 'POST':
-                product_color_image_id = request.POST.get('offer_name')
-                discount_percentage = request.POST.get('offer_discount')
-                start_date = request.POST.get('offer_start_date')
-                end_date = request.POST.get('offer_end_date')
+                discount_percentage_str = request.POST.get('offer_discount')
+                start_date_str = request.POST.get('offer_start_date')
+                end_date_str = request.POST.get('offer_end_date')
                 
-                product_color_image = ProductColorImage.objects.get(pk=product_color_image_id)
+                valid_product = True
+                valid_discount_percentage = True
+                valid_start_date = True
+                valid_end_date = True
                 
-                start_date = make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
-                end_date = make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
                 
-                if end_date > start_date:
-                    product_offer.product_color_image = product_color_image
-                    product_offer.discount_percentage = int(float(discount_percentage))
-                    product_offer.start_date = start_date
-                    product_offer.end_date = end_date
-                    product_offer.save()
+                today = timezone.now().date()
+                offer_start_date = product_offer.start_date
+                
+                
+                if discount_percentage_str and start_date_str and end_date_str:
+                    discount_percentage = int(discount_percentage_str)
                     
-                    messages.success(request, 'Product Offer Updated Successfully')
-                    return redirect('product_offer_module_view')
+                    try:
+                        start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
+                        end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
+                    except ValueError:
+                        messages.error(request, 'Please enter the dates in the format YYYY-MM-DD.')
+                        return redirect('product_offer_edit_page', product_offer_id)
+                    
+                    
+                    if not 1 <= discount_percentage <= 70:
+                        valid_discount_percentage = False
+                        messages.error(request, 'Discount percentage should be minimum of 1%, and maximum of 70%')
+                        
+                        
+                    if start_date < today and start_date != offer_start_date:
+                        valid_start_date = False
+                        messages.error(request, "Please select today's date or a future date for the start date.")
+                        
+                    if end_date <= start_date and end_date <= today:
+                        valid_end_date = False
+                        messages.error(request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
+                        
+                
+                    if valid_product and valid_discount_percentage and valid_start_date and valid_end_date:
+                        product_offer.discount_percentage = discount_percentage
+                        product_offer.start_date = start_date
+                        product_offer.end_date = end_date
+                        product_offer.save()
+                            
+                        messages.success(request, 'Product Offer Updated Successfully')
+                        return redirect('product_offer_module_view')
+                    
                 else:
-                    messages.error(request, 'End date must be after start date')
+                    messages.error(request, 'Please fill in all required fields')
                     return redirect('product_offer_edit_page', product_offer_id)
+                
+                storage = messages.get_messages(request)
+                storage.used = True
             else:
                 return redirect('product_offer_module_view')
         except ProductOffer.DoesNotExist:
             messages.error(request, 'Product Offer not found')
         except ProductColorImage.DoesNotExist:
-            messages.error(request, 'Product color image not found')
-        except Exception as e:
-            messages.error(request, f'An error occurred: {e}')
-            return redirect('product_offer_module_view')
+            messages.error(request, 'Selected product not found')
+        return redirect('product_offer_edit_page', product_offer_id)
     else:
-        return redirect('product_offer_module_view')
+        return redirect('admin_login_page')
+        
 
     
     
@@ -1644,24 +1675,46 @@ def add_product_offer(request):
     if request.user.is_superuser:
         if request.method == 'POST':
             product_color_image_id = request.POST.get('offer_name')
-            discount_percentage = request.POST.get('offer_discount')
-            end_date = request.POST.get('offer_end_date')
+            discount_percentage_str = request.POST.get('offer_discount')
+            end_date_str = request.POST.get('offer_end_date')
             
-            if product_color_image_id and discount_percentage and end_date:
+            
+            valid_product = True
+            valid_discount_percentage = True
+            valid_end_date = True
+            
+            
+            today = timezone.now().date()
+            
+            
+            if product_color_image_id and discount_percentage_str and end_date_str:
+                discount_percentage = int(discount_percentage_str)
+                end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
                 try:
                     product_color_image = ProductColorImage.objects.get(pk=product_color_image_id)
-                    ProductOffer.objects.create(
-                        product_color_image=product_color_image,
-                        discount_percentage=int(discount_percentage),
-                        end_date=end_date
-                    )
-                    messages.success(request, 'Offer Module Added Successfully')
+                    
+                    if ProductOffer.objects.filter(product_color_image = product_color_image).exists():
+                        valid_product = False
+                        messages.error(request, 'Product already have an offer')
+                    
+                    if not 1 <= discount_percentage <= 70:
+                        valid_discount_percentage = False
+                        messages.error(request, 'Discount percentage should be minimum of 1%, and maximum of 70%')
+                        
+                    if end_date <= today:
+                        valid_end_date = False
+                        messages.error(request, 'Please select a future date for the offer end date.')
+                        
+                    
+                    if valid_product and valid_discount_percentage and valid_end_date:
+                        ProductOffer.objects.create(
+                            product_color_image=product_color_image,
+                            discount_percentage=int(discount_percentage),
+                            end_date=end_date
+                        )
+                        messages.success(request, 'Offer Module Added Successfully, now add another')
                 except ProductColorImage.DoesNotExist:
                     messages.error(request, 'Selected product not found')
-                except ValueError:
-                    messages.error(request, 'Invalid discount percentage')
-                except Exception as e:
-                    messages.error(request, f'An error occurred : {e}')
             else:
                 messages.error(request, 'Please fill in all required fields')
         else:
@@ -1669,7 +1722,7 @@ def add_product_offer(request):
     else:
         return redirect('admin_login_page')
 
-    return redirect('product_offer_module_view')
+    return redirect('product_offer_add_page')
     
     
     

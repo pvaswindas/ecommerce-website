@@ -65,9 +65,9 @@
                         <td class="quantity-col">
                           <div class="cart-product-quantity">
                             {% if item.product.quantity > 10 %}
-                              <input type="number" id="quantity-{{ item.id }}" class="form-control" value="{{ item.quantity }}" min="1" max="10" step="1" data-decimals="0" required />
+                              <input type="number" id="quantity-{{ item.id }}"  class="form-control" value="{{ item.quantity }}" min="1" max="10" step="1" data-decimals="0" required />
                             {% else %}
-                              <input type="number" id="quantity-{{ item.id }}" class="form-control" value="{{ item.quantity }}" min="1" max="{{ item.product.quantity }}" step="1" data-decimals="0" required />
+                              <input type="number" id="quantity-{{ item.id }}"  class="form-control" value="{{ item.quantity }}" min="1" max="{{ item.product.quantity }}" step="1" data-decimals="0" required />
                             {% endif %}
                           </div>
                         </td>
