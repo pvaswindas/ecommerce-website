@@ -81,18 +81,19 @@ urlpatterns = [
     path('sneakerheads/admin/orders/detailed-view/<str:order_id>/', order_detailed_view, name='order_detailed_view'),
     path('sneakerheads/admin/change-order-status/<str:order_id>/', change_order_status, name='change_order_status'),
     
-    path('sneakerheads/admin/order/return_product<str:order_items_id>/', return_product, name='return_product'),
+    path('sneakerheads/admin/order/return-product/<str:order_items_id>/', return_product, name='return_product'),
     
     path('sneakerheads/admin/sales_report_filtering/', sales_report_filtering, name='sales_report_filtering'),
     path('sneakerheads/admin/sales-report-page', sales_report_page, name='sales_report_page'),
     
     
     
-    path('sneakerheads/admin/offer/product_offer_module_view/', product_offer_module_view, name='product_offer_module_view'),
-    path('sneakerheads/admin/offer/product_offer_edit_page/<int:product_offer_id>/', product_offer_edit_page, name='product_offer_edit_page'),
-    path('sneakerheads/admin/offer/product_offer_update/<int:product_offer_id>/', product_offer_update, name='product_offer_update'),
-    path('sneakerheads/admin/offer/product_offer_add_page', product_offer_add_page, name='product_offer_add_page'),
+    path('sneakerheads/admin/offer/product-offer-module-view/', product_offer_module_view, name='product_offer_module_view'),
+    path('sneakerheads/admin/offer/product-offer-edit-page/<str:product_color_image_name>/<str:color>/', product_offer_edit_page, name='product_offer_edit_page'),
+    path('sneakerheads/admin/offer/product-offer-update/<int:product_offer_id>/', product_offer_update, name='product_offer_update'),
+    path('sneakerheads/admin/offer/product-offer-add-page', product_offer_add_page, name='product_offer_add_page'),
     path('sneakerheads/admin/offer/add-product-offer', add_product_offer, name='add_product_offer'),
+    path('sneakerheads/admin/offer/delete-product-offer/<int:product_offer_id>/', delete_offer, name='delete_offer'),
     
     
     

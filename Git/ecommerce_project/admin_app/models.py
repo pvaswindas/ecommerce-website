@@ -117,9 +117,18 @@ class ProductOffer(models.Model):
 
 
 
+class CategoryOffer(models.Model):
+    category = models.OneToOneField(Category, on_delete=models.CASCADE)
+    discount_percentage = models.PositiveBigIntegerField()
+    start_date = models.DateField(auto_now_add=True)
+    end_date = models.DateField()
+    
+    def __str__(self):
+        return f"{self.category.name} - {self.discount_percentage}% discount | from {self.start_date} to {self.end_date}"
+
 
 class Coupon(models.Model):
-    coupon_code = models.CharField(primary_key=True, unique=True, max_length=100)
+    coupon_code = models.CharField(primary_key=True, unique=True, max_length=12)
     name = models.CharField(max_length=100)
     discount_percentage = models.PositiveBigIntegerField()
     minimum_amount = models.PositiveBigIntegerField(blank=True, default=0)
@@ -132,11 +141,16 @@ class Coupon(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.coupon_code:
-            self.generate_coupon_code()
+            first_part = "COUPNCD"
+            while True:
+                random_numbers = ''.join(random.choices(string.digits, k=5))
+                coupon_code = f"{first_part}{random_numbers}"
+                if not Coupon.objects.filter(coupon_code=coupon_code).exists():
+                    break
+            self.coupon_code = coupon_code
         super().save(*args, **kwargs)
 
-    def generate_coupon_code(self):
-        self.coupon_code = slugify(self.name)
+
 
 
 
@@ -190,9 +204,13 @@ class Orders(models.Model):
     def save(self, *args, **kwargs):
         if not self.order_id:
             first_part = 'OD'
-            random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
-            random_numbers = ''.join(random.choices(string.digits, k=6))
-            self.order_id = f"{first_part}{random_letters}{random_numbers}"
+            while True:
+                random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
+                random_numbers = ''.join(random.choices(string.digits, k=6))
+                order_id = f"{first_part}{random_letters}{random_numbers}"
+                if not Orders.objects.filter(order_id= order_id).exists():
+                    break
+            self.order_id = order_id
         super().save(*args, **kwargs)
 
 
@@ -222,9 +240,13 @@ class OrderItem(models.Model):
             self.total_price = self.each_price * self.quantity
         if not self.order_items_id:
             first_part = 'ODIN'
-            random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
-            random_numbers = ''.join(random.choices(string.digits, k=4))
-            self.order_items_id = f"{first_part}{random_letters}{random_numbers}"
+            while True:
+                random_letters = ''.join(random.choices(string.ascii_uppercase, k=4))
+                random_numbers = ''.join(random.choices(string.digits, k=4))
+                order_items_id = f"{first_part}{random_letters}{random_numbers}"
+                if not OrderItem.objects.filter(order_items_id = order_items_id).exists():
+                    break
+            self.order_items_id = order_items_id
             
         if self.order_items_id:
             if self.order_status == 'Delivered':
@@ -265,8 +287,12 @@ class WalletTransaction(models.Model):
     def save(self, *args, **kwargs):
         if not self.transaction_id:
             first_part = 'TRNSCT'
-            random_numbers = ''.join(random.choices(string.digits, k=6))
-            self.transaction_id = f"{first_part}{random_numbers}"
+            while True:
+                random_numbers = ''.join(random.choices(string.digits, k=6))
+                transaction_id = f"{first_part}{random_numbers}"
+                if not WalletTransaction.objects.filter(transaction_id = transaction_id).exists():
+                    break
+            self.transaction_id = transaction_id
         super().save(*args, **kwargs)
 
 

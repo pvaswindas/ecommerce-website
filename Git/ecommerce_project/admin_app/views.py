@@ -1,6 +1,6 @@
 import calendar
 from django.shortcuts import render, redirect
-
+import re
 from django.contrib.auth.models import User
 from user_app.models import Customer
 from admin_app.models import *
@@ -60,6 +60,16 @@ is_active_sales  = True
 
 
 five_days_ago = timezone.now() - timedelta(days=5)
+
+
+
+def clear_old_messages(view_func):
+    def only_new_messages(request, *args, **kwargs):
+        response = view_func(request, *args, **kwargs)
+        storage = messages.get_messages(request)
+        storage.used = True
+        return response
+    return only_new_messages
 
 
 # 5 DAYS CUSTOMERS-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1540,10 +1550,13 @@ def sales_report_page(request):
 
 
 
+
+
 @never_cache
+@clear_old_messages
 def product_offer_module_view(request):
     if request.user.is_superuser:
-        product_offer = ProductOffer.objects.all().order_by('-start_date')
+        product_offer = ProductOffer.objects.all().order_by('start_date', 'end_date')
         context = {
             'product_offer' : product_offer,
             'is_active_product_offer' : is_active_product_offer,
@@ -1552,14 +1565,14 @@ def product_offer_module_view(request):
     else:
         return redirect('admin_login_page')
     
-    
-    
+        
 
 @never_cache
-def product_offer_edit_page(request, product_offer_id):
+@clear_old_messages
+def product_offer_edit_page(request, product_color_image_name, color):
     if request.user.is_superuser:
         try:
-            product_offer = ProductOffer.objects.get(pk = product_offer_id)
+            product_offer = ProductOffer.objects.get(product_color_image__products__name = product_color_image_name, product_color_image__color = color)
             product_color = ProductColorImage.objects.all()
             context = {
                 'product_offer' : product_offer,
@@ -1567,8 +1580,9 @@ def product_offer_edit_page(request, product_offer_id):
                 'is_active_product_offer' : is_active_product_offer,
             }
             return render(request, 'pages/offers/product_offer_edit_page.html', context)
-        except Exception as e:
-            return redirect('admin_dashboard')
+        except ProductOffer.DoesNotExist:
+            messages.error(request, 'Product Offer is not found')
+        return redirect(product_offer_module_view)
     else:
         return redirect('admin_login_page')
         
@@ -1578,8 +1592,8 @@ def product_offer_edit_page(request, product_offer_id):
 
 
 
-
 @never_cache
+@clear_old_messages
 def product_offer_update(request, product_offer_id):
     if request.user.is_superuser:
         try:
@@ -1601,52 +1615,54 @@ def product_offer_update(request, product_offer_id):
                 
                 
                 if discount_percentage_str and start_date_str and end_date_str:
-                    discount_percentage = int(discount_percentage_str)
+                    try:
+                        discount_percentage = int(discount_percentage_str)
+                    except ValueError:
+                        messages.error(request, 'Discount percentage should be a number without decimals or symbols.')
+                        return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
                     
                     try:
                         start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
                         end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
                     except ValueError:
                         messages.error(request, 'Please enter the dates in the format YYYY-MM-DD.')
-                        return redirect('product_offer_edit_page', product_offer_id)
+                        return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
                     
                     
-                    if not 1 <= discount_percentage <= 70:
+                    if not 5 <= discount_percentage <= 70:
                         valid_discount_percentage = False
-                        messages.error(request, 'Discount percentage should be minimum of 1%, and maximum of 70%')
+                        messages.error(request, 'Discount percentage should be minimum of 5%, and maximum of 70%.')
                         
                         
-                    if start_date < today and start_date != offer_start_date:
+                    elif start_date < today and start_date != offer_start_date:
                         valid_start_date = False
                         messages.error(request, "Please select today's date or a future date for the start date.")
-                        
-                    if end_date <= start_date and end_date <= today:
+                    
+                    elif end_date <= start_date and end_date <= today:
                         valid_end_date = False
                         messages.error(request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
                         
                 
-                    if valid_product and valid_discount_percentage and valid_start_date and valid_end_date:
-                        product_offer.discount_percentage = discount_percentage
-                        product_offer.start_date = start_date
-                        product_offer.end_date = end_date
-                        product_offer.save()
-                            
-                        messages.success(request, 'Product Offer Updated Successfully')
-                        return redirect('product_offer_module_view')
-                    
+                    try:
+                        if valid_product and valid_discount_percentage and valid_start_date and valid_end_date:
+                            product_offer.discount_percentage = discount_percentage
+                            product_offer.start_date = start_date
+                            product_offer.end_date = end_date
+                            product_offer.save()
+                                
+                            messages.success(request, 'Product Offer Updated Successfully!')
+                            return redirect('product_offer_module_view')
+                    except:
+                        messages.error(request, 'Currently unable to update the product offer, try again after sometime.')
+                        return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
                 else:
-                    messages.error(request, 'Please fill in all required fields')
-                    return redirect('product_offer_edit_page', product_offer_id)
-                
-                storage = messages.get_messages(request)
-                storage.used = True
+                    messages.error(request, 'Please fill in all required fields.')
+                    return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
             else:
                 return redirect('product_offer_module_view')
         except ProductOffer.DoesNotExist:
-            messages.error(request, 'Product Offer not found')
-        except ProductColorImage.DoesNotExist:
-            messages.error(request, 'Selected product not found')
-        return redirect('product_offer_edit_page', product_offer_id)
+            messages.error(request, 'Product Offer not found.')
+        return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
     else:
         return redirect('admin_login_page')
         
@@ -1656,6 +1672,7 @@ def product_offer_update(request, product_offer_id):
     
 
 @never_cache
+@clear_old_messages   
 def product_offer_add_page(request):
     if request.user.is_superuser:
         product_color = ProductColorImage.objects.all()
@@ -1669,8 +1686,8 @@ def product_offer_add_page(request):
     
     
     
-    
 @never_cache
+@clear_old_messages   
 def add_product_offer(request):
     if request.user.is_superuser:
         if request.method == 'POST':
@@ -1688,8 +1705,16 @@ def add_product_offer(request):
             
             
             if product_color_image_id and discount_percentage_str and end_date_str:
-                discount_percentage = int(discount_percentage_str)
-                end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
+                try:
+                    discount_percentage = int(discount_percentage_str)
+                except ValueError:
+                    messages.error(request, 'Discount percentage should be a number without decimals or symbols.')
+                    return redirect('product_offer_add_page')
+                try:
+                    end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
+                except ValueError:
+                        messages.error(request, 'Please enter the dates in the format YYYY-MM-DD.')
+                        return redirect('product_offer_add_page')
                 try:
                     product_color_image = ProductColorImage.objects.get(pk=product_color_image_id)
                     
@@ -1697,32 +1722,53 @@ def add_product_offer(request):
                         valid_product = False
                         messages.error(request, 'Product already have an offer')
                     
-                    if not 1 <= discount_percentage <= 70:
+                    elif not 5 <= discount_percentage <= 70:
                         valid_discount_percentage = False
-                        messages.error(request, 'Discount percentage should be minimum of 1%, and maximum of 70%')
+                        messages.error(request, 'Discount percentage should be minimum of 5%, and maximum of 70%')
                         
-                    if end_date <= today:
+                    elif end_date <= today:
                         valid_end_date = False
                         messages.error(request, 'Please select a future date for the offer end date.')
-                        
+                       
                     
-                    if valid_product and valid_discount_percentage and valid_end_date:
-                        ProductOffer.objects.create(
-                            product_color_image=product_color_image,
-                            discount_percentage=int(discount_percentage),
-                            end_date=end_date
-                        )
-                        messages.success(request, 'Offer Module Added Successfully, now add another')
+                    try:
+                        if valid_product and valid_discount_percentage and valid_end_date:
+                            ProductOffer.objects.create(
+                                product_color_image=product_color_image,
+                                discount_percentage=int(discount_percentage),
+                                end_date=end_date
+                            )
+                            messages.success(request, 'Offer Module Added Successfully!')
+                            return redirect('product_offer_module_view')
+                    except:
+                        messages.error(request, 'Unable to create a product offer at this moment,')
+                        return redirect('product_offer_add_page')
                 except ProductColorImage.DoesNotExist:
                     messages.error(request, 'Selected product not found')
             else:
                 messages.error(request, 'Please fill in all required fields')
+            return redirect(product_offer_add_page)
         else:
-            return redirect('admin_dashboard')
+            return redirect('product_offer_add_page')
     else:
         return redirect('admin_login_page')
-
-    return redirect('product_offer_add_page')
+    
+    
+    
+   
+@never_cache
+@clear_old_messages
+def delete_offer(request, product_offer_id):
+    if request.user.is_superuser:
+        try:
+            product_offer = ProductOffer.objects.get(pk = product_offer_id)
+            product_offer.delete()
+            messages.success(request, 'Product Offer have been successfully deleted!')
+        except ProductOffer.DoesNotExist:
+            messages.error(request, 'Product offer not found')
+        return redirect('product_offer_module_view')
+    else:
+         return redirect('admin_login_page')
     
     
     
@@ -1733,9 +1779,10 @@ def add_product_offer(request):
 
 
 @never_cache
+@clear_old_messages
 def coupon_page_view(request):
     if request.user.is_superuser:
-        coupons = Coupon.objects.all().order_by('-start_date')
+        coupons = Coupon.objects.all()
         context = {
             'coupons' : coupons,
             'is_active_coupon' : is_active_coupon
@@ -1748,6 +1795,7 @@ def coupon_page_view(request):
 
 
 @never_cache
+@clear_old_messages
 def add_coupon_page(request):
     if request.user.is_superuser:
         context = {
@@ -1758,46 +1806,103 @@ def add_coupon_page(request):
         return redirect('admin_login_page')
     
     
-    
+alphabets_pattern = re.compile("^[a-zA-z]+$")
     
 @never_cache
+@clear_old_messages
 def add_coupon(request):
     if request.user.is_superuser:
         if request.method == 'POST':
-            name = request.POST.get('coupon_name')
-            discount_percentage = request.POST.get('offer_discount')
-            end_date = request.POST.get('offer_end_date')
-            minimum_amount = request.POST.get('minimum_amount')
-            maximum_amount = request.POST.get('maximum_amount')
+            name_str = request.POST.get('coupon_name')
+            discount_percentage_str = request.POST.get('offer_discount')
+            end_date_str = request.POST.get('offer_end_date')
+            minimum_amount_str = request.POST.get('minimum_amount')
+            maximum_amount_str = request.POST.get('maximum_amount')
             
-            if name and discount_percentage and end_date:
+            valid_coupon_name = True
+            valid_discount_percentage = True
+            valid_end_date = True
+            valid_min_max = True
+            
+            today = timezone.now().date()
+            
+            if name_str and discount_percentage_str and end_date_str and minimum_amount_str and maximum_amount_str:
+                
+                
+                if not alphabets_pattern.match(name_str):
+                    valid_coupon_name = False
+                    messages.error(request, 'Coupon name should contain only alphabetical characters & should not contain any spaces')
+                    return redirect('add_coupon_page')
+                
+                name = name_str.upper()
+                
                 try:
-                    Coupon.objects.create(
-                        name = name,
-                        discount_percentage = int(discount_percentage),
-                        end_date = end_date,
-                        minimum_amount = minimum_amount,
-                        maximum_amount = maximum_amount,
-                    )
-                    messages.success(request, 'Coupon Added Successfully')
-                except ProductColorImage.DoesNotExist:
-                    messages.error(request, 'Invalid discount percentage')
+                    discount_percentage = int(discount_percentage_str)
                 except ValueError:
-                    messages.error(request, 'Please fill in all required fields')
-                except Exception as e:
-                    messages.error(request, f"An error occurred : {e}")
+                    messages.error(request, 'Discount percentage should be a number without decimals or symbols.')
+                    return redirect('add_coupon_page')
+                
+                try:
+                    end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    messages.error(request, 'Please enter the dates in the format YYYY-MM-DD.')
+                    return redirect('add_coupon_page')
+                
+                
+                try:
+                    minimum_amount = int(minimum_amount_str)
+                    maximum_amount = int(maximum_amount_str)
+                except:
+                    valid_min_max = False
+                    messages.error(request, 'Minimum and Maximum amounts should be a number without decimals or symbols.')
+                    return redirect('add_coupon_page')
+                
+                
+                if not (2500 <= minimum_amount <= 35000 and 3000 <= maximum_amount <= 25000):
+                    valid_min_max = False
+                    messages.error(request, 'Both the minimum and maximum amounts should be between ₹2500 and ₹25000')
+                    return redirect('add_coupon_page')
+                
+                
+                elif maximum_amount <= minimum_amount:
+                    valid_min_max = False
+                    messages.error(request, 'Maximum amount should be greater than minimum amount.')
+                
+                
+                elif not 5 <= discount_percentage <= 20:
+                    valid_discount_percentage = False
+                    messages.error(request, 'Discount percentage should be minimum of 5%, and maximum of 20%.')
+                
+                elif end_date <= today:
+                    valid_end_date = False
+                    messages.error(request, 'Please select a future date for the offer end date.')
+                    
+                
+                try:
+                    if valid_coupon_name and  valid_discount_percentage and valid_end_date and valid_min_max:
+                        Coupon.objects.create(
+                            name = name,
+                            discount_percentage = discount_percentage,
+                            end_date = end_date,
+                            minimum_amount = minimum_amount,
+                            maximum_amount = maximum_amount,
+                        )
+                        messages.success(request, 'Coupon Added Successfully')
+                        return redirect('coupon_page_view')
+                except:
+                    messages.error(request, 'Unable to create a coupon at this moment, try after sometime.')
             else:
                 messages.error(request, 'Please fill in all the required fields')
-        else:
-            return redirect('admin_dashboard')
+        return redirect('add_coupon_page')
     else:
         return redirect('admin_login_page')
     
-    return redirect('coupon_page_view')
+
 
 
 
 @never_cache
+@clear_old_messages
 def coupon_edit_page(request, coupon_id):
     if request.user.is_superuser:
         try:
@@ -1820,46 +1925,107 @@ def coupon_edit_page(request, coupon_id):
 
 
 
+
+
 @never_cache
+@clear_old_messages
 def update_coupon(request, coupon_id):
     if request.user.is_superuser:
-        if request.method == 'POST':
-            try:
-                coupon = Coupon.objects.get(pk=coupon_id)
+        try:
+            coupon = Coupon.objects.get(pk=coupon_id)
+        
+            if request.method == 'POST':
+                
+                coupon_start_date = coupon.start_date
 
-                name = request.POST.get('coupon_name')
-                discount_percentage = request.POST.get('offer_discount')
-                start_date = request.POST.get('offer_start_date')
-                end_date = request.POST.get('offer_end_date')
-                minimum_amount = request.POST.get('minimum_amount')
-                maximum_amount = request.POST.get('maximum_amount')
-
-                start_date = make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
-                end_date = make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
-
-
-                if start_date < end_date:
-                    coupon.name = name
-                    coupon.discount_percentage = int(float(discount_percentage))
-                    coupon.start_date = start_date
-                    coupon.end_date = end_date
-                    coupon.minimum_amount = minimum_amount
-                    coupon.maximum_amount = maximum_amount
-                    coupon.save()
-                    messages.success(request, 'Coupon has been updated successfully')
-                    return redirect('coupon_page_view')
+                name_str = request.POST.get('coupon_name')
+                discount_percentage_str = request.POST.get('offer_discount')
+                start_date_str = request.POST.get('offer_start_date')
+                end_date_str = request.POST.get('offer_end_date')
+                minimum_amount_str = request.POST.get('minimum_amount')
+                maximum_amount_str = request.POST.get('maximum_amount')
+                
+                valid_name = True
+                valid_discount_percentage = True
+                valid_start_date = True
+                valid_end_date = True
+                valid_min_max = True
+                
+                today = timezone.now().date()
+                
+                if name_str and discount_percentage_str and end_date_str and minimum_amount_str and maximum_amount_str:
+                
+                    if not alphabets_pattern.match(name_str):
+                        valid_name = False
+                        messages.error(request, 'Coupon name should contain only alphabetical characters & should not contain any spaces')
+                    
+                    else:
+                        name = name_str.upper()
+                        
+                        if  Coupon.objects.filter(name=name).exclude(pk=coupon_id).exists():
+                            valid_name = False
+                            messages.error(request, 'A coupon with the same name already exists. Please choose a different name.')
+                        
+                        try:
+                            discount_percentage = int(discount_percentage_str)
+                        except ValueError:
+                            valid_discount_percentage = False
+                            messages.error(request, 'Discount percentage should be a number without decimals or symbols.')
+                        
+                        try:
+                            start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
+                            end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
+                        except ValueError:
+                            valid_start_date = False
+                            messages.error(request, 'Please enter the dates in the format YYYY-MM-DD.')
+                        
+                        try:
+                            minimum_amount = int(minimum_amount_str)
+                            maximum_amount = int(maximum_amount_str)
+                        except:
+                            valid_min_max = False
+                            messages.error(request, 'Minimum and Maximum amounts should be a number without decimals or symbols.')
+                            
+                        if not 5 <= discount_percentage <= 20:
+                            valid_discount_percentage = False
+                            messages.error(request, 'Discount percentage should be minimum of 5%, and maximum of 20%.')
+                        
+                        elif start_date < today and start_date != coupon_start_date:
+                            valid_start_date = False
+                            messages.error(request, "Please select today's date or a future date for the start date.")
+                        
+                        elif end_date <= start_date or end_date <= today:
+                            valid_end_date = False
+                            messages.error(request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
+                            
+                        elif not (2500 <= minimum_amount <= 35000 and 3000 <= maximum_amount <= 25000):
+                            valid_min_max = False
+                            messages.error(request, 'Both the minimum and maximum amounts should be between ₹2500 and ₹25000')
+                        
+                        elif maximum_amount <= minimum_amount:
+                            valid_min_max = False
+                            messages.error(request, 'The maximum amount should be greater than the minimum amount.')
+                        
+                        
+                        if valid_name and valid_discount_percentage and valid_start_date and valid_end_date and valid_min_max:
+                            coupon.name = name
+                            coupon.discount_percentage = discount_percentage
+                            coupon.start_date = start_date
+                            coupon.end_date = end_date
+                            coupon.minimum_amount = minimum_amount
+                            coupon.maximum_amount = maximum_amount
+                            coupon.save()
+                            
+                            messages.success(request, 'Coupon has been updated successfully')
+                            return redirect('coupon_page_view')
                 else:
-                    messages.error(request, 'End date must be after start date')
-            except Coupon.DoesNotExist:
-                messages.error(request, 'Coupon not found')
-            except ProductColorImage.DoesNotExist:
-                messages.error(request, 'Product color image not found')
-            except Exception as e:
-                messages.error(request, f'An error occurred: {e}')
-        return redirect('coupon_page_view')
+                    messages.error(request, 'Please fill in all required fields.')
+                
+            return redirect('coupon_edit_page', coupon_id)
+        
+        except Coupon.DoesNotExist:
+            messages.error(request, 'Coupon is not found')
+            return redirect('coupon_page_view')
+        
     else:
         return redirect('admin_login_page')
-        
-            
-        
-        

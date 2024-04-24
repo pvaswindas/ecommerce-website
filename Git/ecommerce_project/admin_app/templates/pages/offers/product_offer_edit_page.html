@@ -13,31 +13,32 @@
   <div class="container mt-5">
     <h2 class="text-center mt-2 mb-4">Edit Product Offer</h2>
     <form action="{% url 'product_offer_update' product_offer.id %}" method="post">
-        {% csrf_token %}
-        <label for="product">Product</label>
-        <input type="text" class="form-control" readonly id="offer_product"  value="{{ product_offer.product_color_image.products.name }} ({{ product_offer.product_color_image.color}})">
-        <div class="form-group">
-            <label for="offer_discount">Discount Percentage</label>
-            <input type="number" class="form-control" id="offer_discount" value="{{ product_offer.discount_percentage }}" name="offer_discount"  />
-        </div>    
-        <div class="form-group">
-            <label for="offer_start_date">Start Date</label>
-            <input type="date" class="form-control" id="offer_start_date" value="{{ product_offer.start_date|date:'Y-m-d' }}" name="offer_start_date"  />
+      {% csrf_token %}
+      <label for="product">Product</label>
+      <input type="text" class="form-control" readonly id="offer_product" value="{{ product_offer.product_color_image.products.name }} ({{ product_offer.product_color_image.color }})" />
+      <div class="form-group">
+        <label for="offer_discount">Discount Percentage</label>
+        <input type="number" class="form-control" id="offer_discount" value="{{ product_offer.discount_percentage }}" name="offer_discount" />
+      </div>
+      <div class="form-group">
+        <label for="offer_start_date">Start Date</label>
+        <input type="date" class="form-control" id="offer_start_date" value="{{ product_offer.start_date|date:'Y-m-d' }}" name="offer_start_date" />
+      </div>
+      <div class="form-group">
+        <label for="offer_end_date">End Date</label>
+        <input type="date" class="form-control" id="offer_end_date" value="{{ product_offer.end_date|date:'Y-m-d' }}" name="offer_end_date" />
+      </div>
+      {% if messages %}
+        <div class="alert alert-danger text-center my-2 py-2 mb-4" role="alert">
+          {% for message in messages %}
+            {{ message }}
+            <br />
+          {% endfor %}
         </div>
-        <div class="form-group">
-            <label for="offer_end_date">End Date</label>
-            <input type="date" class="form-control" id="offer_end_date" value="{{ product_offer.end_date|date:'Y-m-d' }}" name="offer_end_date" />
-        </div>
-        {% if messages %}
-            <div class="text-center py-2 mb-4">
-            {% for message in messages %}
-                <h4>{{ message }}</h4>
-            {% endfor %}
-            </div>
-        {% endif %}
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary w-100">SAVE</button>
-        </div>
+      {% endif %}
+      <div class="text-center">
+        <button type="submit" class="btn btn-primary w-100">SAVE</button>
+      </div>
     </form>
   </div>
 {% endblock %}

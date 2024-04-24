@@ -1,6 +1,7 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete, pre_delete, pre_save
 from django.dispatch import receiver
 from admin_app.models import *
+from django.utils import timezone
 
 
 
@@ -91,3 +92,15 @@ def update_cart_coupon_status(sender, instance, **kwargs):
         cart.save()
     except Exception as e:
         print("Error saving cart:", e)
+
+
+@receiver(post_save, sender=ProductOffer)
+def delete_expired_product_offers(sender, instance, **kwargs):
+    if instance.end_date < timezone.now().date():
+        instance.delete()
+        
+        
+@receiver(post_save, sender=Coupon)
+def delete_expired_coupon(sender, instance, **kwargs):
+    if instance.end_date < timezone.now().date():
+        instance.delete()
