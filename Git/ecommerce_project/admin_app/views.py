@@ -2026,6 +2026,21 @@ def update_coupon(request, coupon_id):
         except Coupon.DoesNotExist:
             messages.error(request, 'Coupon is not found')
             return redirect('coupon_page_view')
-        
+    else:
+        return redirect('admin_login_page')
+
+
+
+@never_cache
+@clear_old_messages
+def delete_coupon(request, coupon_id):
+    if request.user.is_superuser:
+        try:
+            coupon = Coupon.objects.get(coupon_code = coupon_id)
+            coupon.delete()
+            messages.success(request, 'Coupon have been deleted!')
+        except Coupon.DoesNotExist:
+            messages.error(request, 'Coupon not found.')
+        return redirect('coupon_page_view')
     else:
         return redirect('admin_login_page')

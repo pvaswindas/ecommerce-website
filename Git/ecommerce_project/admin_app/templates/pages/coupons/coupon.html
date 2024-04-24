@@ -27,6 +27,7 @@
           <th class="discount-column">Discount Percentage</th>
           <th class="start-column">Start Date</th>
           <th class="end-column">End Date</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -38,6 +39,9 @@
             <td>{{ coupon.discount_percentage }}%</td>
             <td>{{ coupon.start_date }}</td>
             <td>{{ coupon.end_date }}</td>
+            <td>
+              <a href="{% url 'delete_coupon' coupon.coupon_code %}"><button class="btn btn-dark rounded rounded-1">Delete</button></a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
