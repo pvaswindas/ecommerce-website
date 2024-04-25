@@ -16,14 +16,22 @@
       {% csrf_token %}
       {% if messages %}
         {% for message in messages %}
-          <div class="text-center container mb-5">
-            <h4>{{ message }}</h4>
+          <div class="text-center container-fluid mx-3 my-4">
+            {% if message.tags == 'success' %}
+              <h4 style="color: green;">{{ message }}</h4>
+            {% elif message.tags == 'error' %}
+              <h4 style="color: red;">{{ message }}</h4>
+            {% elif message.tags == 'info' %}
+              <h4 style="color: blue;">{{ message }}</h4>
+            {% else %}
+              <h4>{{ message }}</h4>
+            {% endif %}
           </div>
         {% endfor %}
       {% endif %}
       <div class="form-group select-wrapper">
         <label for="product" class="label">Select Product:</label>
-        <select id="product" name="product" required>
+        <select id="product" name="product" >
           <option value="" disabled selected>Select Product</option>
           {% for product in product_list %}
             <option value="{{ product.id }}">{{ product.name }}</option>
@@ -33,17 +41,17 @@
 
       <div class="form-group select-wrapper">
         <label for="color" class="label">Color:</label>
-        <input type="text" id="color" name="color" maxlength="50" required />
+        <input type="text" id="color" name="color" maxlength="50"  />
       </div>
 
       <div class="form-group select-wrapper">
         <label for="price" class="label">Price:</label>
-        <input type="number" id="price" name="price" required />
+        <input type="number" id="price" name="price"  />
       </div>
 
       <div class="form-group">
         <label for="main_image" class="label">Main Image:</label>
-        <input type="file" id="main_image" name="main_image" accept="image/*" required onchange="previewImage('main_image', 'main_preview')" />
+        <input type="file" id="main_image" name="main_image" accept="image/*"  onchange="previewImage('main_image', 'main_preview')" />
         <label for="main_image" class="upload-btn">Select Main Image</label>
         <div id="main_preview" class="preview"></div>
         <button type="button" class="remove-btn" style="display: none;" onclick="removeImage('main_image')">Remove</button>

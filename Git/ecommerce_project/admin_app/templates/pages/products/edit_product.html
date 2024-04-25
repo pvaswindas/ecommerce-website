@@ -30,19 +30,21 @@
           <h3 class="accordion-header py-4">Name & Description</h3>
           <div class="accordion-content">
             <label for="name">Product Name</label>
-            <input type="text" id="name" name="product_name" value="{{ product.name }}" required />
+            <input type="text" id="name" name="product_name" value="{{ product.name }}" />
             <label for="description">Description</label>
-            <textarea id="description" required maxlength="1000" name="description" onkeyup="countChars(this)">{{ product.description }}</textarea>
+            <textarea id="description"  maxlength="1000" name="description" onkeyup="countChars(this)">{{product.description}}</textarea>
             <label for="information">More Information</label>
-            <textarea id="information" required maxlength="1500" name="information" onkeyup="countChars(this)">{{ product.information }}</textarea>
+            <textarea id="information"  maxlength="1500" name="information" onkeyup="countChars(this)">{{product.information}}</textarea>
           </div>
         </div>
 
         <div class="accordion-item">
           <h3 class="accordion-header">Inventory & Pricing</h3>
           <div class="accordion-content">
+            <label for="type">Type</label>
+            <input type="text" id="type" name="type" value="{{product.type}}">
             <label for="category">Category</label>
-            <select id="category" name="category" required>
+            <select id="category" name="category" >
               <option value="">Select Category</option>
               {% for category in category_list %}
                 <option value="{{ category.id }}" {% if product.category == category %} selected {% endif %} >{{ category.name }}</option>

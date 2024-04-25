@@ -580,7 +580,14 @@ def shop_page_view(request):
 
     
     if not search == "":
-        product_color = product_color_list.filter(products__name__icontains = search)
+        product_color = product_color_list.filter(
+            Q(products__name__icontains=search) |
+            Q(color__icontains=search) |
+            Q(price__icontains=search) |
+            Q(products__type__icontains=search) |
+            Q(products__category__name__icontains=search) |
+            Q(products__brand__name__icontains=search)
+        )
         if product_color:
             product_color_list = product_color
         

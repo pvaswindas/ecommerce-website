@@ -22,7 +22,7 @@
         <link rel="stylesheet" href="{% static 'user/assets/css/plugins/magnific-popup/magnific-popup.css' %}" />
       {% endblock %}
       {% block extra_css %}
-
+        <link rel="stylesheet" href="{% static 'user/assets/css/bootstrap.min.css' %}" />
       {% endblock %}
     </head>
   {% endblock %}
@@ -252,8 +252,10 @@
       {% block scripts %}
         <script src="{% static 'user/assets/js/jquery.min.js' %}"></script>
         <script src="{% static 'user/assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'user/assets/js/jquery.hoverIntent.min.js' %}"></script>
         <script src="{% static 'user/assets/js/jquery.waypoints.min.js' %}"></script>
         <script src="{% static 'user/assets/js/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'user/assets/js/jquery.magnific-popup.min.js' %}"></script>
       {% endblock %}
 
       {% block main_js %}

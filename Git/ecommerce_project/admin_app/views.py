@@ -4,6 +4,7 @@ import re
 from django.contrib.auth.models import User
 from user_app.models import Customer
 from admin_app.models import *
+from django.urls import reverse
 from datetime import datetime
 from datetime import timedelta
 from django.utils import timezone
@@ -58,6 +59,15 @@ is_active_coupon = True
 is_active_banner = True
 is_active_sales  = True
 
+alphabets_pattern = re.compile("^[a-zA-z]+$")
+description_pattern = re.compile(r"^[\w\s',.\-\(\)]*$")
+
+
+def clean_string(input_string):
+    clean_string = re.sub(r'[^a-zA-Z0-9]', '', input_string)
+    return clean_string
+
+
 
 five_days_ago = timezone.now() - timedelta(days=5)
 
@@ -66,10 +76,11 @@ five_days_ago = timezone.now() - timedelta(days=5)
 def clear_old_messages(view_func):
     def only_new_messages(request, *args, **kwargs):
         response = view_func(request, *args, **kwargs)
-        storage = messages.get_messages(request)
-        storage.used = True
+        all_messages = messages.get_messages(request)
+        all_messages.used = True
         return response
     return only_new_messages
+
 
 
 # 5 DAYS CUSTOMERS-----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -332,20 +343,49 @@ def admin_add_category_page(request):
 # ADD CATEGORY FUNCTION 
 
 @never_cache
+@clear_old_messages
 def add_categories(request):
     if request.user.is_superuser:
         if request.method == 'POST':
-            name = request.POST['category_name']
-            description = request.POST['category_description']
+            name_str = request.POST['category_name']
+            description_str = request.POST['category_description']
             
-            if not Category.objects.filter(name__icontains = name, is_deleted = False).exists():
-                category = Category.objects.create(name = name, description = description)
-                category.save()
-                messages.success(request, 'New category was added!')
-                return redirect(admin_categories)
-            else:
-                messages.error(request, 'Category already exists, create new category')
+            valid_name = True
+            valid_description = True
+            
+            if name_str and description_str:
+                if not alphabets_pattern.match(name_str):
+                    valid_name = False
+                    messages.error(request, 'Category name should contain only alphabetical characters & should not contain any spaces')
+                    
+                elif not description_pattern.match(description_str):
+                    valid_description = False
+                    messages.error(request, 'The description should contain only alphabetical characters, digits, spaces, periods, commas, and hyphens.')
+                    
+                elif description_str.isspace():
+                    valid_description = False
+                    messages.error(request, 'Description should not contain only spaces.')
+
+                    
+                name = name_str.upper()
+                description = description_str
+                    
+                if valid_name and valid_description:
+                    try:
+                        if not Category.objects.filter(name__icontains = name, is_deleted = False).exists():
+                            category = Category.objects.create(name = name, description = description)
+                            category.save()
+                            messages.success(request, 'New category was added!')
+                            return redirect(admin_categories)
+                        else:
+                            messages.error(request, 'Category already exists, create new category')
+                            return redirect(admin_add_category_page)
+                    except:
+                        messages.error(request, 'Unable to add a category at this moment, try after sometime.')
                 return redirect(admin_add_category_page)
+            else:
+                messages.error(request, 'Please fill all the fields to add a category.')
+        return redirect(admin_add_category_page)
     else:
         return redirect('admin_login_page')
     
@@ -368,20 +408,53 @@ def edit_category_page(request, cat_id):
 def edit_category(request, cat_id):
     if request.user.is_superuser:
         if request.method == 'POST':
-            name = request.POST['category_name']
-            description = request.POST['category_description']
+            name_str = request.POST['category_name']
+            description_str = request.POST['category_description']
             
-            category = Category.objects.get(id = cat_id)
+            valid_name = True
+            valid_description = True
             
-            if not Category.objects.filter(name__icontains = name).exists():
-                category.name = name
-                category.description = description
-                category.save()
-                messages.success(request, 'Category updated successfully!')
-                return redirect(admin_categories)
-            else:
-                messages.error(request, 'Category already exits, add new category')
-                return redirect(edit_category_page)
+            try:
+                category = Category.objects.get(id = cat_id)
+            except Category.DoesNotExist:
+                messages.error('Category not found.')
+                return redirect('admin_categories')
+            
+            if name_str and description_str:
+                if not alphabets_pattern.match(name_str):
+                    print(name_str)
+                    valid_name = False
+                    messages.error(request, 'Category name should contain only alphabetical characters & should not contain any spaces')
+                    
+                elif not description_pattern.match(description_str):
+                    print(description_str)
+                    valid_description = False
+                    messages.error(request, 'The description should contain only alphabetical characters, digits, spaces, periods, commas, and hyphens.')
+                    
+                elif description_str.isspace():
+                    valid_description = False
+                    messages.error(request, 'Description should not contain only spaces.')
+                    
+                name = name_str.upper()
+                description = description_str
+                
+
+            
+                if valid_name and valid_description:
+                    try:
+                        if not Category.objects.filter(name__iexact = name).exclude(pk = cat_id).exists():
+                            category.name = name
+                            category.description = description
+                            category.save()
+                            messages.success(request, 'Category updated successfully!')
+                            return redirect('admin_categories')
+                        else:
+                            messages.error(request, 'Category already exits, add new category')
+                            return redirect('edit_category_page', cat_id)
+                    except:
+                        messages.error(request, 'Unable to add a category at this moment, try after sometime.')
+                return redirect('edit_category_page', cat_id)
+
     else:
         return redirect('admin_login_page') 
 
@@ -490,8 +563,22 @@ def restore_categories(request, cat_id):
 @never_cache
 def list_product_page(request):
     if request.user.is_superuser:
+        query = request.GET.get('query', '')
         product_color = ProductColorImage.objects.filter(is_deleted=False).prefetch_related('productsize_set').annotate(total_quantity=Sum('productsize__quantity'))
-        return render(request, 'pages/products/product.html', {'product_color': product_color, 'is_active_product' : is_active_product})
+        
+        if query:
+            product_color = product_color.filter(
+                Q(products__name__icontains=query) |
+                Q(products__type__icontains=query) |
+                Q(products__category__name__icontains=query) |
+                Q(products__brand__name__icontains=query)
+            )
+            
+        context = {
+            'product_color': product_color,
+            'is_active_product': is_active_product
+        }
+        return render(request, 'pages/products/product.html', context)
     else:
         return redirect('admin_login_page')
 
@@ -521,36 +608,120 @@ def admin_add_product(request):
 
 # ADD PRODUCT FUNCTION
 
+product_name_pattern = re.compile(r'^[a-zA-Z0-9\s\-_]+$')
+
+
 @never_cache
+@clear_old_messages
 def add_products(request):
     if request.user.is_superuser:
         if request.method == 'POST':
             name = request.POST.get('product_name')
             description = request.POST.get('description')
             information = request.POST.get('information')
-            type = request.POST.get('type')
+            type_str = request.POST.get('type')
             category_id = request.POST.get('category')
             brand_id = request.POST.get('brand')
-
-            category = Category.objects.get(pk = category_id)
-            brand = Brand.objects.get(pk = brand_id)
             
-            if Products.objects.filter(name__icontains=name).exists():
-                messages.error(request, 'Product already exists!')
+            is_every_field_valid = True
+            
+            min_length = 10
+            max_length = 100
+            
+            if name and description and information and type_str and category_id and brand_id:
+                
+                cleaned_name = clean_string(name)
+                cleaned_description = clean_string(description)
+                cleaned_information = clean_string(information)
+                cleaned_type = clean_string(type_str)
+                
+                try:
+                    category = Category.objects.get(pk = category_id)
+                    
+                    try:
+                        brand = Brand.objects.get(pk = brand_id)
+                    except Brand.DoesNotExist:
+                        messages.error(request, 'Brand not found.')
+                        return redirect(admin_add_product)
+                    
+                    
+                    if Products.objects.filter(name__iexact = name).exists():
+                        is_every_field_valid = False
+                        messages.error(request, 'Product name already exists, try with another name.')
+                    
+                    elif not min_length <= len(name) <= max_length:
+                        is_every_field_valid = False
+                        messages.error(request, 'Product name must be between 10 and 100 characters long.')
+                    
+                    elif not min_length <= len(cleaned_name) <= max_length:
+                        is_every_field_valid = False
+                        messages.error(request, 'Product name should not consist solely of special characters or be blank.')
+                    
+                    elif name.isspace():
+                        is_every_field_valid = False
+                        messages.error(request, 'Product name should not be blank.')
+                        
+                    elif not product_name_pattern.match(name):
+                        is_every_field_valid = False
+                        messages.error(request, 'Product name should only contain letters, numbers, spaces, hyphens, and underscores.')
+                        
+                    elif not min_length <= len(description) <= 500:
+                        is_every_field_valid = False
+                        messages.error(request, 'Description must be between 10 and 500 characters long.')
+                        
+                    elif not min_length <= len(cleaned_description) <= 500:
+                        is_every_field_valid = False
+                        messages.error(request, 'Description should not consist solely of special characters or be blank.')
+                        
+                    elif not description_pattern.match(description):
+                        is_every_field_valid = False
+                        messages.error(request, 'Description should only contain letters, numbers, spaces, periods, commas, hyphens, and underscores.')
+                    
+                    elif not min_length <= len(information) <= 1000:
+                        is_every_field_valid = False
+                        messages.error(request, 'More information must be between 10 and 1000 characters long.')
+                        
+                    elif not min_length <= len(cleaned_information) <= 1000:
+                        is_every_field_valid = False
+                        messages.error(request, 'More Information field should not consist solely of special characters or be blank.')
+                        
+                        
+                    elif not 5 <= len(cleaned_type) <= 100:
+                        is_every_field_valid = False
+                        messages.error(request, 'Product Type should not consist solely of special characters or be blank.')
+                        
+                    elif not product_name_pattern.match(type_str):
+                        is_every_field_valid = False
+                        messages.error(request, 'Product type should only contain letters, numbers, spaces, periods, commas, hyphens, and underscores.')
+                        
+                                            
+                        
+                    if is_every_field_valid:
+                        if Products.objects.filter(name__iexact=name).exists():
+                            messages.error(request, 'Product already exists!')
+                            return redirect(admin_add_product)
+                        else:
+                            try:
+                                product = Products.objects.create(
+                                    name=name,
+                                    description=description,
+                                    information= information,
+                                    type=type_str,
+                                    category=category,
+                                    brand=brand,
+                                )
+                                product.save()
+                                messages.success(request, 'New Product was created, Add product image')
+                                return redirect(admin_add_image_page)
+                            except:
+                                messages.error(request, 'Currently unable to add a product.')
+                    return redirect(admin_add_product)
+                except Category.DoesNotExist:
+                    messages.error(request, 'Category not found.')
                 return redirect(admin_add_product)
             else:
-                product = Products.objects.create(
-                    name=name,
-                    description=description,
-                    information= information,
-                    type=type,
-                    category=category,
-                    brand=brand,
-                )
-                product.save()
-                messages.success(request, 'New Product was created, Add product image')
-                return redirect(admin_add_image_page)
-
+                messages.error(request, 'Please fill all the fields.')
+                return redirect(admin_add_product)
     else:
         return redirect('admin_login_page')
     
@@ -560,6 +731,7 @@ def add_products(request):
 # EDIT PRODUCT VIEW PAGE FUNCTION
 
 @never_cache
+@clear_old_messages
 def edit_product_page(request, p_id):
     if request.user.is_superuser:
         try:
@@ -594,30 +766,111 @@ def edit_product_page(request, p_id):
 # EDIT PRODUCT VIEW FUNCTION
 
 @never_cache
+@clear_old_messages
 def edit_product_update(request, p_id):
     if request.user.is_superuser:
         if request.method == 'POST':
             name = request.POST.get('product_name')
             description = request.POST.get('description')
             information = request.POST.get('information')
+            type_str = request.POST.get('type')
             category_id = request.POST.get('category')
             brand_id = request.POST.get('brand')
             
+            is_every_field_valid = True
             
-            product = Products.objects.get(pk=p_id)
-            category = Category.objects.get(pk=category_id)
-            brand = Brand.objects.get(pk=brand_id)
+            min_length = 10
+            max_length = 100
             
-            product.name = name
-            product.description = description
-            product.information = information
-            product.category = category
-            product.brand = brand
-            
-            product.save()
-            
-            messages.success(request, 'Product Updated successfully!')
-            return redirect(list_product_page)
+            try:
+                product = Products.objects.get(pk=p_id)
+                
+                if name and description and information and type_str and category_id and brand_id:
+                    cleaned_name = clean_string(name)
+                    cleaned_description = clean_string(description)
+                    cleaned_information = clean_string(information)
+                    cleaned_type = clean_string(type_str)
+                    
+                    try:
+                        category = Category.objects.get(pk=category_id)
+                    except Category.DoesNotExist:
+                        messages.error(request, 'Currently the selected category is not available.')
+                        return redirect('list_product_page')
+                    
+                    try:
+                        brand = Brand.objects.get(pk=brand_id)
+                    except Brand.DoesNotExist:
+                        messages.error(request, 'Currently the selected brand is not available.')
+                        return redirect('list_product_page')
+                    
+                    
+                    if Products.objects.filter(name__iexact = name).exclude(pk= p_id).exists():
+                        is_every_field_valid = False
+                        messages.error(request, 'Product name already exists, try with another name.')
+                    
+                    elif not min_length <= len(name) <= max_length:
+                        is_every_field_valid = False
+                        messages.error(request, 'Product name must be between 10 and 100 characters long.')
+                        
+                    elif not min_length <= len(cleaned_name) <= max_length:
+                        is_every_field_valid = False
+                        messages.error(request, 'Product Name should not consist solely of special characters or be blank.')
+                        
+                    elif not product_name_pattern.match(name):
+                        is_every_field_valid = False
+                        messages.error(request, 'Product name should only contain letters, numbers, spaces, hyphens, and underscores.')
+                    
+                        
+                    elif not min_length <= len(description) <= 500:
+                        is_every_field_valid = False
+                        messages.error(request, 'Description must be between 10 and 500 characters long.')
+                        
+                    elif not min_length <= len(cleaned_description) <= 500:
+                        is_every_field_valid = False
+                        messages.error(request, 'Description should not consist solely of special characters or be blank.')
+                        
+                    elif not description_pattern.match(description):
+                        is_every_field_valid = False
+                        messages.error(request, 'Description should only contain letters, numbers, spaces, periods, commas, hyphens, and underscores.')
+                    
+                    elif not min_length <= len(cleaned_information) <= 1000:
+                        is_every_field_valid = False
+                        messages.error(request, 'More Information field should not consist solely of special characters or be blank.')
+                    
+                    
+                    elif not min_length <= len(information) <= 1000:
+                        is_every_field_valid = False
+                        messages.error(request, 'More information must be between 10 and 1000 characters long.')
+                        print(len(information))
+                        
+                    elif not 5 <= len(cleaned_type) <= 100:
+                        is_every_field_valid = False
+                        messages.error(request, 'Product Type should not consist solely of special characters or be blank.')
+                        
+                    elif not product_name_pattern.match(type_str):
+                        is_every_field_valid = False
+                        messages.error(request, 'Product type should only contain letters, numbers, spaces, periods, commas, hyphens, and underscores.')
+                        
+                    
+                    if is_every_field_valid:
+                        try:
+                            product.name = name
+                            product.description = description
+                            product.information = information
+                            product.category = category
+                            product.brand = brand
+                            product.save()
+                            messages.success(request, 'Product Updated successfully!')
+                            return redirect('list_product_page')
+                        except:
+                            messages.error(request, 'Currently not able to update the product')
+                    return redirect('list_product_page')
+                else:
+                    messages.error(request, 'Please fill all the fields.')
+                    return redirect('list_product_page')
+            except Products.DoesNotExist:
+                messages.error(request, 'Product not found.')
+                return redirect('list_product_page')
     else:
         return redirect('admin_login_page')
 
@@ -869,7 +1122,7 @@ def admin_add_image_page(request):
 def add_product_image(request):
     if request.user.is_superuser:
         if request.method == 'POST':
-                products_id = request.POST.get('product')
+                product_id = request.POST.get('product')
                 color = request.POST.get('color')
                 price = request.POST.get('price')
                 main_image = request.FILES.get('main_image')
@@ -877,26 +1130,65 @@ def add_product_image(request):
                 top_image = request.FILES.get('top_image')
                 back_image = request.FILES.get('back_image')
                 
-                products = Products.objects.get(pk = products_id)
-                existing_color = ProductColorImage.objects.filter(products=products, color=color).exists()
-                if existing_color:
-                    messages.error(request, f"A product image with the color '{color}' already exists for this product.")
-                    return redirect('admin_add_image_page')
+                
+                cleaned_color = clean_string(color)
+                
+                is_every_field_valid = True
+                
+                if product_id and color and price and main_image and side_image and top_image and back_image:
+                    
+                    cleaned_color = clean_string(color)
+                    
+                    try:
+                        products = Products.objects.get(pk = product_id)
+                        
+                        try:
+                            price = int(price)
+                        except ValueError:
+                            messages.error(request, 'Price should be a valid whole number.')
+                            return redirect('admin_add_image_page')
+                            
+                        existing_color = ProductColorImage.objects.filter(products=products, color=color).exists()
+                        if existing_color:
+                            messages.error(request, f"A product image with the color '{color}' already exists for this product.")
+                            return redirect('admin_add_image_page')
+                        else:
+                            
+                            if not 3 <= len(cleaned_color) <= 20 and not alphabets_pattern.match(color):
+                                is_every_field_valid = False
+                                messages.error(request, 'Color should only consist of characters and it should not be blank.')
+                            
+                            elif not 3 <= len(color) <= 20:
+                                is_every_field_valid = False
+                                messages.error(request, 'The color name should be between 3 and 20 characters long.')
+                                
+                            elif not 800 <= price <= 100000:
+                                is_every_field_valid = False
+                                messages.error(request, 'Price should be between ₹800 and ₹100,000.')
+                            
+                            if is_every_field_valid:
+                                product_color_image = ProductColorImage.objects.create(
+                                    color = color,
+                                    price = price,
+                                    main_image = main_image,
+                                    side_image = side_image,
+                                    top_image = top_image,
+                                    back_image = back_image,
+                                    products = products
+                                    )
+                                product_color_image.save()
+                                messages.success(request, "Product Color and Image was added, now add product size")
+                                return redirect(admin_add_variants)
+                            else:
+                                return redirect('admin_add_image_page')
+                    except Products.DoesNotExist:
+                        messages.error(request, 'Product does not exist')
+                        return redirect('admin_add_image_page')
                 else:
-                    product_color_image = ProductColorImage.objects.create(
-                        color = color,
-                        price = price,
-                        main_image = main_image,
-                        side_image = side_image,
-                        top_image = top_image,
-                        back_image = back_image,
-                        products = products
-                        )
-                    product_color_image.save()
-                    messages.success(request, "Product Color and Image was added, now add product size")
-                    return redirect(admin_add_variants)
+                    messages.error(request, 'Please fill all the fields.')
+                    return redirect('admin_add_image_page')
         else:
-            return redirect(admin_add_image_page)
+            return redirect('admin_add_image_page')
     else:
         return redirect('admin_login_page')               
                 
@@ -969,22 +1261,47 @@ def add_size(request):
             size = request.POST.get('size')
             quantity = request.POST.get('quantity')
             
-            product_color_image = ProductColorImage.objects.get(pk=color_id)
+            is_everything_valid = True
             
-            existing_size = ProductSize.objects.filter(product_color_image=product_color_image, size=size).exists()
             
-            if existing_size:
-                messages.error(request, 'This size is already added')
-                return redirect('admin_add_variants')
+            if product_id and color_id and size and quantity:
+                product_color_image = ProductColorImage.objects.get(pk=color_id)
+                
+                try:
+                    quantity = int(quantity)
+                except ValueError:
+                    messages.error(request, 'Size Quantity should be a valid whole number.')
+                    return redirect('admin_add_variants')
+            
+                existing_size = ProductSize.objects.filter(product_color_image=product_color_image, size=size).exists()
+                
+                if existing_size:
+                    messages.error(request, 'This size already exists.')
+                    return redirect('admin_add_variants')
+                else:
+                    
+                    if not 10 <= quantity <=500:
+                        is_everything_valid = False
+                        messages.error(request, "Quantity should be between 10 and 500 units.")
+                    
+                    if is_everything_valid:
+                        try:
+                            product_size = ProductSize.objects.create(
+                            product_color_image=product_color_image,
+                            size=size,
+                            quantity=quantity
+                            )                
+                            product_size.save()
+                            messages.success(request, f"Successfully added a new size for {product_color_image.products.name} ({product_color_image.color})")
+                            return redirect(list_product_page)
+                        except:
+                            messages.error(request, 'Currently facing problems to add a variant.')
+                        return redirect(admin_add_variants)
+                    else:
+                        return redirect(admin_add_variants)
             else:
-                product_size = ProductSize.objects.create(
-                product_color_image=product_color_image,
-                size=size,
-                quantity=quantity
-                )                
-                product_size.save()
-                messages.success(request, 'Added size to the product')
-                return redirect(list_product_page)
+                messages.error(request, 'Please fill all the fields.')
+                return redirect('admin_add_variants')
         else:
             return redirect('admin_add_variants')
     else:
@@ -1612,6 +1929,7 @@ def product_offer_update(request, product_offer_id):
                 
                 today = timezone.now().date()
                 offer_start_date = product_offer.start_date
+                offer_end_date = product_offer.end_date
                 
                 
                 if discount_percentage_str and start_date_str and end_date_str:
@@ -1638,7 +1956,7 @@ def product_offer_update(request, product_offer_id):
                         valid_start_date = False
                         messages.error(request, "Please select today's date or a future date for the start date.")
                     
-                    elif end_date <= start_date and end_date <= today:
+                    elif end_date <= start_date and end_date <= today and end_date != offer_end_date:
                         valid_end_date = False
                         messages.error(request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
                         
@@ -1806,7 +2124,6 @@ def add_coupon_page(request):
         return redirect('admin_login_page')
     
     
-alphabets_pattern = re.compile("^[a-zA-z]+$")
     
 @never_cache
 @clear_old_messages
@@ -1937,6 +2254,7 @@ def update_coupon(request, coupon_id):
             if request.method == 'POST':
                 
                 coupon_start_date = coupon.start_date
+                coupon_end_date = coupon.end_date
 
                 name_str = request.POST.get('coupon_name')
                 discount_percentage_str = request.POST.get('offer_discount')
@@ -1994,7 +2312,7 @@ def update_coupon(request, coupon_id):
                             valid_start_date = False
                             messages.error(request, "Please select today's date or a future date for the start date.")
                         
-                        elif end_date <= start_date or end_date <= today:
+                        elif end_date <= start_date or end_date <= today and end_date != coupon_end_date:
                             valid_end_date = False
                             messages.error(request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
                             
