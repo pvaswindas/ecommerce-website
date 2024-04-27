@@ -54,17 +54,17 @@
                 <a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a>
               </div>
               <div class="product-price">
-                {% if product_offer %}
-                    <span class="text-success">₹ {{ product_offer.offer_price }}.00</span>
+                {% if product_offer or category_offer %}
+                    <span class="text-success">₹ {{ highest_offer_price }}.00</span>
                 {% else %}
                     ₹ {{ product_color.price }}.00
                 {% endif %}
               </div>
             
-              {% if product_offer.offer_price %}
+              {% if product_offer or category_offer %}
                   <div class="product-price-old text-muted">
                       <span class="discount-percentage text-danger">
-                        {{ product_offer.discount_percentage }}% Off
+                        {{ highest_discount }}% Off
                       </span>
                       <del>₹ {{ product_color.price }}.00</del>
                   </div>

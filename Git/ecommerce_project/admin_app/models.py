@@ -4,7 +4,7 @@ import random
 from datetime import date
 from django.db import models
 from user_app.models import *
-from django.db.models import F
+from django.db.models import Max, F
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import logging
@@ -318,6 +318,8 @@ class Cart(models.Model):
         return f"{self.customer.user.first_name} {self.customer.user.last_name}"
 
 
+
+
 class CartProducts(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(ProductSize, on_delete=models.CASCADE)
@@ -331,7 +333,27 @@ class CartProducts(models.Model):
     def total_price(self):
         today = timezone.now().date()
         try:
-            offer = self.product.product_color_image.productoffer.get(end_date__gte=today)
-            return self.quantity * offer.offer_price
+            product_offer = self.product.product_color_image.productoffer.filter(end_date__gte=today).aggregate(Max('offer_price'))['offer_price__max']
+            
+            product_offer = ProductOffer.objects.filter(product_color_image=self.product.product_color_image, end_date__gte=today).first()
+            category_offer = CategoryOffer.objects.filter(category=self.product.product_color_image.products.category, end_date__gte=today).first()
+                    
+            if product_offer and category_offer:
+                highest_discount = max(product_offer.discount_percentage, category_offer.discount_percentage)
+            elif product_offer:
+                highest_discount = product_offer.discount_percentage
+            elif category_offer:
+                highest_discount = category_offer.discount_percentage
+            else:
+                highest_discount = 0
+                    
+            if highest_discount > 0:
+                discount_amount = round((highest_discount * self.product.product_color_image.price) / 100)
+                highest_offer_price = self.product.product_color_image.price - discount_amount
+            else:
+                highest_offer_price = self.product.product_color_image.price
+                
+            return self.quantity * highest_offer_price
         except ObjectDoesNotExist:
             return self.quantity * self.product.product_color_image.price
+

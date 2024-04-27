@@ -34,16 +34,6 @@
             </div>
             <h3 class="product-title"><a href="{% url 'product_single_view_page' product_color.products.name product_color.id %}">{{ product_color.products.name }}</a></h3>
             <div class="product-price">₹ {{ product_color.price }}.00</div>
-            {% for offer in active_categories  %}
-              {% if offer.category == product_color.products.category %}
-                adsgasg
-              {% endif %}
-            {% endfor %}
-            {% for offer in active_offers %}
-              {% if offer.product_color_image == product_color %}
-                <span class="badge badge-success animate__animated animate__rotateIn"><span class="badge-text">Offer: {{ offer.discount_percentage }}% off! ₹{{ offer.offer_price }}</span></span>
-              {% endif %}
-            {% endfor %}
           </div>
         </div>
       </div>

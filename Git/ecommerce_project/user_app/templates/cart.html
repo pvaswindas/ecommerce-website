@@ -139,13 +139,14 @@
 {% endblock %}
 
 {% block custom_scripts %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     function updateTotalPrice(productId) {
-      var quantityInput = $('#quantity-' + productId)
-      var quantity = quantityInput.val()
-      var maxQuantity = quantityInput.attr('max')
-      var csrfToken = '{{ csrf_token }}'
-    
+      var quantityInput = $('#quantity-' + productId);
+      var quantity = quantityInput.val();
+      var maxQuantity = quantityInput.attr('max');
+      var csrfToken = '{{ csrf_token }}';
+  
       $.ajax({
         type: 'POST',
         url: '/update_total_price/',
@@ -155,64 +156,23 @@
           csrfmiddlewaretoken: csrfToken
         },
         dataType: 'json',
-        success: function (data) {
-          $('#total-price-' + productId).text('₹' + data.total_price.toFixed(2))
+        success: function(data) {
+          $('#total-price-' + productId).text('₹' + data.total_price.toFixed(2));
           if (data.error) {
-            quantityInput.val(maxQuantity)
+            quantityInput.val(maxQuantity);
           } else {
             if (parseInt(quantity) > parseInt(maxQuantity)) {
-              quantityInput.val(maxQuantity)
+              quantityInput.val(maxQuantity);
             }
-            updateSubtotal()
+            updateSubtotal();
           }
         }
-      })
+      });
     }
-    
-    function updateSubtotal() {
-      var subtotal = 0
-      var hasItems = false
-      $('.table-cart tbody tr').each(function () {
-        hasItems = true
-        var productId = $(this).find('.quantity-col input').attr('id').split('-')[1]
-        var quantity = $('#quantity-' + productId).val()
-        var price = parseFloat($(this).find('.price-col').text().replace('₹', ''))
-        var total_price = parseFloat(
-          $('#total-price-' + productId)
-            .text()
-            .replace('₹', '')
-        )
-        subtotal += total_price
-      })
-    
-      var shippingCharge = 0
-      if (subtotal < 2500 && hasItems) {
-        shippingCharge = 99
-      }
-    
-      $('.summary-subtotal td:nth-child(2)').text('₹' + subtotal.toFixed(2))
-      $('.summary-shipping-row td:nth-child(2)').text('₹' + shippingCharge.toFixed(2))
-      $('.summary-total td:nth-child(2)').text('₹' + (subtotal + shippingCharge).toFixed(2))
-    }
-    
-    $(document).on('change', '[id^="quantity-"]', function () {
-      var productId = $(this).attr('id').split('-')[1]
-      updateTotalPrice(productId)
-    })
-    
-    $(document).ready(function () {
-      updateSubtotal()
-    })
-    
-    $(document).on('change', '[id^="quantity-"]', function () {
-      var productId = $(this).attr('id').split('-')[1]
-      var newQuantity = $(this).val()
-      updateQuantity(productId, newQuantity)
-    })
-    
+  
     function updateQuantity(itemId, newQuantity) {
-      var csrfToken = '{{ csrf_token }}'
-    
+      var csrfToken = '{{ csrf_token }}';
+  
       $.ajax({
         type: 'POST',
         url: '/update_quantity/',
@@ -222,14 +182,49 @@
           csrfmiddlewaretoken: csrfToken
         },
         dataType: 'json',
-        success: function (data) {
+        success: function(data) {
           if (!data.error) {
-            $('#total-price-' + itemId).text('₹' + data.total_price.toFixed(2))
-            updateSubtotal()
-          } else {
+            $('#total-price-' + itemId).text('₹' + data.total_price.toFixed(2));
+            updateSubtotal();
           }
         }
-      })
+      });
     }
-  </script>
+  
+    function updateSubtotal() {
+      var subtotal = 0;
+      var hasItems = false;
+      $('.table-cart tbody tr').each(function() {
+        hasItems = true;
+        var productId = $(this).find('.quantity-col input').attr('id').split('-')[1];
+        var quantity = $('#quantity-' + productId).val();
+        var total_price = parseFloat($('#total-price-' + productId).text().replace('₹', ''));
+        subtotal += total_price;
+      });
+  
+      var shippingCharge = 0;
+      if (subtotal < 2500 && hasItems) {
+        shippingCharge = 99;
+      }
+  
+      $('.summary-subtotal td:nth-child(2)').text('₹' + subtotal.toFixed(2));
+      $('.summary-shipping-row td:nth-child(2)').text('₹' + shippingCharge.toFixed(2));
+      $('.summary-total td:nth-child(2)').text('₹' + (subtotal + shippingCharge).toFixed(2));
+    }
+  
+    $(document).ready(function() {
+      updateSubtotal();
+  
+      $(document).on('change', '[id^="quantity-"]', function() {
+        var productId = $(this).attr('id').split('-')[1];
+        updateTotalPrice(productId);
+      });
+  
+      $(document).on('change', '[id^="quantity-"]', function() {
+        var itemId = $(this).attr('id').split('-')[1];
+        var newQuantity = $(this).val();
+        updateQuantity(itemId, newQuantity);
+      });
+    });
+  </script>  
 {% endblock %}
