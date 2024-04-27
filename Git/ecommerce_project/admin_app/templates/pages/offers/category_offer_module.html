@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-  <title>Sneakerheads Manage Product Offer</title>
+  <title>Sneakerheads Manage Offer</title>
 {% endblock %}
 
 {% block custom_css %}
@@ -12,7 +12,7 @@
 
 {% block content %}
   <div class="orders">
-    <h1>Manage Product Offer</h1>
+    <h1>Manage Category Offer</h1>
     {% if messages %}
       {% for message in messages %}
         <div class="text-center container my-4">
@@ -31,7 +31,7 @@
     <table>
       <thead>
         <tr>
-          <th class="product-column">Product</th>
+          <th class="category-column">Category</th>
           <th class="discount-column">Discount Percentage</th>
           <th class="start-column">Start Date</th>
           <th class="end-column">End Date</th>
@@ -39,27 +39,25 @@
         </tr>
       </thead>
       <tbody>
-        {% for offer in product_offer %}
+        {% for offer in category_offers %}
           <tr>
             <td>
               {% if offer.end_date <= today %}
                   <div class="expired-offer">
-                      <p class="mb-1 text-danger">{{ offer.product_color_image.products.name }} ({{ offer.product_color_image.color }})</p>
+                      <p class="mb-1 text-danger">{{ offer.category.name }}</p>
                       <span class="badge text-white bg-danger">Offer Expired</span>
                   </div>
               {% else %}
                   <div class="active-offer">
-                      <a href="{% url 'product_offer_edit_page' offer.product_color_image.products.name offer.product_color_image.color %}">
-                        {{ offer.product_color_image.products.name }} ({{ offer.product_color_image.color }})
-                      </a>
+                    <a href="{% url 'category_offer_edit_page' offer.category.name %}">{{ offer.category.name }}</a>
                   </div>
               {% endif %}
-            </td>          
+            </td>
             <td>{{ offer.discount_percentage }}%</td>
             <td>{{ offer.start_date }}</td>
             <td>{{ offer.end_date }}</td>
             <td>
-              <a href="{% url 'delete_offer' offer.id %}"><button class="btn btn-dark rounded rounded-1">Delete</button></a>
+              <a href="{% url 'delete_category_offer' offer.id %}"><button class="btn btn-dark rounded rounded-1">Delete</button></a>
             </td>
           </tr>
         {% endfor %}

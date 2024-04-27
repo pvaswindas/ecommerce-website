@@ -27,11 +27,8 @@
                     <strong>{{ item.product.product_color_image.products.name }}</strong>
                   </p>
                   <p>
-                    Price:{% if item.product.product_color_image.productoffer.exists %}
-                      ₹{{ item.product.product_color_image.productoffer.first.offer_price }}.00
-                    {% else %}
-                      ₹{{ item.product.product_color_image.price }}.00
-                    {% endif %}
+                    Price:
+                      ₹{{ item.total_price }}.00
                   </p>
                   <p>Quantity: {{ item.quantity }}</p>
                   <p>Size: {{ item.product.size }}</p>

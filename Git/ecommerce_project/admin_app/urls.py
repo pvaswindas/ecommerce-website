@@ -88,13 +88,20 @@ urlpatterns = [
     
     
     
-    path('sneakerheads/admin/offer/product-offer-module-view/', product_offer_module_view, name='product_offer_module_view'),
-    path('sneakerheads/admin/offer/product-offer-edit-page/<str:product_color_image_name>/<str:color>/', product_offer_edit_page, name='product_offer_edit_page'),
-    path('sneakerheads/admin/offer/product-offer-update/<int:product_offer_id>/', product_offer_update, name='product_offer_update'),
-    path('sneakerheads/admin/offer/product-offer-add-page', product_offer_add_page, name='product_offer_add_page'),
-    path('sneakerheads/admin/offer/add-product-offer', add_product_offer, name='add_product_offer'),
-    path('sneakerheads/admin/offer/delete-product-offer/<int:product_offer_id>/', delete_offer, name='delete_offer'),
+    path('sneakerheads/admin/offer/product-offer/module-view/', product_offer_module_view, name='product_offer_module_view'),
+    path('sneakerheads/admin/offer/product-offer/edit-page/<str:product_color_image_name>/<str:color>/', product_offer_edit_page, name='product_offer_edit_page'),
+    path('sneakerheads/admin/offer/product-offer/update/<int:product_offer_id>/', product_offer_update, name='product_offer_update'),
+    path('sneakerheads/admin/offer/product-offer/add-page', product_offer_add_page, name='product_offer_add_page'),
+    path('sneakerheads/admin/offer/product-offer/add-offer', add_product_offer, name='add_product_offer'),
+    path('sneakerheads/admin/offer/product-offer/delete-offer/<int:product_offer_id>/', delete_offer, name='delete_offer'),
     
+    
+    path('sneakerheads/admin/offer/category-offer/module_view/', category_offer_module_view, name='category_offer_module_view'),
+    path('sneakerheads/admin/offer/category-offer/add-page/', category_offers_add_page, name='category_offers_add_page'),
+    path('sneakerheads/admin/offer/category-offer/add-category-offer/', add_category_offer, name='add_category_offer'),
+    path('sneakerheads/admin/offer/category-offer/edit-page/<str:category_name>/', category_offer_edit_page, name='category_offer_edit_page'),
+    path('sneakerheads/admin/offer/category-offer/update/<int:category_offer_id>/', category_offer_update, name='category_offer_update'),
+    path('sneakerheads/admin/offer/category-offer/delete/<int:category_offer_id>/', delete_category_offer, name='delete_category_offer'),
     
     
     path('sneakerheads/admin/coupon/', coupon_page_view, name='coupon_page_view'),

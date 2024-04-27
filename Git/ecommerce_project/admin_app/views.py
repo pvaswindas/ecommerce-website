@@ -57,7 +57,7 @@ is_active_coupon = True
 is_active_banner = True
 is_active_sales = True
 
-alphabets_pattern = re.compile("^[a-zA-z]+$")
+alphabets_pattern = re.compile(r"^[a-zA-Z\s]+$")
 description_pattern = re.compile(r"^[\w\s',.\-\(\)]*$")
 
 
@@ -314,29 +314,36 @@ def add_categories(request):
             name_str = request.POST['category_name']
             description_str = request.POST['category_description']
 
-            valid_name = True
-            valid_description = True
+            is_every_field_valid = True
 
             if name_str and description_str:
+                cleaned_name = clean_string(name_str)
+                cleaned_description = clean_string(description)
+                
                 if not alphabets_pattern.match(name_str):
-                    valid_name = False
+                    is_every_field_valid = False
                     messages.error(
                         request, 'Category name should contain only alphabetical characters & should not contain any spaces')
+                    
+                elif not 3 <= len(cleaned_name) <= 30:
+                    is_every_field_valid = False
+                    messages.error(request, 'Category name should be between 3 and 30 characters long, and it should not be blank.')
+                
 
                 elif not description_pattern.match(description_str):
-                    valid_description = False
+                    is_every_field_valid = False
                     messages.error(
                         request, 'The description should contain only alphabetical characters, digits, spaces, periods, commas, and hyphens.')
 
-                elif description_str.isspace():
-                    valid_description = False
+                elif not 10 <= len(cleaned_description) <= 300:
+                    is_every_field_valid = False
                     messages.error(
-                        request, 'Description should not contain only spaces.')
+                        request, 'Description should be between 10 and 300 characters long, and it should not be blank.')
 
-                name = name_str.upper()
-                description = description_str
 
-                if valid_name and valid_description:
+                if is_every_field_valid:
+                    name = name_str.upper()
+                    description = description_str
                     try:
                         if not Category.objects.filter(name__icontains=name, is_deleted=False).exists():
                             category = Category.objects.create(
@@ -381,8 +388,7 @@ def edit_category(request, cat_id):
             name_str = request.POST['category_name']
             description_str = request.POST['category_description']
 
-            valid_name = True
-            valid_description = True
+            is_every_field_valid = True
 
             try:
                 category = Category.objects.get(id=cat_id)
@@ -391,27 +397,33 @@ def edit_category(request, cat_id):
                 return redirect('admin_categories')
 
             if name_str and description_str:
+                cleaned_name = clean_string(name_str)
+                cleaned_description = clean_string(description_str)
+                
                 if not alphabets_pattern.match(name_str):
-                    print(name_str)
-                    valid_name = False
+                    is_every_field_valid = False
                     messages.error(
                         request, 'Category name should contain only alphabetical characters & should not contain any spaces')
+                    
+                elif not 3 <= len(cleaned_name) <= 30:
+                    is_every_field_valid = False
+                    messages.error(request, 'Category name should be between 3 to 30 characters long, and it should not be blank.')
 
                 elif not description_pattern.match(description_str):
-                    print(description_str)
-                    valid_description = False
+                    is_every_field_valid = False
                     messages.error(
                         request, 'The description should contain only alphabetical characters, digits, spaces, periods, commas, and hyphens.')
 
-                elif description_str.isspace():
-                    valid_description = False
+                elif not 10 <= len(cleaned_description) <= 300:
+                    is_every_field_valid = False
                     messages.error(
-                        request, 'Description should not contain only spaces.')
+                        request, 'Description name should be between 10 to 300 characters long, and it should not be blank.')
 
-                name = name_str.upper()
-                description = description_str
+                
 
-                if valid_name and valid_description:
+                if is_every_field_valid:
+                    name = name_str.upper()
+                    description = description_str   
                     try:
                         if not Category.objects.filter(name__iexact=name).exclude(pk=cat_id).exists():
                             category.name = name
@@ -1959,6 +1971,7 @@ def product_offer_module_view(request):
     if request.user.is_superuser:
         product_offer = ProductOffer.objects.all().order_by('start_date', 'end_date')
         context = {
+            'today': today,
             'product_offer': product_offer,
             'is_active_product_offer': is_active_product_offer,
         }
@@ -1974,7 +1987,7 @@ def product_offer_edit_page(request, product_color_image_name, color):
         try:
             product_offer = ProductOffer.objects.get(
                 product_color_image__products__name=product_color_image_name, product_color_image__color=color)
-            product_color = ProductColorImage.objects.all()
+            product_color = ProductColorImage.objects.all().order_by('products__name')
             context = {
                 'product_offer': product_offer,
                 'product_color': product_color,
@@ -1982,8 +1995,8 @@ def product_offer_edit_page(request, product_color_image_name, color):
             }
             return render(request, 'pages/offers/product_offer_edit_page.html', context)
         except ProductOffer.DoesNotExist:
-            messages.error(request, 'Product Offer is not found')
-        return redirect(product_offer_module_view)
+            messages.error(request, 'Product Offer not found')
+            return redirect('product_offer_module_view')
     else:
         return redirect('admin_login_page')
 
@@ -2042,8 +2055,9 @@ def product_offer_update(request, product_offer_id):
                         messages.error(
                             request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
 
-                    try:
-                        if valid_product and valid_discount_percentage and valid_start_date and valid_end_date:
+                    
+                    if valid_product and valid_discount_percentage and valid_start_date and valid_end_date:
+                        try:
                             product_offer.discount_percentage = discount_percentage
                             product_offer.start_date = start_date
                             product_offer.end_date = end_date
@@ -2052,10 +2066,13 @@ def product_offer_update(request, product_offer_id):
                             messages.success(
                                 request, 'Product Offer Updated Successfully!')
                             return redirect('product_offer_module_view')
-                    except:
-                        messages.error(
-                            request, 'Currently unable to update the product offer, try again after sometime.')
+                        except:
+                            messages.error(
+                                request, 'Currently unable to update the product offer, try again after sometime.')
+                            return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
+                    else:
                         return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
+                    
                 else:
                     messages.error(
                         request, 'Please fill in all required fields.')
@@ -2073,7 +2090,7 @@ def product_offer_update(request, product_offer_id):
 @clear_old_messages
 def product_offer_add_page(request):
     if request.user.is_superuser:
-        product_color = ProductColorImage.objects.all()
+        product_color = ProductColorImage.objects.all().order_by('products__name')
         context = {
             'product_color': product_color,
             'is_active_product_offer': is_active_product_offer,
@@ -2116,7 +2133,7 @@ def add_product_offer(request):
                     product_color_image = ProductColorImage.objects.get(
                         pk=product_color_image_id)
 
-                    if ProductOffer.objects.filter(product_color_image=product_color_image).exists():
+                    if ProductOffer.objects.filter(product_color_image=product_color_image, end_date__gte = today).exists():
                         valid_product = False
                         messages.error(
                             request, 'Product already have an offer')
@@ -2124,15 +2141,16 @@ def add_product_offer(request):
                     elif not 5 <= discount_percentage <= 70:
                         valid_discount_percentage = False
                         messages.error(
-                            request, 'Discount percentage should be minimum of 5%, and maximum of 70%')
+                            request, 'Discount percentage should be minimum of 5%, and maximum of 70%.')
 
                     elif end_date <= today:
                         valid_end_date = False
                         messages.error(
                             request, 'Please select a future date for the offer end date.')
 
-                    try:
-                        if valid_product and valid_discount_percentage and valid_end_date:
+                    
+                    if valid_product and valid_discount_percentage and valid_end_date:
+                        try:
                             ProductOffer.objects.create(
                                 product_color_image=product_color_image,
                                 discount_percentage=int(discount_percentage),
@@ -2141,15 +2159,19 @@ def add_product_offer(request):
                             messages.success(
                                 request, 'Offer Module Added Successfully!')
                             return redirect('product_offer_module_view')
-                    except:
-                        messages.error(
-                            request, 'Unable to create a product offer at this moment,')
+                        except:
+                            messages.error(
+                                request, 'Unable to create a product offer at this moment,')
+                            return redirect('product_offer_add_page')
+                    else:
                         return redirect('product_offer_add_page')
+                    
                 except ProductColorImage.DoesNotExist:
                     messages.error(request, 'Selected product not found')
+                    return redirect('product_offer_add_page')
             else:
                 messages.error(request, 'Please fill in all required fields')
-            return redirect(product_offer_add_page)
+            return redirect('product_offer_add_page')
         else:
             return redirect('product_offer_add_page')
     else:
@@ -2170,6 +2192,243 @@ def delete_offer(request, product_offer_id):
         return redirect('product_offer_module_view')
     else:
         return redirect('admin_login_page')
+    
+    
+    
+    
+    
+# ---------------------------------------------------------------- PRODUCT OFFER MODULE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+
+
+@never_cache
+@clear_old_messages
+def category_offer_module_view(request):
+    if request.user.is_superuser:
+        category_offers = CategoryOffer.objects.all().order_by('start_date', 'end_date')
+        context = {
+            'today' : today,
+            'category_offers' : category_offers,
+            'is_active_product_offer' : is_active_product_offer,
+        }
+        return render(request, 'pages/offers/category_offer_module.html', context)
+    else:
+        return redirect('admin_login_page')
+
+
+
+
+
+@never_cache
+@clear_old_messages
+def category_offers_add_page(request):
+    if request.user.is_superuser:
+        categories = Category.objects.all().order_by('name')
+        context = {
+            'categories' : categories,
+            'is_active_product_offer' : is_active_product_offer,
+        }
+        return render(request, 'pages/offers/category_offer_add_page.html', context)
+    else:
+        return redirect('admin_login_page')
+
+
+
+@never_cache
+@clear_old_messages
+def add_category_offer(request):
+    if request.user.is_superuser:
+        if request.method == "POST":
+            category_id = request.POST.get('category_id')
+            discount_percentage_str = request.POST.get('offer_discount')
+            end_date_str = request.POST.get('offer_end_date')
+            
+            is_every_field_valid = True
+            
+            today = timezone.now().date()
+            
+            if category_id and discount_percentage_str and end_date_str:
+                try:
+                    discount_percentage = int(discount_percentage_str)
+                except ValueError:
+                    messages.error(
+                        request, 'Discount percentage should be a number without decimals or symbols.')
+                    return redirect('category_offers_add_page')
+                try:
+                    end_date = datetime.datetime.strptime(
+                        end_date_str, '%Y-%m-%d').date()
+                except ValueError:
+                    messages.error(
+                        request, 'Please enter the dates in the format YYYY-MM-DD.')
+                    return redirect('category_offers_add_page')
+                
+                try:
+                    category = Category.objects.get(pk = category_id)
+                    
+                    if CategoryOffer.objects.filter(category = category, end_date__gte= today).exists():
+                        is_every_field_valid = False
+                        messages.error(request, 'Offer already exist for this category.')
+                    
+                    elif not 5 <= discount_percentage <= 30:
+                        is_every_field_valid = False
+                        messages.error(request, 'Discount percentage should be minimum of 5%, and maximum of 30%.')
+                        
+                    elif end_date <= today:
+                        is_every_field_valid = False
+                        messages.error(request, 'Please select a future date for the offer end date.')
+                        
+                    
+                    if is_every_field_valid:
+                        try:
+                            CategoryOffer.objects.create(
+                                category = category,
+                                discount_percentage = discount_percentage,
+                                end_date = end_date
+                            )
+                            messages.success(request, f"Successfully added offer for {category.name} category")
+                            return redirect('category_offer_module_view')
+                        
+                        except:
+                            messages.error(request, 'Unable to create a category offer at this moment.')
+                            return redirect('category_offers_add_page')
+                    else:
+                        return redirect('category_offers_add_page')
+                except Category.DoesNotExist:
+                    messages.error(request, 'Selected category not found.')
+                    return redirect('category_offers_add_page')
+            else:
+                messages.error(request, 'Please fill all the fields.')
+                return redirect('category_offers_add_page')
+        else:
+            return redirect('category_offers_add_page')
+    else:
+        return redirect('admin_login_page')
+
+
+
+
+
+
+@never_cache
+@clear_old_messages
+def category_offer_edit_page(request, category_name):
+    if request.user.is_superuser:
+        try:
+            category_offer = CategoryOffer.objects.get(category__name = category_name)
+            categories = Category.objects.all().order_by('name')
+            context = {
+                'category_offer' : category_offer,
+                'categories' : categories,
+                'is_active_product_offer' : is_active_product_offer
+            }
+            return render(request, 'pages/offers/category_offer_edit_page.html', context)    
+        except CategoryOffer.DoesNotExist:
+            messages.error('Category Offer not found.')
+            return redirect('category_offer_module_view')
+    else:
+        return redirect('admin_login_page')
+
+
+
+
+
+
+
+@never_cache
+@clear_old_messages
+def category_offer_update(request, category_offer_id):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            try:
+                category_offer = CategoryOffer.objects.get(pk = category_offer_id)
+                
+                discount_percentage_str = request.POST.get('offer_discount')
+                start_date_str = request.POST.get('offer_start_date')
+                end_date_str = request.POST.get('offer_end_date')
+                
+                is_every_field_valid = True
+                
+                offer_start_date = category_offer.start_date
+                offer_end_date = category_offer.end_date
+                
+                if discount_percentage_str and start_date_str and end_date_str:
+                    try:
+                        discount_percentage = int(discount_percentage_str)
+                    except ValueError:
+                        messages.error(request, 'Discount percentage should be a number without decimals or symbols.')
+                        return redirect('category_offer_edit_page', category_offer.category.name)
+                    try:
+                        start_date = datetime.datetime.strptime(
+                            start_date_str, '%Y-%m-%d').date()
+                        end_date = datetime.datetime.strptime(
+                            end_date_str, '%Y-%m-%d').date()
+                    except ValueError:
+                        messages.error(
+                            request, 'Please enter the dates in the format YYYY-MM-DD.')
+                        return redirect('category_offer_edit_page', category_offer.category.name)
+
+                    if not 5 <= discount_percentage <= 70:
+                        is_every_field_valid = False
+                        messages.error(
+                            request, 'Discount percentage should be minimum of 5%, and maximum of 70%.')
+
+                    elif start_date < today and start_date != offer_start_date:
+                        is_every_field_valid = False
+                        messages.error(
+                            request, "Please select today's date or a future date for the start date.")
+
+                    elif end_date <= start_date and end_date <= today and end_date != offer_end_date:
+                        is_every_field_valid = False
+                        messages.error(
+                            request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
+                        
+                    
+                    if is_every_field_valid:
+                        try:
+                            category_offer.discount_percentage = discount_percentage
+                            category_offer.start_date = start_date
+                            category_offer.end_date = end_date
+                            category_offer.save()
+
+                            messages.success(
+                                
+                                request, 'Category Offer Updated Successfully!')
+                            return redirect('category_offer_module_view')
+                        except:
+                            messages.error(
+                                request, 'Currently unable to update the product offer, try again after sometime.')
+                            return redirect('category_offer_edit_page', category_offer.category.name)
+                    else:
+                        return redirect('category_offer_edit_page', category_offer.category.name)
+                    
+            except CategoryOffer.DoesNotExist:
+                messages.error(request, 'Category Offer not found.')
+                return redirect('category_offer_module_view')
+        else:
+            return redirect('category_offer_module_view')
+    else:
+        return redirect('admin_login_page')
+
+
+
+
+
+
+
+@never_cache
+@clear_old_messages
+def delete_category_offer(request, category_offer_id):
+    if request.user.is_superuser:
+        try:
+            category_offer = CategoryOffer.objects.get(pk = category_offer_id)
+            category_offer.delete()
+            messages.success(request, 'Category Offer have been deleted!')
+            return redirect('category_offer_module_view')
+        except CategoryOffer.DoesNotExist:
+            messages.error(request, 'Category Offer not found.')
+            return redirect('category_offer_module_view')
+    else:
+        return redirect('admin_login_page')
+
 
 
 # ----------------------------------------------------------------  COUPON PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------

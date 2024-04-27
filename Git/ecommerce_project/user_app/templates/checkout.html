@@ -73,24 +73,23 @@
 
               {% if cart.coupon_applied %}
                 <div class="applied-coupon">
-                  <p>Coupon Applied: {{ coupon.name }}{{coupon.discount_percentage}}</p>
+                  <p>Coupon Applied: {{ coupon.name }}{{ coupon.discount_percentage }}</p>
                 </div>
                 {% if total_charge_discounted %}
                   <div class="updated-prices">
                     <p>Total (After Discount): ₹ {{ total_charge_discounted }}.00</p>
                   </div>
                 {% endif %}
-  
               {% endif %}
-              <input type="hidden" name="subtotal" value="{{ subtotal }}">
-              <input type="hidden" name="shipping_charge" value="{{ shipping_charge }}">
-              
+              <input type="hidden" name="subtotal" value="{{ subtotal }}" />
+              <input type="hidden" name="shipping_charge" value="{{ shipping_charge }}" />
+
               {% if cart.coupon_applied %}
-                <input type="hidden" name="total_charge_discounted" value="{{ total_charge_discounted }}">
+                <input type="hidden" name="total_charge_discounted" value="{{ total_charge_discounted }}" />
               {% else %}
-                <input type="hidden" name="total_charge" value="{{ total_charge }}"> 
+                <input type="hidden" name="total_charge" value="{{ total_charge }}" />
               {% endif %}
-              
+
               <button type="submit" class="btn btn-outline-primary-2 rounded-2 my-4 btn-order btn-block" id="place_order_button" style="display: none;">
                 <span class="btn-text">Place Order</span>
                 <span class="btn-hover-text">Proceed to Checkout</span>
@@ -104,19 +103,17 @@
             <div class="cart-discount">
               <form action="{% url 'apply_coupon' %}" method="post">
                 {% csrf_token %}
-                 <div class="input-group">
-                    <select class="form-control" id="coupon_code" name="coupon_code">
-                      <option selected disabled value="">Select a coupon</option>
-                      {% for coupon in available_coupons %}
-                        <option value="{{ coupon.coupon_code }}">{{ coupon.name }}{{ coupon.discount_percentage }}</option>
-                      {% endfor %}
-                    </select>                    
-                    <div class="input-group-append">
-                      <button class="btn btn-outline-primary-2 pe-5 ps-3" type="submit" id="apply_coupon_button">
-                        <i class="icon-long-arrow-right"></i> Apply
-                      </button>
-                    </div>
-                 </div>
+                <div class="input-group">
+                  <select class="form-control" id="coupon_code" name="coupon_code">
+                    <option selected disabled value="">Select a coupon</option>
+                    {% for coupon in available_coupons %}
+                      <option value="{{ coupon.coupon_code }}">{{ coupon.name }}{{ coupon.discount_percentage }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-primary-2 pe-5 ps-3" type="submit" id="apply_coupon_button"><i class="icon-long-arrow-right"></i> Apply</button>
+                  </div>
+                </div>
               </form>
             </div>
           </div>
@@ -137,59 +134,47 @@
                   {% for item in cart_items %}
                     <tr>
                       <td>
-                        <a href="#">{{ item.product.product_color_image.products.name }}</a>
+                        <a href="#">{{ item.product.product_color_image.products.name }} × {{ item.quantity }}</a>
                       </td>
-                      <td>
-                        {% if item.product.product_color_image.productoffer.exists %}
-                          {% if item.quantity > 1 %}
-                            ₹{{ item.product.product_color_image.productoffer.first.offer_price }}.00 × {{item.quantity}}
-                          {% endif %}
-                        {% else %}
-                          {% if item.quantity > 1 %}
-                            ₹{{ item.product.product_color_image.price }}.00 × {{item.quantity}}
-                          {% endif %}
-                        {% endif %}
-                      </td>
+                      <td>₹{{ item.total_price }}.00</td>
                     </tr>
                   {% endfor %}
 
                   {% if cart.coupon_applied %}
-                  <tr class="summary-subtotal">
-                    <td>Discount:</td>
-                    <td>₹ {{ discount_amount }} .00</td>
-                  </tr>
+                    <tr class="summary-subtotal">
+                      <td>Discount:</td>
+                      <td>₹ {{ discount_amount }} .00</td>
+                    </tr>
                   {% endif %}
 
                   <tr class="summary-subtotal">
                     <td>Subtotal:</td>
-                    <td>₹
-                      {% if cart.coupon_applied %}
+                    <td>
+                      ₹{% if cart.coupon_applied %}
                         {{ sub_charge }}
                       {% else %}
                         {{ subtotal }}
-                      {% endif %}
-                      .00
+                      {% endif %}.00
                     </td>
                   </tr>
                   <tr>
                     <td>Shipping:</td>
-                    <td>₹ 
-                      {% if cart.coupon_applied %}
+                    <td>
+                      ₹{% if cart.coupon_applied %}
                         {{ charge_for_shipping }}
                       {% else %}
                         {{ shipping_charge }}
-                      {% endif %}
-                      .00</td>
+                      {% endif %}.00
+                    </td>
                   </tr>
                   <tr class="summary-total">
                     <td>Total:</td>
-                    <td>₹
-                      {% if cart.coupon_applied %}
+                    <td>
+                      ₹{% if cart.coupon_applied %}
                         {{ total_charge_discounted }}
                       {% else %}
                         {{ total_charge }}
-                      {% endif %}
-                      .00
+                      {% endif %}.00
                     </td>
                   </tr>
                 </tbody>
@@ -230,14 +215,14 @@
   </script>
 
   <script>
-    document.getElementById('apply_coupon_button').addEventListener('click', function() {
-      var couponCode = document.getElementById('coupon_code').value;
-    });
+    document.getElementById('apply_coupon_button').addEventListener('click', function () {
+      var couponCode = document.getElementById('coupon_code').value
+    })
   </script>
-  
+
   <script>
     document.getElementById('inner_form').addEventListener('submit', function (event) {
-      event.stopPropagation();
-    });
+      event.stopPropagation()
+    })
   </script>
 {% endblock %}

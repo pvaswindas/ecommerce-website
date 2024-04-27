@@ -32,12 +32,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.hashers import check_password
+from django.db.models import Max, Case, When, F, Value, IntegerField
 
 
 # ---------------------------------------------------------------------------------- CC_INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
-
+today = datetime.now().date()
 
 
 def get_cart_wishlist_address_order_data(request):
@@ -63,17 +64,18 @@ def get_cart_wishlist_address_order_data(request):
             'orders' : orders,
             'order_items' : order_items,
         })
-        
+        today = datetime.now().date()
         if cart_items:
             item_count = 0
             subtotal = 0
             for item in cart_items:
                 item_count += 1
-                if item.product.product_color_image.productoffer.exists():
-                    offer = item.product.product_color_image.productoffer.first()
+                try:
+                    offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
                     each_price = offer.offer_price * item.quantity
-                else:
+                except ObjectDoesNotExist:
                     each_price = item.product.product_color_image.price * item.quantity
+                    
                 subtotal = subtotal + each_price
             shipping_charge = 99 if subtotal <= 2500 else 0
             total_charge = subtotal + shipping_charge
@@ -505,48 +507,40 @@ def search_for_product(request):
 
 
 
-selected_category = []
-
 @never_cache
 def category_wise(request):
-    global selected_category
     if request.method == 'POST':
         category_wise = request.POST.get('category_wise')
+        selected_category = request.session.get('selected_category', [])
         if category_wise in selected_category:
             selected_category.remove(category_wise)
         else:
             selected_category.append(category_wise)
+        request.session['selected_category'] = selected_category
         return redirect('shop_page_view')
     else:
         return redirect('index_page')
-    
-
-
-
-
-
-selected_brand = []
 
 @never_cache
 def brand_wise(request):
-    global selected_brand
     if request.method == 'POST':
         brand_wise = request.POST.get('brand_wise')
+        selected_brand = request.session.get('selected_brand', [])
         if brand_wise in selected_brand:
             selected_brand.remove(brand_wise)
         else:
             selected_brand.append(brand_wise)
+        request.session['selected_brand'] = selected_brand
         return redirect('shop_page_view')
     else:
         return redirect('index_page')
 
-
-
 @never_cache
 def clean_all(request):
-    global selected_category, selected_brand
-    selected_category = []
-    selected_brand = []
+    if 'selected_category' in request.session:
+        del request.session['selected_category']
+    if 'selected_brand' in request.session:
+        del request.session['selected_brand']
     return redirect('shop_page_view')
 
       
@@ -571,6 +565,8 @@ def shop_page_view(request):
         
     product_color_list = ProductColorImage.objects.filter(is_deleted=False, is_listed=True)
     
+    selected_category = request.session.get('selected_category', [])
+    selected_brand = request.session.get('selected_brand', [])
     
     if selected_category and selected_brand:
         product_color_list = product_color_list.filter(Q(products__category__name__in=selected_category) & Q(products__brand__name__in=selected_brand))
@@ -602,11 +598,6 @@ def shop_page_view(request):
     elif high_to_low:
         product_color_list = product_color_list.order_by('-price')
         
-    
-    active_offers = ProductOffer.objects.filter(
-        Q(end_date__gte=timezone.now()) | Q(end_date=None),
-        product_color_image__in=product_color_list
-    )
         
     latest_products = ProductColorImage.objects.filter(is_deleted=False, is_listed=True).order_by('-created_at')[:3]
 
@@ -628,7 +619,6 @@ def shop_page_view(request):
         'high_to_low' : high_to_low,
         'selected_category' : selected_category,
         'selected_brand' : selected_brand,
-        'active_offers' : active_offers,
         
     })
     default = False
@@ -654,9 +644,9 @@ def shop_page_view(request):
 def product_single_view_page(request, product_name, pdt_id):
     context = {}
     product_color = ProductColorImage.objects.get(pk=pdt_id)
-    
+    today = datetime.now().date()
     try:
-        product_offer = ProductOffer.objects.get(product_color_image=product_color)
+        product_offer = ProductOffer.objects.get(product_color_image=product_color, end_date__gte= today)
         context['product_offer'] = product_offer
     except ObjectDoesNotExist:
         pass
@@ -1332,10 +1322,10 @@ def update_total_price(request):
                 available_quantity = product.quantity
 
                 if quantity <= available_quantity:
-                    if product.product_color_image.productoffer.exists():
-                        offer = product.product_color_image.productoffer.first()
+                    try:
+                        offer = ProductOffer.objects.get(product_color_image = product.product_color_image, end_date__gte = today)
                         total_price = offer.offer_price * quantity
-                    else:
+                    except:
                         total_price = product.product_color_image.price * quantity
                     return JsonResponse({'total_price': total_price})
                 else:
@@ -1363,10 +1353,10 @@ def update_quantity(request):
                 cart_item.quantity = new_quantity
                 cart_item.save()
                 
-                if cart_item.product.product_color_image.productoffer.exists():
-                    offer = cart_item.product.product_color_image.productoffer.first()
+                try:
+                    offer = ProductOffer.objects.get(product_color_image = cart_item.product.product_color_image, end_date__gte = today)
                     total_price = offer.offer_price * new_quantity
-                else:
+                except ObjectDoesNotExist:
                     total_price = cart_item.product.product_color_image.price * new_quantity
                 
                 return JsonResponse({'total_price': total_price})
@@ -1390,6 +1380,7 @@ def update_quantity(request):
 @never_cache
 def checkout_page(request):
     if request.user.is_authenticated:
+        context = {}
         user = request.user
         customer = Customer.objects.get(user=user)
         cart = Cart.objects.get(customer=customer)
@@ -1415,6 +1406,8 @@ def checkout_page(request):
                 pass
             sub_charge = total_charge_discounted
             
+            today = datetime.now().date()
+            
             if total_charge_discounted <= 2500:
                 charge_for_shipping = 99
                 total_charge_discounted = total_charge_discounted + charge_for_shipping
@@ -1426,16 +1419,17 @@ def checkout_page(request):
             available_coupons = Coupon.objects.filter(
                 Q(minimum_amount__lte = total_price) & 
                 Q(maximum_amount__gte = total_price) &
+                Q(end_date__gte = today) &
                 ~Q(coupon_code__in = used_coupons)
                 )
-            context = {
+            context.update({
                 'coupon' : coupon,
                 'available_coupons': available_coupons,
                 'discount_amount' : discount_amount,
                 'sub_charge' : sub_charge,
                 'charge_for_shipping' : charge_for_shipping,
                 'total_charge_discounted': total_charge_discounted,
-            }
+            })
             cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
             context.update(cart_wishlist_address_order_data)
             return render(request, 'checkout.html', context)
@@ -1466,11 +1460,11 @@ def calculate_discounted_total_charge(cart_items, coupon):
     cart_total_without_offer = 0
     
     for item in cart_items:
-        if item.product.product_color_image.productoffer.exists():
-            product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image)
+        try:
+            product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
             offer_price = product_offer.offer_price
             cart_total_with_offer += offer_price * item.quantity
-        else:
+        except ObjectDoesNotExist:
             cart_total_without_offer += item.product.product_color_image.price * item.quantity
     cart_total = cart_total_with_offer + cart_total_without_offer 
     
@@ -1542,11 +1536,11 @@ def place_order(request):
                     item_count = 0
                     for item in cart_items:
                         item_count += 1
-                        if item.product.product_color_image.productoffer.exists():
-                            product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image)
+                        try:
+                            product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
                             offer_price = product_offer.offer_price
                             cart_total_with_offer += offer_price
-                        else:
+                        except ObjectDoesNotExist:
                             cart_total_without_offer += item.product.product_color_image.price
                     cart_total = cart_total_with_offer + cart_total_without_offer
                     
@@ -1651,10 +1645,10 @@ def place_order(request):
                         
                         for item in cart_items:
                             price_of_each = 0
-                            if item.product.product_color_image.productoffer.exists():
-                                offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image)
+                            try:
+                                offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
                                 price_of_each = offer.offer_price * item.quantity
-                            else:
+                            except ObjectDoesNotExist:
                                 price_of_each = item.product.product_color_image.price * item.quantity
     
                             order_item = OrderItem.objects.create(
@@ -1712,12 +1706,13 @@ def razorpay_payment(request, user_id):
             cart_total_with_offer = 0
             cart_total_without_offer = 0
             for item in cart_items:
-                if item.product.product_color_image.productoffer.exists():
-                    product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image)
+                try:
+                    product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
                     offer_price = product_offer.offer_price
                     cart_total_with_offer += offer_price * item.quantity
-                else:
+                except ObjectDoesNotExist:
                     cart_total_without_offer += item.product.product_color_image.price * item.quantity
+                    
             subtotal = cart_total_with_offer + cart_total_without_offer
             
             total_charge = subtotal
@@ -1780,11 +1775,13 @@ def razorpay_payment(request, user_id):
                     order.save()
                     for item in cart_items:
                         price_of_each = 0
-                        if item.product.product_color_image.productoffer.exists():
-                            offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image)
+                        try:
+                            offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
                             price_of_each = offer.offer_price
-                        else:
+                        except ObjectDoesNotExist:
                             price_of_each = item.product.product_color_image.price
+                            
+                            
                             
                         
                         order_item = OrderItem.objects.create(

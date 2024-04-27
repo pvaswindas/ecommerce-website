@@ -6,9 +6,7 @@ from django.db import models
 from user_app.models import *
 from django.db.models import F
 from django.utils import timezone
-from django.dispatch import receiver
-from django.utils.text import slugify
-from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 import logging
 logger = logging.getLogger(__name__)
 
@@ -106,7 +104,7 @@ class ProductOffer(models.Model):
 
 
 class CategoryOffer(models.Model):
-    category = models.OneToOneField(Category, on_delete=models.CASCADE)
+    category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name='categoryoffer')
     discount_percentage = models.PositiveBigIntegerField()
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField()
@@ -331,8 +329,9 @@ class CartProducts(models.Model):
 
     @property
     def total_price(self):
-        if self.product.product_color_image.productoffer.exists():
-            offer = self.product.product_color_image.productoffer.first()
+        today = timezone.now().date()
+        try:
+            offer = self.product.product_color_image.productoffer.get(end_date__gte=today)
             return self.quantity * offer.offer_price
-        else:
+        except ObjectDoesNotExist:
             return self.quantity * self.product.product_color_image.price
