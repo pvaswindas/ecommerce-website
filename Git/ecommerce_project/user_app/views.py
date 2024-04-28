@@ -1174,36 +1174,25 @@ def cancel_order(request, order_items_id):
                         if order_item.order.coupon_applied:
                             minimum_amount = order.coupon_minimum_amount
                             maximum_amount = order.coupon_maximum_amount
-                            other_order_items = OrderItem.objects.filter(order=order, cancel_product = False).exclude(order_items_id = order_items_id)
+                            other_order_items = OrderItem.objects.filter(order=order, return_product = False, cancel_product = False).exclude(order_items_id = order_items_id)
                             total_of_other_order = 0
                             for item in other_order_items:
                                 total_of_other_order += item.each_price
                             
                             item_price = order_item.each_price
                             
-                            discount_price = round((item_price * order.coupon_discount_percent) / 100)
-                            coupon_applied_price = item_price - discount_price
                             
-                            total_after_reducing = order.total_charge - coupon_applied_price
+                            
+                            total_after_reducing = order.total_charge - order_item.each_price
                             
                             if minimum_amount <= total_of_other_order <= maximum_amount:
-                                
-                                for item in other_order_items:
-                                    other_item_price = item.each_price
-                                    discount_for_other_item = round((other_item_price * order.coupon_discount_percent) / 100)
-                                    other_item_coupon_applied_price = other_item_price - discount_for_other_item
-                                        
-                                    item.each_price = other_item_coupon_applied_price
-                                    item.save()
                                     
                                 if other_order_items:
-                                    order_item.each_price = coupon_applied_price
-                                    order_item.save()
-                                    order.total_charge = total_after_reducing
-                                    order.save()
-                                    refund_money = coupon_applied_price
-                                else:
-                                    refund_money = order_item.each_price
+                                    if total_after_reducing > 0:
+                                        order.total_charge = total_after_reducing
+                                        order.save()
+                                
+                                refund_money = order_item.each_price
                                         
                                 
                                 
@@ -1253,9 +1242,10 @@ def cancel_order(request, order_items_id):
                                 money_deposit = refund_money,
                             )
                             wallet_transaction.save()
-                            
+                                
                             order_total = order.total_charge
                             order.total_charge = order_total - refund_money
+                            order.save()
                     else:
                         refund_money = order.total_charge
                         wallet_transaction = WalletTransaction.objects.create(
@@ -1265,20 +1255,27 @@ def cancel_order(request, order_items_id):
                         )
                         wallet_transaction.save()
                         
+                        order_total = order.total_charge
+                        order.total_charge = order_total - refund_money
+                        order.save()
+                        
                     new_wallet_balance = wallet.balance + refund_money
                     wallet.balance = new_wallet_balance   
                     wallet.save()
                     
-                    product_size.quantity += order_item.quantity
-                    product_size.save()
+                product_size.quantity += order_item.quantity
+                product_size.save()
+                
+                if not order.payment.method_name == "Razorpay":
+                    order.total_charge -= order_item.each_price
+                    order.save()
+                order_item.cancel_product = True
+                order_item.order_status = 'Cancelled'
+                order_item.save()
                     
-                    order_item.cancel_product = True
-                    order_item.order_status = 'Cancelled'
-                    order_item.save()
+                time.sleep(2)
                     
-                    time.sleep(2)
-                    
-                    return redirect('order_detail', order_items_id)
+                return redirect('order_detail', order_items_id)
         except Exception as e:
             return redirect(index_page)
     else:
@@ -1514,7 +1511,6 @@ def checkout_page(request):
         discount_amount = 0
         if cart_items:
             total_price = sum(item.total_price for item in cart_items)
-            print("CART TOTAL :", total_price)
             coupon = None
             if cart.coupon_applied:
                 try:
@@ -1524,7 +1520,6 @@ def checkout_page(request):
                     cart.coupon = None
 
                 total_charge_discounted, discount_amount   = calculate_total_charge_discounted(cart_items, cart)
-                print("TOTAL CHARGE DISCOUNTED :", total_charge_discounted)
                 sub_charge = total_charge_discounted
             charge_for_shipping = 0
             
@@ -1537,7 +1532,11 @@ def checkout_page(request):
                 charge_for_shipping = 99
                 total_charge_discounted = total_charge_discounted + charge_for_shipping
             
-            orders_with_coupon = Orders.objects.filter(customer = customer, coupon_applied = True)
+            orders_with_coupon = Orders.objects.filter(
+                customer=customer,
+                coupon_applied=True,
+                order__cancel_product=False
+            )
             
             used_coupons = orders_with_coupon.values_list('coupon_name', flat=True)
 
@@ -1688,7 +1687,6 @@ def place_order(request):
                     
                     subtotal = request.POST.get('subtotal')
                     shipping_charge = request.POST.get('shipping_charge')
-                    print("SUBTOTAL :", subtotal)
                     if total_charge_discounted is not None:
                         if total_charge_discounted <= 2500:
                             shipping_charge = 99
@@ -1758,6 +1756,10 @@ def place_order(request):
                         for item in cart_items:
                             price_of_each = item.total_price
                             
+                            if cart.coupon_applied:
+                                coupon = Coupon.objects.get(pk = cart.coupon)
+                                discount_price = round((price_of_each * coupon.discount_percentage) / 100)
+                                price_of_each = price_of_each - discount_price
                             
                             order_item = OrderItem.objects.create(
                                 order=order,
@@ -1878,6 +1880,11 @@ def razorpay_payment(request, user_id):
                     
                     for item in cart_items:
                         price_of_each = item.total_price
+                        
+                        if cart.coupon_applied:
+                            coupon = Coupon.objects.get(pk = cart.coupon)
+                            discount_price = round((price_of_each * coupon.discount_percentage) / 100)
+                            price_of_each = price_of_each - discount_price
                         
                         order_item = OrderItem.objects.create(
                             order=order,

@@ -1713,36 +1713,24 @@ def return_product(request, order_items_id):
                     if order_item.order.coupon_applied:
                         minimum_amount = order.coupon_minimum_amount
                         maximum_amount = order.coupon_maximum_amount
-                        other_order_items = OrderItem.objects.filter(order=order, return_product = False).exclude(order_items_id = order_items_id)
+                        other_order_items = OrderItem.objects.filter(order=order, return_product = False, cancel_product = False).exclude(order_items_id = order_items_id)
                         total_of_other_order = 0
                         for item in other_order_items:
                             total_of_other_order += item.each_price
                         
                         item_price = order_item.each_price
                         
-                        discount_price = round((item_price * order.coupon_discount_percent) / 100)
-                        coupon_applied_price = item_price - discount_price
                         
-                        total_after_reducing = order.total_charge - coupon_applied_price
+                        total_after_reducing = order.total_charge - order_item.each_price
                            
                         if minimum_amount <= total_of_other_order <= maximum_amount:
                             
-                            for item in other_order_items:
-                                other_item_price = item.each_price
-                                discount_for_other_item = round((other_item_price * order.coupon_discount_percent) / 100)
-                                other_item_coupon_applied_price = other_item_price - discount_for_other_item
-                                    
-                                item.each_price = other_item_coupon_applied_price
-                                item.save()
-                                
                             if other_order_items:
-                                order_item.each_price = coupon_applied_price
-                                order_item.save()
-                                order.total_charge = total_after_reducing
-                                order.save()
-                                refund_money = coupon_applied_price
-                            else:
-                                refund_money = order_item.each_price
+                                if total_after_reducing > 0:
+                                    order.total_charge = total_after_reducing
+                                    order.save()
+                                
+                            refund_money = order_item.each_price
                                     
                             
                             
@@ -1795,6 +1783,7 @@ def return_product(request, order_items_id):
                         
                         order_total = order.total_charge
                         order.total_charge = order_total - refund_money
+                        order.save()
                 else:
                     refund_money = order.total_charge
                     wallet_transaction = WalletTransaction.objects.create(
@@ -1803,6 +1792,9 @@ def return_product(request, order_items_id):
                         money_deposit=refund_money,
                     )
                     wallet_transaction.save()
+                    
+                    order_item.each_price = refund_money
+                    order_item.save()
                     
                 new_wallet_balance = wallet.balance + refund_money
                 wallet.balance = new_wallet_balance   
