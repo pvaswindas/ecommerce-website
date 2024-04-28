@@ -12,12 +12,16 @@
               <div class="flex-grow-1 ms-md-3">
                 <h4 class="mb-1">Order ID : {{ item.order_items_id }}</h4>
                 
-                  {% if not item.order_status == 'Cancelled' %}
-                  <p class="mb-1">
-                    <strong>Order Status :</strong> {{ item.order_status }}
+                  {% if item.order_status == 'Cancelled' %}
+                  <p class="mb-1 text-danger border border-1 border-danger w-50 px-2 rounded rounded-1">
+                    <strong>Order Status :  {{ item.order_status }}</strong>
+                  </p>
+                  {% elif item.order_status == 'Returned' %}
+                  <p class="mb-1 text-warning border border-1 border-warning w-50 px-2 rounded rounded-1">
+                    <strong>Order Status : {{ item.order_status }}</strong>
                   </p>
                   {% else %}
-                  <p class="mb-1 text-danger border border-1 border-danger w-50 px-2 rounded rounded-1">
+                  <p class="mb-1">
                     <strong>Order Status :</strong> {{ item.order_status }}
                   </p>
                   {% endif %}
@@ -29,7 +33,7 @@
                   <strong>Payment :</strong> {{ item.order.payment.method_name }}
                 </p>
                 <p class="mb-1">
-                  <strong>Price :</strong> ₹{{ item.total_price }}.00
+                  <strong>Price :</strong> ₹{{ item.each_price }}.00
                 </p>
                 <p class="mb-1">
                   <strong>Quantity :</strong> {{ item.quantity }}

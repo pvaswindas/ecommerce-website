@@ -23,8 +23,9 @@
     <table>
       <thead>
         <tr>
-          <th class="customer-column">Customer</th>
+          <th class="product-image-column">Product</th>
           <th class="order-id-column">Order ID</th>
+          <th class="customer-column">Customer</th>
           <th class="order-product">Product</th>
           <th class="status-column">Status</th>
           <th class="price-column">Price</th>
@@ -34,7 +35,7 @@
       <tbody>
         {% for item in order_item %}
           <tr>
-            <td>{{ item.order.customer.user.first_name }} {{ item.order.customer.user.last_name }}</td>
+            <td><img src="{{ item.product.product_color_image.main_image.url }}" style="max-width: 100px;" alt=""></td>
             <td>
               <a href="{% url 'order_detailed_view' item.order_items_id %}">{{ item.order_items_id }}</a>
               {% if item.cancel_product %}
@@ -47,9 +48,10 @@
                 {% endif %}
               {% endif %}
             </td>
+            <td>{{ item.order.customer.user.first_name }} {{ item.order.customer.user.last_name }}</td>
             <td>{{ item.product}}</td>
             <td>{{ item.order_status }}</td>
-            <td>{{ item.total_price }}</td>
+            <td>{{ item.each_price }}</td>
             <td>{{ item.product.size }}</td>
           </tr>
         {% endfor %}

@@ -81,7 +81,7 @@
                   </div>
                 {% endif %}
               {% endif %}
-              <input type="hidden" name="subtotal" value="{{ subtotal }}" />
+              <input type="hidden" name="subtotal" value="{{ sub_charge }}" />
               <input type="hidden" name="shipping_charge" value="{{ shipping_charge }}" />
 
               {% if cart.coupon_applied %}
@@ -151,7 +151,7 @@
                     <td>Subtotal:</td>
                     <td>
                       ₹{% if cart.coupon_applied %}
-                        {{ sub_charge }}
+                        {{ total_charge_discounted }}
                       {% else %}
                         {{ subtotal }}
                       {% endif %}.00

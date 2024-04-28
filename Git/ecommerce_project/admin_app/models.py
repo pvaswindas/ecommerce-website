@@ -173,7 +173,7 @@ class Orders(models.Model):
     coupon_name = models.CharField(blank=True, null=True)
     coupon_discount_percent = models.PositiveBigIntegerField(
         blank=True, null=True)
-    discount_price = models.PositiveBigIntegerField(blank=True, default=0)
+    discount_price = models.PositiveBigIntegerField(blank=True, null = True, default=0)
     coupon_minimum_amount = models.PositiveBigIntegerField(
         blank=True, null=True)
     coupon_maximum_amount = models.PositiveBigIntegerField(
@@ -181,7 +181,7 @@ class Orders(models.Model):
 
     def __str__(self):
         paid_status = "- Paid" if self.paid else ""
-        return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.payment} {paid_status}"
+        return f"{self.customer.user.first_name} {self.customer.user.last_name} : {self.order_id} - {self.payment} {paid_status} | {self.total_charge}"
 
     def save(self, *args, **kwargs):
         if not self.order_id:
@@ -210,17 +210,14 @@ class OrderItem(models.Model):
     return_product = models.BooleanField(default=False)
     request_return = models.BooleanField(default=False)
     delivery_date = models.DateField(null=True, blank=True)
-    total_price = models.PositiveBigIntegerField(default=0)
 
     def __str__(self):
         customer_name = f"{self.order.customer.user.first_name} {
             self.order.customer.user.last_name}"
         product_name = self.product.product_color_image.products.name
-        return f"{customer_name}: {self.order.order_id} - {self.order_items_id} - {product_name} | {self.total_price}"
+        return f"{customer_name}: {self.order.order_id} - {self.order_items_id} - {product_name} | {self.each_price}"
 
     def save(self, *args, **kwargs):
-        if not self.total_price:
-            self.total_price = self.each_price * self.quantity
         if not self.order_items_id:
             first_part = 'ODIN'
             while True:

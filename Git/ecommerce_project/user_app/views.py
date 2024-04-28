@@ -1162,97 +1162,123 @@ def cancel_order(request, order_items_id):
             order = order_item.order
             user = request.user
             wallet = Wallet.objects.get(user = user)
-            
-            if order.payment.method_name == "Razorpay":
-                refund_money = 0
-                other_item_price = 0
-                sum_of_all_other = 0
-                if order.number_of_orders > 1:
-                    if order_item.order.coupon_applied:
-                        minimum_amount = order.coupon_minimum_amount
-                        maximum_amount = order.coupon_maximum_amount
-                        item_price = order_item.total_price
-                        discount_price = round((item_price * order.coupon_discount_percent) / 100)
-                        coupon_applied_price = item_price - discount_price
-                        total_after_reducing = order.total_charge - coupon_applied_price
-                        
-                        
-                        other_order_items = OrderItem.objects.filter(order=order).exclude(pk=order_items_id)
-                        
-                        if minimum_amount <= total_after_reducing <= maximum_amount:
+            with transaction.atomic():
+                if order.payment.method_name == "Razorpay":
+                    refund_money = 0
+                    other_item_price = 0
+                    sum_of_all_other = 0
+                    refund_money = 0
+                    other_item_price = 0
+                    sum_of_all_other = 0
+                    if order.number_of_orders > 1:
+                        if order_item.order.coupon_applied:
+                            minimum_amount = order.coupon_minimum_amount
+                            maximum_amount = order.coupon_maximum_amount
+                            other_order_items = OrderItem.objects.filter(order=order, cancel_product = False).exclude(order_items_id = order_items_id)
+                            total_of_other_order = 0
                             for item in other_order_items:
-                                other_item_price = item.total_price
-                                discount_for_other_item = round((other_item_price * order.coupon_discount_percent) / 100)
-                                other_item_coupon_applied_price = other_item_price - discount_for_other_item
-                                
-                                item.total_price = other_item_coupon_applied_price
-                                item.save()
-                                
-                            order.total_charge = total_after_reducing
-                            order.save()
-                            refund_money = coupon_applied_price
-                            wallet_transaction = WalletTransaction.objects.create(
-                                wallet = wallet,
-                                order_item = order_item,
-                                money_deposit = refund_money
-                            )
-                            wallet_transaction.save()
+                                total_of_other_order += item.each_price
                             
+                            item_price = order_item.each_price
+                            
+                            discount_price = round((item_price * order.coupon_discount_percent) / 100)
+                            coupon_applied_price = item_price - discount_price
+                            
+                            total_after_reducing = order.total_charge - coupon_applied_price
+                            
+                            if minimum_amount <= total_of_other_order <= maximum_amount:
+                                
+                                for item in other_order_items:
+                                    other_item_price = item.each_price
+                                    discount_for_other_item = round((other_item_price * order.coupon_discount_percent) / 100)
+                                    other_item_coupon_applied_price = other_item_price - discount_for_other_item
+                                        
+                                    item.each_price = other_item_coupon_applied_price
+                                    item.save()
+                                    
+                                if other_order_items:
+                                    order_item.each_price = coupon_applied_price
+                                    order_item.save()
+                                    order.total_charge = total_after_reducing
+                                    order.save()
+                                    refund_money = coupon_applied_price
+                                else:
+                                    refund_money = order_item.each_price
+                                        
+                                
+                                
+                                wallet_transaction = WalletTransaction.objects.create(
+                                    wallet = wallet,
+                                    order_item = order_item,
+                                    money_deposit = refund_money
+                                )
+                                wallet_transaction.save()
+                                    
+                            else:
+                                order_total = order.total_charge
+                                sum_of_all_other = 0
+                                for item in other_order_items:
+                                    other_item_price = item.each_price
+                                    sum_of_all_other += other_item_price
+                                    
+                                
+                                refund_money = int(order_total - sum_of_all_other)
+                                
+                                wallet_transaction = WalletTransaction.objects.create(
+                                    wallet = wallet,
+                                    order_item = order_item,
+                                    money_deposit = refund_money
+                                )
+                                wallet_transaction.save()
+                                
+                                
+                                order_item.each_price = refund_money
+                                order_item.save()
+                                
+                                    
+                                order.total_charge = sum_of_all_other
+                                order.coupon_applied = False
+                                order.coupon_name = None
+                                order.discount_price = None
+                                order.coupon_discount_percent = None
+                                order.coupon_minimum_amount = None
+                                order.coupon_maximum_amount = None
+                                order.save()
                         else:
-                            order_total = order.total_charge
-                            for item in other_order_items:
-                                other_item_price = item.each_price * item.quantity
-                                sum_of_all_other += other_item_price
-                                item.total_price = other_item_price
-                                item.save()
-                                
-                            refund_money = order_total - sum_of_all_other
-                            
+                            item_price = order_item.each_price
+                            refund_money = item_price
                             wallet_transaction = WalletTransaction.objects.create(
                                 wallet = wallet,
                                 order_item = order_item,
-                                money_deposit = refund_money
+                                money_deposit = refund_money,
                             )
                             wallet_transaction.save()
                             
-                            order.total_charge = sum_of_all_other
-                            order.coupon_applied = False
-                            order.coupon_name = None
-                            order.discount_price = None
-                            order.coupon_discount_percent = None
-                            order.coupon_minimum_amount = None
-                            order.coupon_maximum_amount = None
-                            order.save()
+                            order_total = order.total_charge
+                            order.total_charge = order_total - refund_money
                     else:
-                        item_price = order_item.total_price
-                        refund_money = item_price
+                        refund_money = order.total_charge
                         wallet_transaction = WalletTransaction.objects.create(
-                            wallet = wallet,
+                            wallet=wallet,
                             order_item = order_item,
-                            money_deposit = refund_money,
+                            money_deposit=refund_money,
                         )
-                        wallet_transaction.save()  
-                else:
-                    refund_money = order.total_charge
-                    wallet_transaction = WalletTransaction.objects.create(
-                        wallet=wallet,
-                        order_item = order_item,
-                        money_deposit=refund_money,
-                    )
-                    wallet_transaction.save()
-            new_wallet_balance = wallet.balance + refund_money
-            wallet.balance = new_wallet_balance   
-            wallet.save()
-        
-            product_size.quantity += order_item.quantity
-            product_size.save()        
-            order_item.cancel_product = True
-            order_item.order_status = 'Cancelled'
-            order_item.save()
-            
-            time.sleep(2)
-            
-            return redirect('order_detail', order_items_id)
+                        wallet_transaction.save()
+                        
+                    new_wallet_balance = wallet.balance + refund_money
+                    wallet.balance = new_wallet_balance   
+                    wallet.save()
+                    
+                    product_size.quantity += order_item.quantity
+                    product_size.save()
+                    
+                    order_item.cancel_product = True
+                    order_item.order_status = 'Cancelled'
+                    order_item.save()
+                    
+                    time.sleep(2)
+                    
+                    return redirect('order_detail', order_items_id)
         except Exception as e:
             return redirect(index_page)
     else:
@@ -1488,6 +1514,7 @@ def checkout_page(request):
         discount_amount = 0
         if cart_items:
             total_price = sum(item.total_price for item in cart_items)
+            print("CART TOTAL :", total_price)
             coupon = None
             if cart.coupon_applied:
                 try:
@@ -1497,12 +1524,12 @@ def checkout_page(request):
                     cart.coupon = None
 
                 total_charge_discounted, discount_amount   = calculate_total_charge_discounted(cart_items, cart)
-            
+                print("TOTAL CHARGE DISCOUNTED :", total_charge_discounted)
+                sub_charge = total_charge_discounted
             charge_for_shipping = 0
             
             if not cart.coupon_applied:
-                pass
-            sub_charge = total_charge_discounted
+                sub_charge = total_price
             
             today = datetime.now().date()
             
@@ -1661,7 +1688,7 @@ def place_order(request):
                     
                     subtotal = request.POST.get('subtotal')
                     shipping_charge = request.POST.get('shipping_charge')
-                    
+                    print("SUBTOTAL :", subtotal)
                     if total_charge_discounted is not None:
                         if total_charge_discounted <= 2500:
                             shipping_charge = 99
@@ -1672,9 +1699,6 @@ def place_order(request):
                     payment_method = request.POST.get('payment_method')
                     
                     address = Address.objects.get(pk=address_id)
-                    
-                    
-                        
                     
                     
                     razorpay = None
@@ -1732,13 +1756,9 @@ def place_order(request):
                         order.save()
                         
                         for item in cart_items:
-                            price_of_each = 0
-                            try:
-                                offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
-                                price_of_each = offer.offer_price * item.quantity
-                            except ObjectDoesNotExist:
-                                price_of_each = item.product.product_color_image.price * item.quantity
-    
+                            price_of_each = item.total_price
+                            
+                            
                             order_item = OrderItem.objects.create(
                                 order=order,
                                 product=item.product,
@@ -1855,16 +1875,9 @@ def razorpay_payment(request, user_id):
                         coupon_maximum_amount = maximum_amount,
                     )
                     order.save()
+                    
                     for item in cart_items:
-                        price_of_each = 0
-                        try:
-                            offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
-                            price_of_each = offer.offer_price
-                        except ObjectDoesNotExist:
-                            price_of_each = item.product.product_color_image.price
-                            
-                            
-                            
+                        price_of_each = item.total_price
                         
                         order_item = OrderItem.objects.create(
                             order=order,

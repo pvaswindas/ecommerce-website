@@ -26,10 +26,10 @@
             {% if order_items.order.number_of_orders == 1 %}
               <p>Price : ₹{{ order_items.order.total_charge }}</p>
             {% else %}
-              <p>Price : ₹{{ order_items.total_price }}</p>
+              <p>Price : ₹{{ order_items.each_price }}</p>
             {% endif %}
           {% else %}
-            <p>Price : ₹{{ order_items.total_price }}</p>
+            <p>Price : ₹{{ order_items.each_price }}</p>
           {% endif %}
 
           {% if order_items.order.shipping_charge > 0 %}
@@ -194,7 +194,7 @@
                   </td>
                   <td>{{ order_items.product.product_color_image.products.name }}</td>
                   <td>{{ order_items.quantity }}</td>
-                  <td>₹{{ order_items.total_price }}.00</td>
+                  <td>₹{{ order_items.each_price }}.00</td>
                   {% if order_items.order.coupon_applied %}
                     {% if order_items.order.number_of_orders == 1 %}
                       <td>₹{{ order_items.order.total_charge }}.00</td>

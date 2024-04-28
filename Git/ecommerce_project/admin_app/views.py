@@ -4,12 +4,14 @@ import re
 from django.contrib.auth.models import User
 from user_app.models import Customer
 from admin_app.models import *
+import time
 from django.urls import reverse
 from datetime import datetime
 from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth import authenticate
 from django.contrib import auth
+from django.db import transaction
 from django.contrib import messages
 from django.utils.timezone import make_aware
 from django.contrib.auth.decorators import login_required
@@ -825,7 +827,6 @@ def edit_product_update(request, p_id):
                         is_every_field_valid = False
                         messages.error(
                             request, 'More information must be between 10 and 1000 characters long.')
-                        print(len(information))
 
                     elif not 5 <= len(cleaned_type) <= 100:
                         is_every_field_valid = False
@@ -1699,11 +1700,125 @@ def change_order_status(request, order_id):
 def return_product(request, order_items_id):
     if request.user.is_superuser:
         try:
-            order_items = OrderItem.objects.get(pk=order_items_id)
-            order_items.return_product = True
-            order_items.order_status = 'Returned'
-            order_items.save()
-            return redirect('order_detailed_view', order_items_id)
+            with transaction.atomic():
+                order_item = OrderItem.objects.get(pk=order_items_id)
+                product_size = order_item.product
+                order = order_item.order
+                user = order.customer.user
+                wallet = Wallet.objects.get(user = user)
+                refund_money = 0
+                other_item_price = 0
+                sum_of_all_other = 0
+                if order.number_of_orders > 1:
+                    if order_item.order.coupon_applied:
+                        minimum_amount = order.coupon_minimum_amount
+                        maximum_amount = order.coupon_maximum_amount
+                        other_order_items = OrderItem.objects.filter(order=order, return_product = False).exclude(order_items_id = order_items_id)
+                        total_of_other_order = 0
+                        for item in other_order_items:
+                            total_of_other_order += item.each_price
+                        
+                        item_price = order_item.each_price
+                        
+                        discount_price = round((item_price * order.coupon_discount_percent) / 100)
+                        coupon_applied_price = item_price - discount_price
+                        
+                        total_after_reducing = order.total_charge - coupon_applied_price
+                           
+                        if minimum_amount <= total_of_other_order <= maximum_amount:
+                            
+                            for item in other_order_items:
+                                other_item_price = item.each_price
+                                discount_for_other_item = round((other_item_price * order.coupon_discount_percent) / 100)
+                                other_item_coupon_applied_price = other_item_price - discount_for_other_item
+                                    
+                                item.each_price = other_item_coupon_applied_price
+                                item.save()
+                                
+                            if other_order_items:
+                                order_item.each_price = coupon_applied_price
+                                order_item.save()
+                                order.total_charge = total_after_reducing
+                                order.save()
+                                refund_money = coupon_applied_price
+                            else:
+                                refund_money = order_item.each_price
+                                    
+                            
+                            
+                            wallet_transaction = WalletTransaction.objects.create(
+                                wallet = wallet,
+                                order_item = order_item,
+                                money_deposit = refund_money
+                            )
+                            wallet_transaction.save()
+                                
+                        else:
+                            order_total = order.total_charge
+                            sum_of_all_other = 0
+                            for item in other_order_items:
+                                other_item_price = item.each_price
+                                sum_of_all_other += other_item_price
+                                
+                            
+                            refund_money = int(order_total - sum_of_all_other)
+                            
+                            wallet_transaction = WalletTransaction.objects.create(
+                                wallet = wallet,
+                                order_item = order_item,
+                                money_deposit = refund_money
+                            )
+                            wallet_transaction.save()
+                            
+                            
+                            order_item.each_price = refund_money
+                            order_item.save()
+                               
+                                
+                            order.total_charge = sum_of_all_other
+                            order.coupon_applied = False
+                            order.coupon_name = None
+                            order.discount_price = None
+                            order.coupon_discount_percent = None
+                            order.coupon_minimum_amount = None
+                            order.coupon_maximum_amount = None
+                            order.save()
+                    else:
+                        item_price = order_item.each_price
+                        refund_money = item_price
+                        wallet_transaction = WalletTransaction.objects.create(
+                            wallet = wallet,
+                            order_item = order_item,
+                            money_deposit = refund_money,
+                        )
+                        wallet_transaction.save()
+                        
+                        order_total = order.total_charge
+                        order.total_charge = order_total - refund_money
+                else:
+                    refund_money = order.total_charge
+                    wallet_transaction = WalletTransaction.objects.create(
+                        wallet=wallet,
+                        order_item = order_item,
+                        money_deposit=refund_money,
+                    )
+                    wallet_transaction.save()
+                    
+                new_wallet_balance = wallet.balance + refund_money
+                wallet.balance = new_wallet_balance   
+                wallet.save()
+                
+                product_size.quantity += order_item.quantity
+                product_size.save() 
+                
+                order_item.return_product = True
+                order_item.order_status = 'Returned'
+                order_item.save()
+                
+                time.sleep(2)
+                
+                
+                return redirect('order_detailed_view', order_items_id)
         except Exception as e:
             return redirect(admin_login_page)
     else:
