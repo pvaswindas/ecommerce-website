@@ -42,7 +42,7 @@
         {% for offer in category_offers %}
           <tr>
             <td>
-              {% if offer.end_date <= today %}
+              {% if offer.end_date < today %}
                   <div class="expired-offer">
                       <p class="mb-1 text-danger">{{ offer.category.name }}</p>
                       <span class="badge text-white bg-danger">Offer Expired</span>

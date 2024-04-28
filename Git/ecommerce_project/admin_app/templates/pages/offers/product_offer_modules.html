@@ -42,7 +42,7 @@
         {% for offer in product_offer %}
           <tr>
             <td>
-              {% if offer.end_date <= today %}
+              {% if offer.end_date < today %}
                   <div class="expired-offer">
                       <p class="mb-1 text-danger">{{ offer.product_color_image.products.name }} ({{ offer.product_color_image.color }})</p>
                       <span class="badge text-white bg-danger">Offer Expired</span>

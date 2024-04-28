@@ -1398,7 +1398,6 @@ def update_total_price(request):
                         total_price = highest_offer_price * quantity
                     except ObjectDoesNotExist:
                         total_price = product.product_color_image.price * quantity
-                    print(total_price)
                     return JsonResponse({'total_price': total_price})
                 else:
                     return JsonResponse({'error': f'Only {available_quantity} units available'})
@@ -1423,33 +1422,43 @@ def update_quantity(request):
             
             try:
                 cart_item = CartProducts.objects.get(pk=item_id)
-                cart_item.quantity = new_quantity
-                cart_item.save()
-                
                 try:
-                    product_offer = ProductOffer.objects.filter(product_color_image=cart_item.product_color_image, end_date__gte=today).first()
-                    category_offer = CategoryOffer.objects.filter(category=cart_item.product_color_image.products.category, end_date__gte=today).first()
+                    new_quantity = int(new_quantity)
+                except ValueError:
+                    messages.error(request, 'Add the cart quantity using the buttons')
+                    return redirect('cart_view_page')
+                try:
+                    if cart_item.product.quantity >= new_quantity:
+                        cart_item.quantity = new_quantity
+                        cart_item.save()
                         
-                    if product_offer and category_offer:
-                        highest_discount = max(product_offer.discount_percentage, category_offer.discount_percentage)
-                    elif product_offer:
-                        highest_discount = product_offer.discount_percentage
-                    elif category_offer:
-                        highest_discount = category_offer.discount_percentage
-                    else:
-                        highest_discount = 0
+                        try:
+                            product_offer = ProductOffer.objects.filter(product_color_image=cart_item.product.product_color_image, end_date__gte=today).first()
+                            category_offer = CategoryOffer.objects.filter(category=cart_item.product.product_color_image.products.category, end_date__gte=today).first()
+                                
+                            if product_offer and category_offer:
+                                highest_discount = max(product_offer.discount_percentage, category_offer.discount_percentage)
+                            elif product_offer:
+                                highest_discount = product_offer.discount_percentage
+                            elif category_offer:
+                                highest_discount = category_offer.discount_percentage
+                            else:
+                                highest_discount = 0
+                                
+                            if highest_discount > 0:
+                                discount_amount = round((highest_discount * cart_item.product.product_color_image.price) / 100)
+                                highest_offer_price = cart_item.product.product_color_image.price - discount_amount
+                            else:
+                                highest_offer_price = cart_item.product.product_color_image.price
+                                    
+                            total_price = highest_offer_price * new_quantity
+                        except ObjectDoesNotExist:
+                            total_price = cart_item.product.product_color_image.price * new_quantity
                         
-                    if highest_discount > 0:
-                        discount_amount = round((highest_discount * cart_item.product_color_image.price) / 100)
-                        highest_offer_price = cart_item.product_color_image.price - discount_amount
-                    else:
-                        highest_offer_price = cart_item.product_color_image.price
-                            
-                    total_price = highest_offer_price * new_quantity
-                except ObjectDoesNotExist:
-                    total_price = cart_item.product.product_color_image.price * new_quantity
-                
-                return JsonResponse({'total_price': total_price})
+                        return JsonResponse({'total_price': total_price})
+                    
+                except:
+                    pass
             except CartProducts.DoesNotExist:
                 return JsonResponse({'error': 'Product not found'})
         else:
@@ -1475,7 +1484,6 @@ def checkout_page(request):
         customer = Customer.objects.get(user=user)
         cart = Cart.objects.get(customer=customer)
         cart_items = CartProducts.objects.filter(cart=cart, in_stock=True)
-        
         total_charge_discounted = 0
         discount_amount = 0
         if cart_items:
@@ -1546,40 +1554,11 @@ def calculate_total_charge_discounted(cart_items, cart):
 
 
 def calculate_discounted_total_charge(cart_items, coupon):
-    cart_total_with_offer = 0
-    cart_total_without_offer = 0
+    cart_total_price = 0
     
     for item in cart_items:
-        try:
-            product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
-            
-            try:
-                product_offer = ProductOffer.objects.get(product_color_image= item.product.product_color_image, end_date__gte=today)
-            except ProductOffer.DoesNotExist:
-                product_offer = None
-                    
-            try:
-                category_offer = CategoryOffer.objects.get(category = item.product.product_color_image.products.category, end_date__gte=today)
-            except CategoryOffer.DoesNotExist:
-                category_offer = None
-                            
-            if product_offer and category_offer:
-                highest_discount = max(product_offer.discount_percentage, category_offer.discount_percentage)
-            elif product_offer:
-                highest_discount = product_offer.discount_percentage
-            elif category_offer:
-                highest_discount = category_offer.discount_percentage
-                    
-            if category_offer or product_offer:
-                discount_amount = round((highest_discount * item.product.product_color_image.price) / 100)
-                highest_offer_price = item.product.product_color_image.price - discount_amount
-            
-            
-            offer_price = highest_offer_price
-            cart_total_with_offer += offer_price * item.quantity
-        except ObjectDoesNotExist:
-            cart_total_without_offer += item.product.product_color_image.price * item.quantity
-    cart_total = cart_total_with_offer + cart_total_without_offer 
+        cart_total_price += item.total_price
+    cart_total = cart_total_price 
     
     if coupon:
         discount_amount = round((cart_total * coupon.discount_percentage) / 100)
@@ -1644,18 +1623,14 @@ def place_order(request):
                     total_money = request.POST.get('total_charge')
                     
                     cart_total = 0
-                    cart_total_with_offer = 0
-                    cart_total_without_offer = 0
                     item_count = 0
+                    cart_total_price = 0
+                    
                     for item in cart_items:
                         item_count += 1
-                        try:
-                            product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
-                            offer_price = product_offer.offer_price
-                            cart_total_with_offer += offer_price
-                        except ObjectDoesNotExist:
-                            cart_total_without_offer += item.product.product_color_image.price
-                    cart_total = cart_total_with_offer + cart_total_without_offer
+                        cart_total_price += item.total_price
+                        
+                    cart_total = cart_total_price
                     
                     
                     total_charge = 0
@@ -1816,17 +1791,11 @@ def razorpay_payment(request, user_id):
             address = Address.objects.get(pk=address_id)
             
             subtotal = 0
-            cart_total_with_offer = 0
-            cart_total_without_offer = 0
+            cart_total_price = 0
             for item in cart_items:
-                try:
-                    product_offer = ProductOffer.objects.get(product_color_image = item.product.product_color_image, end_date__gte = today)
-                    offer_price = product_offer.offer_price
-                    cart_total_with_offer += offer_price * item.quantity
-                except ObjectDoesNotExist:
-                    cart_total_without_offer += item.product.product_color_image.price * item.quantity
+                cart_total_price += item.total_price
                     
-            subtotal = cart_total_with_offer + cart_total_without_offer
+            subtotal = cart_total_price
             
             total_charge = subtotal
             if_coupon_applied = False
