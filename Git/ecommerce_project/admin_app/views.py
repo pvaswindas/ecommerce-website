@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from user_app.models import Customer
 from admin_app.models import *
 import time
+import json
+import pytz  # type: ignore
 from django.urls import reverse
 from datetime import datetime
 from datetime import timedelta
@@ -14,7 +16,7 @@ from django.contrib import auth
 from django.db import transaction
 from django.contrib import messages
 from django.utils.timezone import make_aware
-from django.contrib.auth.decorators import login_required
+from django.db.models import F, ExpressionWrapper, DecimalField, Case, When, Value, Subquery, Count, OuterRef, IntegerField
 from django.views.decorators.cache import never_cache
 
 import datetime
@@ -321,16 +323,16 @@ def add_categories(request):
             if name_str and description_str:
                 cleaned_name = clean_string(name_str)
                 cleaned_description = clean_string(description)
-                
+
                 if not alphabets_pattern.match(name_str):
                     is_every_field_valid = False
                     messages.error(
                         request, 'Category name should contain only alphabetical characters & should not contain any spaces')
-                    
+
                 elif not 3 <= len(cleaned_name) <= 30:
                     is_every_field_valid = False
-                    messages.error(request, 'Category name should be between 3 and 30 characters long, and it should not be blank.')
-                
+                    messages.error(
+                        request, 'Category name should be between 3 and 30 characters long, and it should not be blank.')
 
                 elif not description_pattern.match(description_str):
                     is_every_field_valid = False
@@ -341,7 +343,6 @@ def add_categories(request):
                     is_every_field_valid = False
                     messages.error(
                         request, 'Description should be between 10 and 300 characters long, and it should not be blank.')
-
 
                 if is_every_field_valid:
                     name = name_str.upper()
@@ -401,15 +402,16 @@ def edit_category(request, cat_id):
             if name_str and description_str:
                 cleaned_name = clean_string(name_str)
                 cleaned_description = clean_string(description_str)
-                
+
                 if not alphabets_pattern.match(name_str):
                     is_every_field_valid = False
                     messages.error(
                         request, 'Category name should contain only alphabetical characters & should not contain any spaces')
-                    
+
                 elif not 3 <= len(cleaned_name) <= 30:
                     is_every_field_valid = False
-                    messages.error(request, 'Category name should be between 3 to 30 characters long, and it should not be blank.')
+                    messages.error(
+                        request, 'Category name should be between 3 to 30 characters long, and it should not be blank.')
 
                 elif not description_pattern.match(description_str):
                     is_every_field_valid = False
@@ -421,11 +423,9 @@ def edit_category(request, cat_id):
                     messages.error(
                         request, 'Description name should be between 10 to 300 characters long, and it should not be blank.')
 
-                
-
                 if is_every_field_valid:
                     name = name_str.upper()
-                    description = description_str   
+                    description = description_str
                     try:
                         if not Category.objects.filter(name__iexact=name).exclude(pk=cat_id).exists():
                             category.name = name
@@ -1448,10 +1448,11 @@ def add_brand(request):
                 elif Brand.objects.filter(manufacturer_details__iexact=manufacturer_details).exists():
                     is_every_field_valid = False
                     messages.error(request, 'Manufacturer already exists.')
-                
+
                 elif not 10 <= len(cleaned_manufacturer) <= 300:
                     is_every_field_valid = False
-                    messages.error(request, 'Manufacturer details should be between 10 and 300 characters long, and it should not be blank.')
+                    messages.error(
+                        request, 'Manufacturer details should be between 10 and 300 characters long, and it should not be blank.')
 
                 if is_every_field_valid:
                     name = name.title()
@@ -1466,7 +1467,8 @@ def add_brand(request):
                             messages.success(request, 'New brand added!')
                             return redirect(list_brand_page)
                         except:
-                            messages.error(request, 'Currently not able to create a brand, try again after some time.')
+                            messages.error(
+                                request, 'Currently not able to create a brand, try again after some time.')
                             return redirect('admin_add_brand')
                     else:
                         messages.error(
@@ -1504,20 +1506,19 @@ def edit_brand(request, brand_id):
             name = request.POST['name']
             country_of_origin = request.POST['country_of_origin']
             manufacturer_details = request.POST['manufacturer_details']
-            
+
             is_every_field_valid = True
-            
+
             try:
                 brand = Brand.objects.get(id=brand_id)
             except Brand.DoesNotExist:
                 messages.error(request, 'Brand not found.')
                 return redirect('list_brand_page')
-            
-            
+
             if name and country_of_origin and manufacturer_details:
                 cleaned_name = clean_string(name)
                 cleaned_manufacturer = clean_string(manufacturer_details)
-                
+
                 if not 2 <= len(cleaned_name) <= 30:
                     is_every_field_valid = False
                     messages.error(
@@ -1528,25 +1529,28 @@ def edit_brand(request, brand_id):
                     messages.error(
                         request, 'Brand name should contain only alphabetical characters & should not contain any spaces')
 
-                elif Brand.objects.filter(manufacturer_details__iexact=manufacturer_details).exclude(pk = brand_id).exists():
+                elif Brand.objects.filter(manufacturer_details__iexact=manufacturer_details).exclude(pk=brand_id).exists():
                     is_every_field_valid = False
                     messages.error(request, 'Manufacturer already exists.')
-                
+
                 elif not 10 <= len(cleaned_manufacturer) <= 300:
                     is_every_field_valid = False
-                    messages.error(request, 'Manufacturer details should be between 10 and 300 characters long, and it should not be blank.')
+                    messages.error(
+                        request, 'Manufacturer details should be between 10 and 300 characters long, and it should not be blank.')
 
                 if is_every_field_valid:
                     name = name.title()
-                    if not Brand.objects.filter(name__iexact = name).exclude(pk= brand_id).exists():
+                    if not Brand.objects.filter(name__iexact=name).exclude(pk=brand_id).exists():
                         brand.name = name
                         brand.country_of_origin = country_of_origin
                         brand.manufacturer_details = manufacturer_details
                         brand.save()
-                        messages.success(request, 'Brand updated successfully!')
+                        messages.success(
+                            request, 'Brand updated successfully!')
                         return redirect('list_brand_page')
                     else:
-                        messages.error(request, 'Another brand exists with the same name, try a different name.')
+                        messages.error(
+                            request, 'Another brand exists with the same name, try a different name.')
                         return redirect('edit_brand_page', brand_id)
                 else:
                     return redirect('edit_brand_page', brand_id)
@@ -1687,6 +1691,11 @@ def change_order_status(request, order_id):
             today = date.today()
 
             if order_status == 'Delivered':
+                if order_item.order.payment.method_name == 'Cash On Delivery':
+                    order_item.order.payment.pending = False
+                    order_item.order.payment.success = True
+                    order_item.order.payment.save()
+                    
                 order_item.delivery_date = today
                 order_item.save()
             messages.success(request, 'Order Status Updated')
@@ -1705,7 +1714,7 @@ def return_product(request, order_items_id):
                 product_size = order_item.product
                 order = order_item.order
                 user = order.customer.user
-                wallet = Wallet.objects.get(user = user)
+                wallet = Wallet.objects.get(user=user)
                 refund_money = 0
                 other_item_price = 0
                 sum_of_all_other = 0
@@ -1713,56 +1722,51 @@ def return_product(request, order_items_id):
                     if order_item.order.coupon_applied:
                         minimum_amount = order.coupon_minimum_amount
                         maximum_amount = order.coupon_maximum_amount
-                        other_order_items = OrderItem.objects.filter(order=order, return_product = False, cancel_product = False).exclude(order_items_id = order_items_id)
+                        other_order_items = OrderItem.objects.filter(
+                            order=order, return_product=False, cancel_product=False).exclude(order_items_id=order_items_id)
                         total_of_other_order = 0
                         for item in other_order_items:
                             total_of_other_order += item.each_price
-                        
+
                         item_price = order_item.each_price
-                        
-                        
+
                         total_after_reducing = order.total_charge - order_item.each_price
-                           
+
                         if minimum_amount <= total_of_other_order <= maximum_amount:
-                            
+
                             if other_order_items:
                                 if total_after_reducing > 0:
                                     order.total_charge = total_after_reducing
                                     order.save()
-                                
+
                             refund_money = order_item.each_price
-                                    
-                            
-                            
+
                             wallet_transaction = WalletTransaction.objects.create(
-                                wallet = wallet,
-                                order_item = order_item,
-                                money_deposit = refund_money
+                                wallet=wallet,
+                                order_item=order_item,
+                                money_deposit=refund_money
                             )
                             wallet_transaction.save()
-                                
+
                         else:
                             order_total = order.total_charge
                             sum_of_all_other = 0
                             for item in other_order_items:
                                 other_item_price = item.each_price
                                 sum_of_all_other += other_item_price
-                                
-                            
+
                             refund_money = int(order_total - sum_of_all_other)
-                            
+
                             wallet_transaction = WalletTransaction.objects.create(
-                                wallet = wallet,
-                                order_item = order_item,
-                                money_deposit = refund_money
+                                wallet=wallet,
+                                order_item=order_item,
+                                money_deposit=refund_money
                             )
                             wallet_transaction.save()
-                            
-                            
+
                             order_item.each_price = refund_money
                             order_item.save()
-                               
-                                
+
                             order.total_charge = sum_of_all_other
                             order.coupon_applied = False
                             order.coupon_name = None
@@ -1775,12 +1779,12 @@ def return_product(request, order_items_id):
                         item_price = order_item.each_price
                         refund_money = item_price
                         wallet_transaction = WalletTransaction.objects.create(
-                            wallet = wallet,
-                            order_item = order_item,
-                            money_deposit = refund_money,
+                            wallet=wallet,
+                            order_item=order_item,
+                            money_deposit=refund_money,
                         )
                         wallet_transaction.save()
-                        
+
                         order_total = order.total_charge
                         order.total_charge = order_total - refund_money
                         order.save()
@@ -1788,28 +1792,27 @@ def return_product(request, order_items_id):
                     refund_money = order.total_charge
                     wallet_transaction = WalletTransaction.objects.create(
                         wallet=wallet,
-                        order_item = order_item,
+                        order_item=order_item,
                         money_deposit=refund_money,
                     )
                     wallet_transaction.save()
-                    
+
                     order_item.each_price = refund_money
                     order_item.save()
-                    
+
                 new_wallet_balance = wallet.balance + refund_money
-                wallet.balance = new_wallet_balance   
+                wallet.balance = new_wallet_balance
                 wallet.save()
-                
+
                 product_size.quantity += order_item.quantity
-                product_size.save() 
-                
+                product_size.save()
+
                 order_item.return_product = True
                 order_item.order_status = 'Returned'
                 order_item.save()
-                
+
                 time.sleep(2)
-                
-                
+
                 return redirect('order_detailed_view', order_items_id)
         except Exception as e:
             return redirect(admin_login_page)
@@ -1820,19 +1823,20 @@ def return_product(request, order_items_id):
 # ----------------------------------------------------------------  SALES REPORT PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
-weekly_filter = False
-monthly_filter = False
-yearly_filter = False
-custom_date_filter = False
-
-current_date = timezone.now()
+current_date = timezone.now().date()
 start_date = current_date - timedelta(days=current_date.weekday())
 end_date = start_date + timedelta(days=6)
 
+start_date = timezone.make_aware(datetime.datetime.combine(
+    start_date, datetime.datetime.min.time()), pytz.utc)
+
+
+end_date = timezone.make_aware(datetime.datetime.combine(
+    end_date, datetime.datetime.max.time()), pytz.utc)
+
+
 now = timezone.now()
-current_year_and_month = now.strftime("%Y-%m")
-first_day_of_month = None
-last_day_of_month = None
+
 
 current_year = now.strftime("%Y")
 custom_start_date = None
@@ -1840,93 +1844,164 @@ custom_end_date = None
 
 
 @never_cache
-def sales_report_filtering(request):
-    if request.user.is_superuser:
-        global weekly_filter, monthly_filter, yearly_filter, custom_date_filter, current_year_and_month, current_year, custom_start_date, custom_end_date, first_day_of_month, last_day_of_month
-        if request.method == 'POST':
-            filter = request.POST.get('filter')
-
-            if filter == "weekly":
-                weekly_filter = True
-
-                monthly_filter = False
-                yearly_filter = False
-                custom_date_filter = False
-
-            elif filter == 'monthly':
-                monthly_filter = True
-
-                weekly_filter = False
-                yearly_filter = False
-                custom_date_filter = False
-
-                current_year_and_month = request.POST.get('year_month')
-                year, month = map(int, current_year_and_month.split('-'))
-
-                first_day_of_month = timezone.datetime(year, month, 1).replace(
-                    hour=0, minute=0, second=0, microsecond=0)
-                last_day_of_month = timezone.datetime(
-                    year, month, calendar.monthrange(year, month)[1], 23, 59, 59, 999999)
-
-            elif filter == 'yearly':
-                yearly_filter = True
-
-                weekly_filter = False
-                monthly_filter = False
-                custom_date_filter = False
-
-                current_year = request.POST.get('year')
-            elif filter == 'custom':
-                custom_date_filter = True
-
-                weekly_filter = False
-                weekly_filter = False
-                monthly_filter = False
-
-                custom_start_date = request.POST.get('start_date')
-                custom_end_date = request.POST.get('end_date')
-
-            return redirect('sales_report_page')
-    else:
-        return redirect('admin_login_page')
-
-
-@never_cache
+@clear_old_messages
 def sales_report_page(request):
     if request.user.is_superuser:
-        global weekly_filter, monthly_filter, yearly_filter, custom_date_filter, current_year_and_month, current_year, custom_start_date, custom_end_date, first_day_of_month, last_day_of_month
+        global current_year, start_date, end_date
 
-        today = timezone.now().date()
+        today = timezone.now()
+        
+        sales_data = None
 
-        sales_data = OrderItem.objects.filter(
-            Q(cancel_product=False) &
-            Q(return_product=False) &
-            Q(order_status='Delivered') &
-            Q(order__placed_at__date=today)
-        )
+        if request.method == 'GET':
+            filter_option = request.GET.get('filter')
 
-        if weekly_filter:
-            sales_data = OrderItem.objects.filter(
-                Q(cancel_product=False) &
-                Q(return_product=False) &
-                Q(order_status='Delivered') &
-                Q(order__placed_at__range=(start_date, end_date))
+            if filter_option == 'weekly':
+                sales_data = OrderItem.objects.filter(
+                    Q(cancel_product=False) &
+                    Q(return_product=False) &
+                    Q(order_status='Delivered') &
+                    Q(order__placed_at__range=(start_date, end_date))
+                )
+                request.session['start_date'] = start_date.strftime('%Y-%m-%d %H:%M:%S')
+                request.session['end_date'] = end_date.strftime('%Y-%m-%d %H:%M:%S')
+                
+            if filter_option == 'monthly':
+                current_year_and_month = request.GET.get('year_month')
+
+                if current_year_and_month:
+                    year, month = map(int, current_year_and_month.split('-'))
+
+                    first_day_of_month = timezone.datetime(year, month, 1).replace(
+                        hour=0, minute=0, second=0, microsecond=0)
+                    last_day_of_month = timezone.datetime(
+                        year, month, calendar.monthrange(year, month)[1], 23, 59, 59, 999999)
+                    
+                    first_day_of_month = make_aware(first_day_of_month)
+                    last_day_of_month = make_aware(last_day_of_month)
+
+                    sales_data = OrderItem.objects.filter(
+                        Q(cancel_product=False) &
+                        Q(return_product=False) &
+                        Q(order_status='Delivered') &
+                        Q(order__placed_at__range=(
+                            first_day_of_month, last_day_of_month))
+                    )
+                    request.session['start_date'] = first_day_of_month.strftime('%Y-%m-%d %H:%M:%S')
+                    request.session['end_date'] = last_day_of_month.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    messages.error(
+                        request, "Please select a month to continue")
+                    return redirect('sales_report_page')
+
+            if filter_option == 'yearly':
+                filter_year = request.GET.get('year')
+
+                if filter_year:
+                    year = int(filter_year)
+
+                    start_date_of_year = datetime.datetime(year, 1, 1, 0, 0, 0)
+
+                    if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0):
+                        end_date_of_year = datetime.datetime(
+                            year, 12, 31, 23, 59, 59)
+                    else:
+                        end_date_of_year = datetime.datetime(
+                            year, 12, 31, 23, 59, 59)
+                        
+                    start_date_of_year = make_aware(start_date_of_year)
+                    end_date_of_year = make_aware(end_date_of_year)
+
+                    sales_data = OrderItem.objects.filter(
+                        Q(cancel_product=False) &
+                        Q(return_product=False) &
+                        Q(order_status='Delivered') &
+                        Q(order__placed_at__range=(
+                            start_date_of_year, end_date_of_year))
+                    )
+                    request.session['start_date'] = start_date_of_year.strftime('%Y-%m-%d %H:%M:%S')
+                    request.session['end_date'] = end_date_of_year.strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    messages.error(
+                        request, "Please select a year to continue.")
+                    return redirect('sales_report_page')
+
+            if filter_option == 'custom':
+                custom_start_date = request.GET.get('start_date')
+                custom_end_date = request.GET.get('end_date')
+
+                if custom_start_date and custom_end_date:
+                    start_datetime = datetime.datetime.strptime(
+                        custom_start_date, '%Y-%m-%d')
+                    end_datetime = datetime.datetime.strptime(
+                        custom_end_date, '%Y-%m-%d')
+
+                    start_datetime = make_aware(start_datetime)
+                    end_datetime = make_aware(end_datetime)
+                    
+                    if start_datetime < end_datetime and start_datetime <= today:
+                        start_datetime = start_datetime.replace(
+                            hour=0, minute=0, second=0, microsecond=0)
+
+                        end_datetime = end_datetime.replace(
+                            hour=23, minute=59, second=59, microsecond=999999)
+
+                        sales_data = OrderItem.objects.filter(
+                            Q(cancel_product=False) &
+                            Q(return_product=False) &
+                            Q(order_status='Delivered') &
+                            Q(order__placed_at__range=(
+                                start_datetime, end_datetime
+                            ))
+                        )
+                        request.session['start_date'] = start_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                        request.session['end_date'] = end_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        messages.error(request, 'Please select a valid date range.')
+                        return redirect('sales_report_page')
+                else:
+                    messages.error(
+                        request, 'Please select all the required fields to continue')
+                    return redirect('sales_report_page')
+
+        if sales_data is not None:
+            sales_data = sales_data.annotate(
+                order_item_count=Subquery(
+                    OrderItem.objects.filter(
+                        order=OuterRef('order'),
+                        cancel_product=False,
+                        return_product=False
+                    ).values('order').annotate(
+                        item_count=Count('order_id')
+                    ).values('item_count')[:1],
+                    output_field=IntegerField()
+                )
             )
 
-        if monthly_filter:
-            sales_data = OrderItem.objects.filter(
-                Q(cancel_product=False) &
-                Q(return_product=False) &
-                Q(order_status='Delivered') &
-                Q(order__placed_at__range=(first_day_of_month, last_day_of_month))
+            sales_data = sales_data.annotate(
+                discount_amount=Case(
+                    When(order__coupon_applied=True, then=ExpressionWrapper(
+                        F('order__discount_price') / F('order_item_count'),
+                        output_field=DecimalField(max_digits=10, decimal_places=2)
+                    )),
+                    default=Value(None),
+                    output_field=DecimalField(max_digits=10, decimal_places=2)
+                )
             )
 
-        overall_sales_count = sales_data.count()
-        overall_order_amount = sales_data.aggregate(total_amount=Sum('total_price'))[
+        overall_sales_count = sales_data.count() if sales_data else 0
+        overall_order_amount = sales_data.aggregate(total_amount=Sum('each_price'))[
             'total_amount'] if sales_data else 0
         overall_discount = sales_data.aggregate(total_discount=Sum(
-            'order__discount_price'))['total_discount'] if sales_data else 0
+            'discount_amount'))['total_discount'] if sales_data else 0
+        
+        if sales_data:
+            request.session['overall_sales_count'] = overall_sales_count
+            request.session['overall_order_amount'] = overall_order_amount
+            request.session['overall_discount'] = overall_discount
+        
 
+        
         context = {
             'sales_data': sales_data,
             'is_active_sales': is_active_sales,
@@ -1934,137 +2009,168 @@ def sales_report_page(request):
             'overall_order_amount': overall_order_amount,
             'overall_discount': overall_discount,
         }
-
-        if request.method == 'POST':
-            if 'sales_report' in request.POST and request.POST['sales_report'] == 'pdf':
-                buffer = BytesIO()
-
-                doc = SimpleDocTemplate(buffer, pagesize=letter)
-
-                styles = getSampleStyleSheet()
-                centered_style = ParagraphStyle(
-                    name='Centered', parent=styles['Heading1'], alignment=1)
-
-                today_date = datetime.datetime.now().strftime("%Y-%m-%d")
-
-                content = []
-
-                company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {
-                    today_date}"
-                content.append(Paragraph(company_details, styles['Normal']))
-                content.append(Spacer(1, 0.5 * inch))
-
-                content.append(
-                    Paragraph("<b>Sales Report</b>", centered_style))
-                content.append(Spacer(1, 0.5 * inch))
-
-                data = [["Product", "Quantity", "Price", "Total Price", "Date"]]
-                for sale in sales_data:
-                    formatted_date = sale.order.placed_at.strftime(
-                        "%a, %d %b %Y")
-                    data.append(
-                        [sale.product, sale.quantity, sale.each_price, sale.total_price, formatted_date])
-
-                table = Table(data, repeatRows=1)
-                table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                    ('TOPPADDING', (0, 0), (-1, 0), 12),
-                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                    ('GRID', (0, 0), (-1, -1), 1, colors.black)
-                ]))
-
-                content.append(table)
-
-                content.append(Spacer(1, 0.5 * inch))
-
-                overall_sales_count_text = f"<b>Overall Sales Count:</b> {
-                    overall_sales_count}"
-                overall_order_amount_text = f"<b>Overall Order Amount:</b> {
-                    overall_order_amount}"
-                overall_discount_amount_text = f"<b>Overall Discount:</b> {
-                    overall_discount}"
-
-                content.append(
-                    Paragraph(overall_sales_count_text, styles['Normal']))
-                content.append(
-                    Paragraph(overall_order_amount_text, styles['Normal']))
-                content.append(
-                    Paragraph(overall_discount_amount_text, styles['Normal']))
-
-                doc.build(content)
-
-                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-                file_name = f"Sales_Report_{current_time}.pdf"
-
-                response = HttpResponse(
-                    buffer.getvalue(), content_type='application/pdf')
-                response['Content-Disposition'] = f'attachment; filename="{
-                    file_name}"'
-
-                return response
-
-            elif 'sales_report' in request.POST and request.POST['sales_report'] == 'excel':
-                output = BytesIO()
-                workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-                worksheet = workbook.add_worksheet('Sales Report')
-
-                headings = ["Product", "Color", "Quantity",
-                            "Price", "Total Price", "Date", "Size"]
-                for col, heading in enumerate(headings):
-                    worksheet.write(0, col, heading)
-
-                for row, sale in enumerate(sales_data, start=1):
-                    formatted_date = sale.order.placed_at.strftime(
-                        "%a, %d %b %Y")
-                    color = sale.product.product_color_image.color
-                    size = sale.product.size
-
-                    worksheet.write(
-                        row, 0, sale.product.product_color_image.products.name)
-                    worksheet.write(row, 1, color)
-                    worksheet.write(row, 2, sale.quantity)
-                    worksheet.write(row, 3, sale.each_price)
-                    worksheet.write(row, 4, sale.total_price)
-                    worksheet.write(row, 5, formatted_date)
-                    worksheet.write(row, 6, size)
-
-                overall_row = len(sales_data) + 2
-                worksheet.write(overall_row, 0, "Overall Sales Count:")
-                worksheet.write(overall_row, 1, overall_sales_count)
-                worksheet.write(overall_row + 1, 0, "Overall Order Amount:")
-                worksheet.write(overall_row + 1, 1, overall_order_amount)
-                worksheet.write(overall_row + 2, 0, "Overall Discount:")
-                worksheet.write(overall_row + 2, 1, overall_discount)
-
-                for i, heading in enumerate(headings):
-                    max_length = max([len(str(getattr(row, heading.lower(), "")))
-                                     for row in sales_data] + [len(heading)])
-                    worksheet.set_column(i, i, max_length + 2)
-
-                date_width = max(
-                    [len(sale.order.placed_at.strftime("%a, %d %b %Y")) for sale in sales_data])
-                worksheet.set_column(5, 5, date_width + 2)
-                color_width = max([len(color) for color in [
-                                  sale.product.product_color_image.color for sale in sales_data]])
-                worksheet.set_column(1, 1, color_width + 2)
-
-                workbook.close()
-
-                output.seek(0)
-                response = HttpResponse(output.getvalue(
-                ), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-                file_name = f"Sales Report {current_time}.xlsx"
-                response['Content-Disposition'] = f'attachment; filename="{
-                    file_name}"'
-
-                return response
-
         return render(request, 'admin_sales_report.html', context)
+    else:
+        return redirect('admin_login_page')
+    
+    
+    
+@never_cache
+@clear_old_messages
+def download_sales_report(request):
+    if request.user.is_superuser:
+            if request.method == 'POST':
+                
+                start_date_str = request.session.get('start_date')
+                end_date_str = request.session.get('end_date')
+                
+                print("Session Start Date :", start_date_str)
+                print("Session End Date :", end_date_str)
+                
+                start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d %H:%M:%S')
+                end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d %H:%M:%S')
+                
+                sales_data = OrderItem.objects.filter(
+                    Q(cancel_product=False) &
+                    Q(return_product=False) &
+                    Q(order_status='Delivered') &
+                    Q(order__placed_at__range=(start_date, end_date))
+                )
+                
+                overall_sales_count = request.session.get('overall_sales_count')
+                overall_order_amount = request.session.get('overall_order_amount')
+                overall_discount = request.session.get('overall_discount')
+                
+                if 'sales_report' in request.POST and request.POST['sales_report'] == 'pdf':
+                    buffer = BytesIO()
+
+                    doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+                    styles = getSampleStyleSheet()
+                    centered_style = ParagraphStyle(
+                        name='Centered', parent=styles['Heading1'], alignment=1)
+
+                    today_date = datetime.datetime.now().strftime("%Y-%m-%d")
+
+                    content = []
+
+                    company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {
+                        today_date}"
+                    content.append(Paragraph(company_details, styles['Normal']))
+                    content.append(Spacer(1, 0.5 * inch))
+
+                    content.append(
+                        Paragraph("<b>Sales Report</b>", centered_style))
+                    content.append(Spacer(1, 0.5 * inch))
+
+                    data = [["Product", "Quantity", "Total Price", "Date"]]
+                    for sale in sales_data:
+                        formatted_date = sale.order.placed_at.strftime(
+                            "%a, %d %b %Y")
+                        data.append(
+                            [sale.product, sale.quantity, sale.each_price, formatted_date])
+
+                    table = Table(data, repeatRows=1)
+                    table.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('TOPPADDING', (0, 0), (-1, 0), 12),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                    ]))
+
+                    content.append(table)
+
+                    content.append(Spacer(1, 0.5 * inch))
+
+                    overall_sales_count_text = f"<b>Overall Sales Count:</b> {
+                        overall_sales_count}"
+                    overall_order_amount_text = f"<b>Overall Order Amount:</b> {
+                        overall_order_amount}"
+                    overall_discount_amount_text = f"<b>Overall Discount:</b> {
+                        overall_discount}"
+
+                    content.append(
+                        Paragraph(overall_sales_count_text, styles['Normal']))
+                    content.append(
+                        Paragraph(overall_order_amount_text, styles['Normal']))
+                    content.append(
+                        Paragraph(overall_discount_amount_text, styles['Normal']))
+
+                    doc.build(content)
+
+                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                    file_name = f"Sales_Report_{current_time}.pdf"
+
+                    response = HttpResponse(
+                        buffer.getvalue(), content_type='application/pdf')
+                    response['Content-Disposition'] = f'attachment; filename="{
+                        file_name}"'
+
+                    return response
+
+                elif 'sales_report' in request.POST and request.POST['sales_report'] == 'excel':
+                    output = BytesIO()
+                    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+                    worksheet = workbook.add_worksheet('Sales Report')
+
+                    headings = ["Product", "Color", "Quantity",
+                                "Total Price", "Date", "Size"]
+                    header_format = workbook.add_format(
+                        {'border': 1, 'bold': True})
+                    for col, heading in enumerate(headings):
+                        worksheet.write(0, col, heading, header_format)
+
+                    for row, sale in enumerate(sales_data, start=1):
+                        formatted_date = sale.order.placed_at.strftime(
+                            "%a, %d %b %Y")
+                        color = sale.product.product_color_image.color
+                        size = sale.product.size
+
+                        worksheet.write(
+                            row, 0, sale.product.product_color_image.products.name)
+                        worksheet.write(row, 1, color)
+                        worksheet.write(row, 2, sale.quantity)
+                        worksheet.write(row, 3, sale.each_price)
+                        worksheet.write(row, 4, formatted_date)
+                        worksheet.write(row, 5, size)
+
+                    overall_row = len(sales_data) + 2
+                    worksheet.write(overall_row, 0, "Overall Sales Count:")
+                    worksheet.write(overall_row, 1, overall_sales_count)
+                    worksheet.write(overall_row + 1, 0, "Overall Order Amount:")
+                    worksheet.write(overall_row + 1, 1, overall_order_amount)
+                    worksheet.write(overall_row + 2, 0, "Overall Discount:")
+                    worksheet.write(overall_row + 2, 1, overall_discount)
+
+                    for i, heading in enumerate(headings):
+                        max_length = max([len(str(getattr(row, heading.lower(), "")))
+                                        for row in sales_data] + [len(heading)])
+                        worksheet.set_column(i, i, max_length + 2)
+
+                    date_width = max(
+                        [len(sale.order.placed_at.strftime("%a, %d %b %Y")) for sale in sales_data])
+                    worksheet.set_column(4, 4, date_width + 2)
+                    color_width = max([len(color) for color in [
+                        sale.product.product_color_image.color for sale in sales_data]])
+                    worksheet.set_column(1, 1, color_width + 2)
+
+                    workbook.close()
+
+                    output.seek(0)
+                    response = HttpResponse(output.getvalue(),
+                                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                    file_name = f"Sales Report {current_time}.xlsx"
+                    response['Content-Disposition'] = f'attachment; filename="{
+                        file_name}"'
+
+                    return response
+            else:
+                return redirect('admin_dashboard')
     else:
         return redirect('admin_login_page')
 
@@ -2162,7 +2268,6 @@ def product_offer_update(request, product_offer_id):
                         messages.error(
                             request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
 
-                    
                     if valid_product and valid_discount_percentage and valid_start_date and valid_end_date:
                         try:
                             product_offer.discount_percentage = discount_percentage
@@ -2179,7 +2284,7 @@ def product_offer_update(request, product_offer_id):
                             return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
                     else:
                         return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
-                    
+
                 else:
                     messages.error(
                         request, 'Please fill in all required fields.')
@@ -2240,7 +2345,7 @@ def add_product_offer(request):
                     product_color_image = ProductColorImage.objects.get(
                         pk=product_color_image_id)
 
-                    if ProductOffer.objects.filter(product_color_image=product_color_image, end_date__gte = today).exists():
+                    if ProductOffer.objects.filter(product_color_image=product_color_image, end_date__gte=today).exists():
                         valid_product = False
                         messages.error(
                             request, 'Product already have an offer')
@@ -2255,7 +2360,6 @@ def add_product_offer(request):
                         messages.error(
                             request, 'Please select a future date for the offer end date.')
 
-                    
                     if valid_product and valid_discount_percentage and valid_end_date:
                         try:
                             ProductOffer.objects.create(
@@ -2272,7 +2376,7 @@ def add_product_offer(request):
                             return redirect('product_offer_add_page')
                     else:
                         return redirect('product_offer_add_page')
-                    
+
                 except ProductColorImage.DoesNotExist:
                     messages.error(request, 'Selected product not found')
                     return redirect('product_offer_add_page')
@@ -2299,11 +2403,8 @@ def delete_offer(request, product_offer_id):
         return redirect('product_offer_module_view')
     else:
         return redirect('admin_login_page')
-    
-    
-    
-    
-    
+
+
 # ---------------------------------------------------------------- PRODUCT OFFER MODULE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
@@ -2313,16 +2414,13 @@ def category_offer_module_view(request):
     if request.user.is_superuser:
         category_offers = CategoryOffer.objects.all().order_by('start_date', 'end_date')
         context = {
-            'today' : today,
-            'category_offers' : category_offers,
-            'is_active_product_offer' : is_active_product_offer,
+            'today': today,
+            'category_offers': category_offers,
+            'is_active_product_offer': is_active_product_offer,
         }
         return render(request, 'pages/offers/category_offer_module.html', context)
     else:
         return redirect('admin_login_page')
-
-
-
 
 
 @never_cache
@@ -2331,13 +2429,12 @@ def category_offers_add_page(request):
     if request.user.is_superuser:
         categories = Category.objects.all().order_by('name')
         context = {
-            'categories' : categories,
-            'is_active_product_offer' : is_active_product_offer,
+            'categories': categories,
+            'is_active_product_offer': is_active_product_offer,
         }
         return render(request, 'pages/offers/category_offer_add_page.html', context)
     else:
         return redirect('admin_login_page')
-
 
 
 @never_cache
@@ -2348,11 +2445,11 @@ def add_category_offer(request):
             category_id = request.POST.get('category_id')
             discount_percentage_str = request.POST.get('offer_discount')
             end_date_str = request.POST.get('offer_end_date')
-            
+
             is_every_field_valid = True
-            
+
             today = timezone.now().date()
-            
+
             if category_id and discount_percentage_str and end_date_str:
                 try:
                     discount_percentage = int(discount_percentage_str)
@@ -2367,35 +2464,39 @@ def add_category_offer(request):
                     messages.error(
                         request, 'Please enter the dates in the format YYYY-MM-DD.')
                     return redirect('category_offers_add_page')
-                
+
                 try:
-                    category = Category.objects.get(pk = category_id)
-                    
-                    if CategoryOffer.objects.filter(category = category, end_date__gte= today).exists():
+                    category = Category.objects.get(pk=category_id)
+
+                    if CategoryOffer.objects.filter(category=category, end_date__gte=today).exists():
                         is_every_field_valid = False
-                        messages.error(request, 'Offer already exist for this category.')
-                    
+                        messages.error(
+                            request, 'Offer already exist for this category.')
+
                     elif not 5 <= discount_percentage <= 30:
                         is_every_field_valid = False
-                        messages.error(request, 'Discount percentage should be minimum of 5%, and maximum of 30%.')
-                        
+                        messages.error(
+                            request, 'Discount percentage should be minimum of 5%, and maximum of 30%.')
+
                     elif end_date <= today:
                         is_every_field_valid = False
-                        messages.error(request, 'Please select a future date for the offer end date.')
-                        
-                    
+                        messages.error(
+                            request, 'Please select a future date for the offer end date.')
+
                     if is_every_field_valid:
                         try:
                             CategoryOffer.objects.create(
-                                category = category,
-                                discount_percentage = discount_percentage,
-                                end_date = end_date
+                                category=category,
+                                discount_percentage=discount_percentage,
+                                end_date=end_date
                             )
-                            messages.success(request, f"Successfully added offer for {category.name} category")
+                            messages.success(request, f"Successfully added offer for {
+                                             category.name} category")
                             return redirect('category_offer_module_view')
-                        
+
                         except:
-                            messages.error(request, 'Unable to create a category offer at this moment.')
+                            messages.error(
+                                request, 'Unable to create a category offer at this moment.')
                             return redirect('category_offers_add_page')
                     else:
                         return redirect('category_offers_add_page')
@@ -2411,33 +2512,25 @@ def add_category_offer(request):
         return redirect('admin_login_page')
 
 
-
-
-
-
 @never_cache
 @clear_old_messages
 def category_offer_edit_page(request, category_name):
     if request.user.is_superuser:
         try:
-            category_offer = CategoryOffer.objects.get(category__name = category_name)
+            category_offer = CategoryOffer.objects.get(
+                category__name=category_name)
             categories = Category.objects.all().order_by('name')
             context = {
-                'category_offer' : category_offer,
-                'categories' : categories,
-                'is_active_product_offer' : is_active_product_offer
+                'category_offer': category_offer,
+                'categories': categories,
+                'is_active_product_offer': is_active_product_offer
             }
-            return render(request, 'pages/offers/category_offer_edit_page.html', context)    
+            return render(request, 'pages/offers/category_offer_edit_page.html', context)
         except CategoryOffer.DoesNotExist:
             messages.error('Category Offer not found.')
             return redirect('category_offer_module_view')
     else:
         return redirect('admin_login_page')
-
-
-
-
-
 
 
 @never_cache
@@ -2446,22 +2539,24 @@ def category_offer_update(request, category_offer_id):
     if request.user.is_superuser:
         if request.method == 'POST':
             try:
-                category_offer = CategoryOffer.objects.get(pk = category_offer_id)
-                
+                category_offer = CategoryOffer.objects.get(
+                    pk=category_offer_id)
+
                 discount_percentage_str = request.POST.get('offer_discount')
                 start_date_str = request.POST.get('offer_start_date')
                 end_date_str = request.POST.get('offer_end_date')
-                
+
                 is_every_field_valid = True
-                
+
                 offer_start_date = category_offer.start_date
                 offer_end_date = category_offer.end_date
-                
+
                 if discount_percentage_str and start_date_str and end_date_str:
                     try:
                         discount_percentage = int(discount_percentage_str)
                     except ValueError:
-                        messages.error(request, 'Discount percentage should be a number without decimals or symbols.')
+                        messages.error(
+                            request, 'Discount percentage should be a number without decimals or symbols.')
                         return redirect('category_offer_edit_page', category_offer.category.name)
                     try:
                         start_date = datetime.datetime.strptime(
@@ -2487,8 +2582,7 @@ def category_offer_update(request, category_offer_id):
                         is_every_field_valid = False
                         messages.error(
                             request, "Please select a future date for the offer end date, ensuring it is greater than today's date and the start date.")
-                        
-                    
+
                     if is_every_field_valid:
                         try:
                             category_offer.discount_percentage = discount_percentage
@@ -2497,7 +2591,7 @@ def category_offer_update(request, category_offer_id):
                             category_offer.save()
 
                             messages.success(
-                                
+
                                 request, 'Category Offer Updated Successfully!')
                             return redirect('category_offer_module_view')
                         except:
@@ -2506,7 +2600,7 @@ def category_offer_update(request, category_offer_id):
                             return redirect('category_offer_edit_page', category_offer.category.name)
                     else:
                         return redirect('category_offer_edit_page', category_offer.category.name)
-                    
+
             except CategoryOffer.DoesNotExist:
                 messages.error(request, 'Category Offer not found.')
                 return redirect('category_offer_module_view')
@@ -2516,17 +2610,12 @@ def category_offer_update(request, category_offer_id):
         return redirect('admin_login_page')
 
 
-
-
-
-
-
 @never_cache
 @clear_old_messages
 def delete_category_offer(request, category_offer_id):
     if request.user.is_superuser:
         try:
-            category_offer = CategoryOffer.objects.get(pk = category_offer_id)
+            category_offer = CategoryOffer.objects.get(pk=category_offer_id)
             category_offer.delete()
             messages.success(request, 'Category Offer have been deleted!')
             return redirect('category_offer_module_view')
@@ -2535,7 +2624,6 @@ def delete_category_offer(request, category_offer_id):
             return redirect('category_offer_module_view')
     else:
         return redirect('admin_login_page')
-
 
 
 # ----------------------------------------------------------------  COUPON PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------

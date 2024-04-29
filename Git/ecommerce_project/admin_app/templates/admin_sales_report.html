@@ -4,6 +4,7 @@
 
 {% block custom_css %}
   <link rel="shortcut icon" href="{% static 'images/Sneakerheads.png' %}" />
+  
   <style>
     .hidden {
       display: none;
@@ -28,6 +29,64 @@
     .no-data {
       text-align: center;
     }
+
+    .sales-table-container {
+      margin-top: 20px;
+      overflow-x: auto;
+    }
+
+    .sales-table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid #ddd;
+      font-family: Arial, sans-serif;
+    }
+
+    .sales-table th,
+    .sales-table td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    .sales-table th {
+      background-color: #f2f2f2;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .sales-table tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .sales-table tbody tr:hover {
+      background-color: #ddd;
+    }
+
+    .sales-table input[type="text"],
+    .sales-table input[type="number"],
+    .sales-table select {
+      width: calc(100% - 24px);
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    .sales-table button[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .sales-table button[type="submit"]:hover {
+      background-color: #45a049;
+    }
   </style>
 {% endblock %}
 
@@ -38,9 +97,9 @@
         <div class="col-md-12">
           <div class="sales-report-section">
             <h2 class="my-3 text-center">Sales Report</h2>
-            <form method="post" action="{% url 'sales_report_filtering' %}" class="sales-report-form">
+            <form method="get" action="{% url 'sales_report_page' %}" class="sales-report-form">
               {% csrf_token %}
-              <div class="form-group w-50">
+              <div class="form-group w-50 my-2">
                 <label for="filter">Filter by:</label>
                 <select class="form-control" id="filter" name="filter">
                   <option value="weekly">Weekly</option>
@@ -71,14 +130,28 @@
                   <input type="date" class="form-control" id="end_date" name="end_date" />
                 </div>
               </div>
-              <button type="submit" class="btn btn-primary btn rounded rounded-1">Update Report</button>
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="text-center container mt-4">
+                    {% if message.tags == 'success' %}
+                      <h4 style="color: green;">{{ message }}</h4>
+                    {% elif message.tags == 'error' %}
+                      <h4 style="color: red;">{{ message }}</h4>
+                    {% elif message.tags == 'info' %}
+                      <h4 style="color: blue;">{{ message }}</h4>
+                    {% else %}
+                      <h4>{{ message }}</h4>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              {% endif %}
+              <button type="submit" class="btn btn-primary btn rounded my-3 rounded-1">Update Report</button>
             </form>
             <table class="table sales-table">
               <thead>
                 <tr>
                   <th>Product</th>
                   <th>Quantity</th>
-                  <th>Price</th>
                   <th>Discount Deduction</th>
                   <th>Total Amount</th>
                   <th>Date</th>
@@ -89,15 +162,10 @@
                   <tr>
                     <td>{{ sale.product }}</td>
                     <td>{{ sale.quantity }}</td>
-                    <td>{{ sale.each_price }}</td>
                     <td>
-                      {% if sale.order.discount_price > 0 %}
-                        {{ sale.order.discount_price }}
-                      {% else %}
-                        None
-                      {% endif %}
+                      {{ sale.discount_amount }}
                     </td>
-                    <td>{{ sale.total_price }}</td>
+                    <td>{{ sale.each_price }}</td>
                     <td>{{ sale.order.placed_at|date:'D, d M Y' }}</td>
                   </tr>
                   {% empty %}
@@ -115,12 +183,11 @@
       <div class="row">
         {% if sales_data %}
           <div class="col-md-12">
-            <div class="download-report-section">
-              <h2 class="mt-5 mb-3 text-center">Download Report</h2>
+            <div class="download-report-section container">
+              <h2 class="mt-5 mb-3 text-start">Download Report</h2>
 
-              <form method="post" action="{% url 'sales_report_page' %}">
+              <form method="post" action="{% url 'download_sales_report' %}">
                 {% csrf_token %}
-                <input type="hidden" name="sales_data_json" value="{{ sales_data_json }}">
                 <input type="hidden" name="overall_sales_count" value="{{ overall_sales_count }}">
                 <input type="hidden" name="overall_order_amount" value="{{ overall_order_amount }}">
                 <input type="hidden" name="overall_discount" value="{{ overall_discount }}">
@@ -134,7 +201,7 @@
             </div>
           </div>
         {% else %}
-          <p>No sales data available to generate report.</p>
+          <p>No sales data available to download report.</p>
         {% endif %}
       </div>
     </div>

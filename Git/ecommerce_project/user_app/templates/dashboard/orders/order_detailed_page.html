@@ -78,14 +78,16 @@
                 </div>
                 <div class="tracking-item {% if order_items.order_status == 'Delivered' %}active{% endif %}">
                   <div class="tracking-icon"></div>
-                  <div class="tracking-text">Delivered</div>
+                  <div class="tracking-text">
+                    Delivered {% if order_items.order_status == 'Delivered' %}<br /> <small>{{ order_items.delivery_date }}</small>{% endif %}
+                  </div>
                 </div>
               </div>
               {% if order_items.order_status == 'Delivered' %}
                 {% if can_return_product %}
                   <a href="{% url 'sent_return_request' order_items.order_items_id %}"><button class="btn btn-primary">Return Order</button></a>
                 {% else %}
-                  <span>Return policy ended on {{ return_end_date_only_date }}</span>
+                  <span>Return policy ended on {{ return_end_date }}</span>
                 {% endif %}
               {% else %}
                 <button id="cancelOrderBtn" class="btn btn-danger">Cancel Order</button>

@@ -40,6 +40,17 @@ from django.contrib.auth.hashers import check_password
 today = datetime.now().date()
 
 
+def clear_old_messages(view_func):
+    def only_new_messages(request, *args, **kwargs):
+        response = view_func(request, *args, **kwargs)
+        all_messages = messages.get_messages(request)
+        all_messages.used = True
+        return response
+    return only_new_messages
+
+
+
+@clear_old_messages
 def get_cart_wishlist_address_order_data(request):
     data = {}
     if request.user.is_authenticated:
@@ -108,6 +119,7 @@ def get_cart_wishlist_address_order_data(request):
 
 
 @never_cache
+@clear_old_messages
 def index_page(request):
     if request.user.is_authenticated:
         context = {}
@@ -117,6 +129,7 @@ def index_page(request):
     return render(request, 'index.html')
 
 @never_cache
+@clear_old_messages
 def sign_in(request):
     if request.user.is_authenticated:
         return redirect('index_page')
@@ -125,6 +138,7 @@ def sign_in(request):
 
 
 @never_cache
+@clear_old_messages
 def sign_up(request):
     if request.user.is_authenticated:
         return redirect('index_page')
@@ -138,6 +152,7 @@ def sign_up(request):
  
     
 @never_cache
+@clear_old_messages
 def verify_otp(request):
     if request.user.is_authenticated:
         return redirect('index_page')
@@ -167,6 +182,7 @@ def send_otp_email(email, otp):
 
 
 @never_cache
+@clear_old_messages
 def register_function(request):
     if request.user.is_authenticated:
         return redirect('index_page')
@@ -239,6 +255,7 @@ def register_function(request):
 
 
 @never_cache
+@clear_old_messages
 def otp_verification_page(request):
     if request.user.is_authenticated:
         return redirect('index_page')
@@ -294,6 +311,7 @@ def otp_verification_page(request):
 
 
 @never_cache
+@clear_old_messages
 def resend_otp(request):
     if request.user.is_authenticated:
         return redirect('index_page')
@@ -328,6 +346,7 @@ def resend_otp(request):
 
 
 @never_cache
+@clear_old_messages
 def sign_in_function(request):
     if request.user.is_authenticated:
         return redirect('index_page')
@@ -358,11 +377,13 @@ def sign_in_function(request):
 
 
 @never_cache
+@clear_old_messages
 def forgot_password_page(request):
     return render(request, 'forgot_password.html')
 
 
 @never_cache
+@clear_old_messages
 def reset_password(request, user_id):
     timestamp = request.GET.get('timestamp')
     if not timestamp or int(timestamp) < int(time.time()):
@@ -372,6 +393,7 @@ def reset_password(request, user_id):
 
 
 @never_cache
+@clear_old_messages
 def reset_password_change(request, user_id):
     if request.method == 'POST':
         password = request.POST.get('password')
@@ -414,6 +436,7 @@ def send_link_email(email, page_url, timestamp):
     
     
 @never_cache
+@clear_old_messages
 def verify_email(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -450,6 +473,7 @@ def verify_email(request):
 
 
 @never_cache
+@clear_old_messages
 def logout(request):
     if request.method == 'POST':
         auth.logout(request)
@@ -476,6 +500,7 @@ high_to_low = False
 
 
 @never_cache
+@clear_old_messages
 def get_product_sort(request):
     global default, a_z, new_arrival, low_to_high, high_to_low
 
@@ -506,6 +531,7 @@ search = ""
 
 
 @never_cache
+@clear_old_messages
 def search_for_product(request):
     global search      
     
@@ -525,6 +551,7 @@ def search_for_product(request):
 
 
 @never_cache
+@clear_old_messages
 def category_wise(request):
     if request.method == 'POST':
         category_wise = request.POST.get('category_wise')
@@ -539,6 +566,7 @@ def category_wise(request):
         return redirect('index_page')
 
 @never_cache
+@clear_old_messages
 def brand_wise(request):
     if request.method == 'POST':
         brand_wise = request.POST.get('brand_wise')
@@ -553,6 +581,7 @@ def brand_wise(request):
         return redirect('index_page')
 
 @never_cache
+@clear_old_messages
 def clean_all(request):
     if 'selected_category' in request.session:
         del request.session['selected_category']
@@ -563,6 +592,7 @@ def clean_all(request):
       
 
 @never_cache
+@clear_old_messages
 def shop_page_view(request):
     global search, default, a_z, new_arrival, low_to_high, high_to_low, selected_category, selected_brand
     context = {}
@@ -658,6 +688,7 @@ def shop_page_view(request):
 
 
 @never_cache
+@clear_old_messages
 def product_single_view_page(request, product_name, pdt_id):
     context = {}
     product_color = ProductColorImage.objects.get(pk=pdt_id)
@@ -735,6 +766,7 @@ def product_single_view_page(request, product_name, pdt_id):
 
 
 @never_cache
+@clear_old_messages
 def wishlist_view(request):
     if request.user.is_authenticated:
         user = request.user
@@ -755,6 +787,7 @@ def wishlist_view(request):
         return render(request, 'wishlist.html', context)
 
 @never_cache
+@clear_old_messages
 def add_to_wishlist(request, product_color_id):
     if request.user.is_authenticated:
         user = request.user
@@ -784,6 +817,7 @@ def add_to_wishlist(request, product_color_id):
     
     
 @never_cache
+@clear_old_messages
 def remove_from_wishlist(request, product_color_id):
     if request.user.is_authenticated:
         user = request.user
@@ -810,6 +844,7 @@ def remove_from_wishlist(request, product_color_id):
 
 
 @never_cache
+@clear_old_messages
 def remove_in_wishlist(request, product_color_id):
     if request.user.is_authenticated:
         user = request.user
@@ -841,6 +876,7 @@ def remove_in_wishlist(request, product_color_id):
 
 
 @never_cache
+@clear_old_messages
 def user_dashboard(request, user_id):
     if request.user.is_authenticated:
         context = {}
@@ -857,6 +893,7 @@ def user_dashboard(request, user_id):
 
 
 @never_cache
+@clear_old_messages
 def user_details_edit(request):
     if request.user.is_authenticated:
         user = request.user
@@ -920,6 +957,7 @@ def user_details_edit(request):
 
 
 @never_cache
+@clear_old_messages
 def wallet_page_view(request, user_id):
     if request.user.is_authenticated:
         try:
@@ -1102,18 +1140,22 @@ def order_detail(request, order_id):
     if request.user.is_authenticated:
         try:
             seven_days_ago = timezone.now() - timedelta(days=7)
-            orders_placed_before_7_days = OrderItem.objects.filter(order__placed_at__gte = seven_days_ago)
+            
+            orders_placed_before_7_days = OrderItem.objects.filter(delivery_date__gte = seven_days_ago)
             order_items = OrderItem.objects.get(pk = order_id)
-            return_end_date = order_items.order.placed_at + timedelta(days=7)
-            return_end_date_local = return_end_date.astimezone(timezone.get_current_timezone())
-            return_end_date_only_date = return_end_date_local.date()
+            
+            if order_items.delivery_date is not None:
+                return_end_date = order_items.delivery_date + timedelta(days=7)
+            else:
+                return_end_date = None
+            
             can_return_product = False
+            placed = False
+            shipped = False
+            delivery = False
+            delivered = False
             if order_items in orders_placed_before_7_days:
                 can_return_product = True
-                placed = False
-                shipped = False
-                delivery = False
-                delivered = False
             if order_items.order_status == 'Order Placed':
                 placed = True
             if order_items.order_status == 'Shipped':
@@ -1129,7 +1171,7 @@ def order_detail(request, order_id):
             else:
                 wallet_transaction = None    
             context = {
-                'return_end_date_only_date' : return_end_date_only_date,
+                'return_end_date' : return_end_date,
                 'can_return_product' : can_return_product,
                 'order_items' : order_items,
                 'placed' : placed,
@@ -1140,8 +1182,8 @@ def order_detail(request, order_id):
                 'wallet_transaction' : wallet_transaction,
             }
             return render(request, 'dashboard/orders/order_detailed_page.html', context)
-        except Exception as e:
-            return redirect(index_page)
+        except:
+            return redirect('index_page')
     else:
         return redirect(sign_in)
 
@@ -1325,7 +1367,7 @@ def cart_view_page(request, user_id):
         
         return render(request, 'cart.html', context)
     else:
-        return render(request, 'sign_in.html')
+        return redirect('index_page')
 
     
     
@@ -1639,147 +1681,153 @@ razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZOR
 @never_cache
 def place_order(request):
     if request.user.is_authenticated:
-            with transaction.atomic():
-                user = request.user
-                customer = Customer.objects.get(user=user)
-                cart = Cart.objects.get(customer=customer)
-                cart_items = CartProducts.objects.filter(cart=cart)
-                if cart_items:
-                    total_charge_discounted = request.POST.get('total_charge_discounted')
-                    total_money = request.POST.get('total_charge')
-                    
-                    cart_total = 0
-                    item_count = 0
-                    cart_total_price = 0
-                    
-                    for item in cart_items:
-                        item_count += 1
-                        cart_total_price += item.total_price
+        try:
+            if request.method == 'POST':
+                with transaction.atomic():
+                    user = request.user
+                    customer = Customer.objects.get(user=user)
+                    cart = Cart.objects.get(customer=customer)
+                    cart_items = CartProducts.objects.filter(cart=cart)
+                    if cart_items:
+                        total_charge_discounted = request.POST.get('total_charge_discounted')
+                        total_money = request.POST.get('total_charge')
                         
-                    cart_total = cart_total_price
-                    
-                    
-                    total_charge = 0
-                    if total_charge_discounted is not None:
-                        total_charge = total_charge_discounted
-                    else:
-                        total_charge = total_money
-                    
-                    
-                    if_coupon_applied = False
-                    coupon_name = None
-                    discount_price = 0
-                    discount_percentage = None
-                    minimum_amount = None
-                    maximum_amount = None
-                    discount_amount = None
-                    if cart.coupon_applied:
-                        coupon = Coupon.objects.get(coupon_code = cart.coupon)
-                        discount_price = int(cart_total) - int(total_charge_discounted)
-                        total_charge_discounted, discount_amount   = calculate_total_charge_discounted(cart_items, cart)
-                        if_coupon_applied = True
-                        coupon_name = cart.coupon
-                        discount_percentage = coupon.discount_percentage
-                        minimum_amount = coupon.minimum_amount
-                        maximum_amount = coupon.maximum_amount
-                    
-                    
-                    
-                    subtotal = request.POST.get('subtotal')
-                    shipping_charge = request.POST.get('shipping_charge')
-                    if total_charge_discounted is not None:
-                        if total_charge_discounted <= 2500:
-                            shipping_charge = 99
-                            total_charge_discounted
-                        else:
-                            shipping_charge = 0
-                    address_id = request.POST.get('delivery_address')
-                    payment_method = request.POST.get('payment_method')
-                    
-                    address = Address.objects.get(pk=address_id)
-                    
-                    
-                    razorpay = None
-                    
-                    if payment_method == 'Razorpay':
-                        try:
-                            callback_params = {
-                                'address_id': address_id,
-                            }
-                            callback_query_string = urlencode(callback_params)
-                            callback_url = request.build_absolute_uri(reverse('razorpay_payment', kwargs={'user_id': user.id})) + '?' + callback_query_string
-                            currency = 'INR'
-                            amount_in_paise = int(total_charge) * 100
-                            razorpay_order = razorpay_client.order.create(dict(amount=amount_in_paise, currency=currency, payment_capture='0'))
-                            razorpay_order_id = razorpay_order['id']
-                            razorpay = {
-                                'customer' : customer,
-                                'cart' : cart,
-                                'cart_items' : cart_items,
-                                'shipping_charge' : shipping_charge,
-                                'address' : address,
-                                'discount_amount' : discount_amount,
-                                'total_charge_discounted' : total_charge_discounted,
-                                'total_charge' : total_charge,
-                                'subtotal' : subtotal,
-                                'razorpay_order_id' : razorpay_order_id,
-                                'total' : amount_in_paise,
-                                'currency' : currency,
-                                'discount_price' : discount_price,
-                                'user' : user,
-                                'callback_url' : callback_url,
-                                'customer' : customer,
-                                'settings' : settings,
-                            }
-                            return render(request, 'razorpay_test.html', razorpay)
-                        except Exception as e:
-                            return HttpResponseBadRequest("Razorpay Order Creation Failed: " + str(e))
-                    else:
-                        payment = Payment.objects.create(method_name=payment_method)
-                        order = Orders.objects.create(
-                            customer=customer,
-                            address=address,
-                            payment=payment,
-                            number_of_orders=item_count,
-                            subtotal=subtotal,
-                            shipping_charge=shipping_charge,
-                            total_charge=total_charge,
-                            coupon_applied = if_coupon_applied,
-                            coupon_name = coupon_name,
-                            coupon_discount_percent = discount_percentage,
-                            discount_price = discount_price,
-                            coupon_minimum_amount = minimum_amount,
-                            coupon_maximum_amount = maximum_amount,
-                        )
-                        order.save()
+                        cart_total = 0
+                        item_count = 0
+                        cart_total_price = 0
                         
                         for item in cart_items:
-                            price_of_each = item.total_price
+                            item_count += 1
+                            cart_total_price += item.total_price
                             
-                            if cart.coupon_applied:
-                                coupon = Coupon.objects.get(pk = cart.coupon)
-                                discount_price = round((price_of_each * coupon.discount_percentage) / 100)
-                                price_of_each = price_of_each - discount_price
-                            
-                            order_item = OrderItem.objects.create(
-                                order=order,
-                                product=item.product,
-                                quantity=item.quantity,
-                                order_status="Order Placed",
-                                each_price=price_of_each,
+                        cart_total = cart_total_price
+                        
+                        
+                        total_charge = 0
+                        if total_charge_discounted is not None:
+                            total_charge = total_charge_discounted
+                        else:
+                            total_charge = total_money
+                        
+                        
+                        if_coupon_applied = False
+                        coupon_name = None
+                        discount_price = 0
+                        discount_percentage = None
+                        minimum_amount = None
+                        maximum_amount = None
+                        discount_amount = None
+                        if cart.coupon_applied:
+                            coupon = Coupon.objects.get(coupon_code = cart.coupon)
+                            discount_price = int(cart_total) - int(total_charge_discounted)
+                            total_charge_discounted, discount_amount   = calculate_total_charge_discounted(cart_items, cart)
+                            if_coupon_applied = True
+                            coupon_name = cart.coupon
+                            discount_percentage = coupon.discount_percentage
+                            minimum_amount = coupon.minimum_amount
+                            maximum_amount = coupon.maximum_amount
+                        
+                        
+                        
+                        subtotal = request.POST.get('subtotal')
+                        shipping_charge = request.POST.get('shipping_charge')
+                        if total_charge_discounted is not None:
+                            if total_charge_discounted <= 2500:
+                                shipping_charge = 99
+                                total_charge_discounted
+                            else:
+                                shipping_charge = 0
+                        address_id = request.POST.get('delivery_address')
+                        payment_method = request.POST.get('payment_method')
+                        
+                        address = Address.objects.get(pk=address_id)
+                        
+                        
+                        razorpay = None
+                        
+                        if payment_method == 'Razorpay':
+                            try:
+                                callback_params = {
+                                    'address_id': address_id,
+                                }
+                                callback_query_string = urlencode(callback_params)
+                                callback_url = request.build_absolute_uri(reverse('razorpay_payment', kwargs={'user_id': user.id})) + '?' + callback_query_string
+                                currency = 'INR'
+                                amount_in_paise = int(total_charge) * 100
+                                razorpay_order = razorpay_client.order.create(dict(amount=amount_in_paise, currency=currency, payment_capture='0'))
+                                razorpay_order_id = razorpay_order['id']
+                                razorpay = {
+                                    'customer' : customer,
+                                    'cart' : cart,
+                                    'cart_items' : cart_items,
+                                    'shipping_charge' : shipping_charge,
+                                    'address' : address,
+                                    'discount_amount' : discount_amount,
+                                    'total_charge_discounted' : total_charge_discounted,
+                                    'total_charge' : total_charge,
+                                    'subtotal' : subtotal,
+                                    'razorpay_order_id' : razorpay_order_id,
+                                    'total' : amount_in_paise,
+                                    'currency' : currency,
+                                    'discount_price' : discount_price,
+                                    'user' : user,
+                                    'callback_url' : callback_url,
+                                    'customer' : customer,
+                                    'settings' : settings,
+                                }
+                                return render(request, 'razorpay_test.html', razorpay)
+                            except Exception as e:
+                                return HttpResponseBadRequest("Razorpay Order Creation Failed: " + str(e))
+                        else:
+                            payment = Payment.objects.create(method_name=payment_method)
+                            order = Orders.objects.create(
+                                customer=customer,
+                                address=address,
+                                payment=payment,
+                                number_of_orders=item_count,
+                                subtotal=subtotal,
+                                shipping_charge=shipping_charge,
+                                total_charge=total_charge,
+                                coupon_applied = if_coupon_applied,
+                                coupon_name = coupon_name,
+                                coupon_discount_percent = discount_percentage,
+                                discount_price = discount_price,
+                                coupon_minimum_amount = minimum_amount,
+                                coupon_maximum_amount = maximum_amount,
                             )
-                            order_item.save()
-                            product_size_id = item.product.id
-                            product_size = ProductSize.objects.get(pk=product_size_id)
-                            product_size.quantity -= item.quantity
-                            product_size.save()
-                        cart_items.delete()
+                            order.save()
                             
-                        time.sleep(2)
-                            
-                        return render(request, 'order_placed.html', {'order': order})
-                else:
-                    return redirect('index_page')
+                            for item in cart_items:
+                                price_of_each = item.total_price
+                                
+                                if cart.coupon_applied:
+                                    coupon = Coupon.objects.get(pk = cart.coupon)
+                                    discount_price = round((price_of_each * coupon.discount_percentage) / 100)
+                                    price_of_each = price_of_each - discount_price
+                                
+                                order_item = OrderItem.objects.create(
+                                    order=order,
+                                    product=item.product,
+                                    quantity=item.quantity,
+                                    order_status="Order Placed",
+                                    each_price=price_of_each,
+                                )
+                                order_item.save()
+                                product_size_id = item.product.id
+                                product_size = ProductSize.objects.get(pk=product_size_id)
+                                product_size.quantity -= item.quantity
+                                product_size.save()
+                            cart_items.delete()
+                                
+                            time.sleep(2)
+                                
+                            return redirect('order_placed_view', order_id=order.order_id)
+                    else:
+                        return redirect('index_page')
+            else:
+                return redirect('index_page')
+        except:
+            return redirect('index_page')
     else:
         return redirect('sign_in_page')
 
@@ -1796,6 +1844,7 @@ def place_order(request):
 
 
 @csrf_exempt
+@never_cache
 def razorpay_payment(request, user_id):
     if request.method == "POST":
             payment_id = request.POST.get('razorpay_payment_id', '')
@@ -1904,7 +1953,7 @@ def razorpay_payment(request, user_id):
                     
                     time.sleep(2)
                     
-                    return render(request, 'order_placed.html', {'order': order})
+                    return redirect('order_placed_view', order_id=order.order_id)
             else:
                 payment.failed = True
                 payment.pending = False
@@ -1913,5 +1962,17 @@ def razorpay_payment(request, user_id):
                 time.sleep(2)
                 
                 return render(request, 'paymentfail.html')
+    else:
+        return redirect('index_page')
+
+
+from django.shortcuts import get_object_or_404
+
+@never_cache
+
+def order_placed_view(request, order_id):
+    if request.user.is_authenticated:
+        order = get_object_or_404(Orders, order_id = order_id)
+        return render(request, 'order_placed.html', {'order': order})
     else:
         return redirect('index_page')

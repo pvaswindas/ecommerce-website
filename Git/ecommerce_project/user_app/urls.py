@@ -63,6 +63,7 @@ urlpatterns = [
     path('sneakerheads/user/order/place-order/', place_order, name='place_order'),
     path('sneakerheads/user/order/cancel_order/<str:order_items_id>/', cancel_order, name='cancel_order'),
     path('sneakerheads/user/order/sent_return_request/<str:order_items_id>/', sent_return_request, name='sent_return_request'),
+    path('sneakerheads/user/order/placed_order_details/<str:order_id>/', order_placed_view, name='order_placed_view' ),
     
     
     
