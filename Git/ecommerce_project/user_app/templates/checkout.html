@@ -62,12 +62,24 @@
                 <div class="payment-method-list">
                   <div class="payment-method-item">
                     <input type="radio" id="payment_method_cash" class="payment-method" name="payment_method" value="Cash On Delivery" />
-                    <label for="payment_method_cash" class="payment-method-label w-50"><img class="w-25" src="{% static 'user/images/payment_logo/cash-on-delivery.png' %}" alt="Cash on Delivery" class="payment-method-image" /></label>
+                    <label for="payment_method_cash" class="payment-method-label" style="max-width: 100px;"><img style="max-width: 70px;" src="{% static 'user/images/payment_logo/cash-on-delivery.png' %}" alt="Cash on Delivery" class="payment-method-image" /></label>
                   </div>
                   <div class="payment-method-item">
                     <input type="radio" id="payment_method_razorpay" class="payment-method" name="payment_method" value="Razorpay" />
-                    <label for="payment_method_razorpay" class="payment-method-label w-50"><img class="w-25" src="{% static 'user/images/payment_logo/razorpay.png' %}" alt="Razorpay" class="payment-method-image" /></label>
+                    <label for="payment_method_razorpay" class="payment-method-label" style="max-width: 200px;"><img style="max-width: 70px;" src="{% static 'user/images/payment_logo/razorpay.png' %}" alt="Razorpay" class="payment-method-image" /></label>
                   </div>
+                  {% if wallet_balance >= total_charge %}
+                  <div class="payment-method-item">
+                    <input type="radio" id="payment_method_wallet" class="payment-method" name="payment_method" value="Wallet" />
+                    <label for="payment_method_wallet" aria-disabled="true" class="payment-method-label" style="max-width: 100px;"><img style="max-width: 70px;" src="{% static 'user/images/payment_logo/wallet.png' %}" alt="Wallet" class="payment-method-image" /></label>
+                  </div>
+                  {% else %}
+                    <div class="payment-method-item">
+                      <label for="payment_method_wallet" class="payment-method-label" style="max-width: 100px;">
+                        <img style="max-width: 70px; filter: grayscale(50%);" src="{% static 'user/images/payment_logo/wallet.png' %}" alt="Wallet" class="payment-method-image" />
+                      </label>
+                    </div>
+                  {% endif %}
                 </div>
               </div>
 

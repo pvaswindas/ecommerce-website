@@ -6,6 +6,8 @@ from user_app.models import Customer
 from admin_app.models import *
 import time
 import json
+from django.core.exceptions import ValidationError
+from PIL import Image # type: ignore
 import pytz  # type: ignore
 from django.urls import reverse
 from datetime import datetime
@@ -69,7 +71,14 @@ def clean_string(input_string):
     clean_string = re.sub(r'[^a-zA-Z0-9]', '', input_string)
     return clean_string
 
-
+def validate_image(file):
+    try:
+        img = Image.open(file)
+        img.verify()
+    except Exception as e:
+        raise ValidationError("Invalid image file: {}".format(e))
+        
+        
 five_days_ago = timezone.now() - timedelta(days=5)
 
 
@@ -937,57 +946,70 @@ def edit_product_color(request, p_id):
             top_image = request.FILES.get('top_image')
             back_image = request.FILES.get('back_image')
 
-            try:
-                product_color_image = ProductColorImage.objects.get(pk=p_id)
-            except ProductColorImage.DoesNotExist:
-                messages.error(request, 'Product color not found.')
-                return redirect('list_product_page')
+            if color and price and main_image and side_image and top_image and back_image:
+                try:
+                    product_color_image = ProductColorImage.objects.get(pk=p_id)
+                except ProductColorImage.DoesNotExist:
+                    messages.error(request, 'Product color not found.')
+                    return redirect('list_product_page')
 
-            is_every_field_valid = True
+                is_every_field_valid = True
+                
+                try:
+                    validate_image(main_image)
+                    validate_image(side_image)
+                    validate_image(top_image)
+                    validate_image(back_image)
+                except:
+                    messages.error(request, 'Image files should be in valid format.')
+                    return redirect('admin_add_image_page')
 
-            try:
-                price = int(price)
-            except ValueError:
-                messages.error(
-                    request, 'Price should be a valid whole number.')
-                return redirect('list_product_page')
+                try:
+                    price = int(price)
+                except ValueError:
+                    messages.error(
+                        request, 'Price should be a valid whole number.')
+                    return redirect('list_product_page')
 
-            cleaned_color = clean_string(color)
+                cleaned_color = clean_string(color)
 
-            if not 3 <= len(cleaned_color) <= 30 and not alphabets_pattern.match(color):
-                is_every_field_valid = False
-                messages.error(
-                    request, 'Color should only consist of characters and it should not be blank.')
+                if not 3 <= len(cleaned_color) <= 30 and not alphabets_pattern.match(color):
+                    is_every_field_valid = False
+                    messages.error(
+                        request, 'Color should only consist of characters and it should not be blank.')
 
-            elif not 3 <= len(color) <= 30:
-                is_every_field_valid = False
-                messages.error(
-                    request, 'The color name should be between 3 and 30 characters long.')
+                elif not 3 <= len(color) <= 30:
+                    is_every_field_valid = False
+                    messages.error(
+                        request, 'The color name should be between 3 and 30 characters long.')
 
-            elif not 800 <= price <= 100000:
-                is_every_field_valid = False
-                messages.error(
-                    request, 'Price should be between ₹800 and ₹100,000.')
+                elif not 800 <= price <= 100000:
+                    is_every_field_valid = False
+                    messages.error(
+                        request, 'Price should be between ₹800 and ₹100,000.')
 
-            if is_every_field_valid:
-                product_color_image.color = color
-                product_color_image.price = price
+                if is_every_field_valid:
+                    product_color_image.color = color
+                    product_color_image.price = price
 
-                if main_image:
-                    product_color_image.main_image = main_image
-                if side_image:
-                    product_color_image.side_image = side_image
-                if top_image:
-                    product_color_image.top_image = top_image
-                if back_image:
-                    product_color_image.back_image = back_image
+                    if main_image:
+                        product_color_image.main_image = main_image
+                    if side_image:
+                        product_color_image.side_image = side_image
+                    if top_image:
+                        product_color_image.top_image = top_image
+                    if back_image:
+                        product_color_image.back_image = back_image
 
-                product_color_image.save()
+                    product_color_image.save()
 
-                messages.success(
-                    request, 'Product color & images have been updated successfully')
-                return redirect(list_product_page)
+                    messages.success(
+                        request, 'Product color & images have been updated successfully')
+                    return redirect('list_product_page')
+                else:
+                    return redirect('list_product_page')
             else:
+                messages.error(request, 'Please fill all the fields to continue.')
                 return redirect('list_product_page')
         else:
             return render(request, 'edit_product_color.html', {'product_color_image': product_color_image, 'is_active_product': is_active_product})
@@ -1162,9 +1184,12 @@ def admin_add_image_page(request):
         return redirect(admin_login_page)
 
 
-# ADD PRODUCT IMAGE FUNCTION
 
+    
+
+# ADD PRODUCT IMAGE FUNCTION
 @never_cache
+@clear_old_messages
 def add_product_image(request):
     if request.user.is_superuser:
         if request.method == 'POST':
@@ -1183,6 +1208,15 @@ def add_product_image(request):
             if product_id and color and price and main_image and side_image and top_image and back_image:
 
                 cleaned_color = clean_string(color)
+                
+                try:
+                    validate_image(main_image)
+                    validate_image(side_image)
+                    validate_image(top_image)
+                    validate_image(back_image)
+                except:
+                    messages.error(request, 'Image files should be in valid format.')
+                    return redirect('admin_add_image_page')
 
                 try:
                     products = Products.objects.get(pk=product_id)

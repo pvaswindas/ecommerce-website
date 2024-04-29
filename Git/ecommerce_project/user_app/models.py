@@ -47,7 +47,7 @@ class Address(models.Model):
     country = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
-    street_address = models.CharField(max_length=200)
+    street_address = models.CharField(max_length=500)
     pin_code = models.CharField(max_length=50)
     
     def __str__(self):

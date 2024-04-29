@@ -1,11 +1,19 @@
 <div class="container main-container">
   <h1 class="my-5">Profile Information</h1>
   {% if messages %}
-    <div class="container messages-container text-black">
-      {% for message in messages %}
-        <h6>{{ message }}</h6>
-      {% endfor %}
-    </div>
+    {% for message in messages %}
+      <div class="text-center messages-container container mt-4">
+        {% if message.tags == 'success' %}
+          <h6 style="color: green;">{{ message }}</h6>
+        {% elif message.tags == 'error' %}
+          <h6 style="color: red;">{{ message }}</h6>
+        {% elif message.tags == 'info' %}
+          <h6 style="color: blue;">{{ message }}</h6>
+        {% else %}
+          <h6>{{ message }}</h6>
+        {% endif %}
+      </div>
+    {% endfor %}
   {% endif %}
   <div class="profile-info">
     <form action="{% url 'user_details_edit' %}" method="post" id="customer-profile-form">

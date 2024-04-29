@@ -104,7 +104,7 @@
                 <div class="tracking-text">Cancelled</div>
               </div>
             </div>
-            {% if order_items.order.payment.method_name == 'Razorpay' %}
+            {% if order_items.order.payment.method_name == "Razorpay" or order_items.order.payment.method_name == "Wallet" %}
               <div class="card refund-card">
                   <div class="card-body">
                       <div class="refund-icon w-25">
