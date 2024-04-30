@@ -35,25 +35,63 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-9">
+
+            {% comment %} <div id="addAddressModal" class="modal" style="display: none;">
+              <div class="modal-content">
+                <span class="close" onclick="closeAddAddressModal()">&times;</span>
+                <div class="shipping-address-info">
+                  <form action="" method="post" id="shipping-address-form">
+                    {% csrf_token %}
+                    <label for="name">Name</label><br />
+                    <input type="text" required name="name"/><br>
+            
+                    <label for="phone_number">Phone Number</label><br />
+                    <input type="text" required name="phone_number"/><br>
+            
+                    <label for="country">Country</label><br />
+                    <input type="text" name="country"/><br>
+            
+                    <label for="state">State</label> <br>
+                    <input type="text" required name="state"/><br />
+            
+                    <label for="city">City</label><br />
+                    <input type="text" required name="city"/><br>
+            
+                    <label for="street_address">Street Address</label><br />
+                    <input type="text" required name="street_address"/><br>
+            
+                    <label for="pincode">Pincode</label><br />
+                    <input type="text" required name="pincode"/><br>
+            
+                    <br><button type="submit" form="shipping-address-form" class="save-button btn btn-primary w-100 my-3">Save</button>
+                  </form>
+                </div>
+              </div>
+            </div> {% endcomment %}
+
             <form action="{% url 'place_order' %}" method="post" id="checkout_form">
               {% csrf_token %}
               <div class="delivery-address-container">
                 <h2 class="address-heading">Delivery Address</h2>
-                <p class="address-select-info">Please select a delivery address:</p>
+                <p class="address-select-info">{% if addresses %}Please select a delivery address:{% endif %}</p>
                 <div class="address-list">
-                  {% for addr in addresses %}
-                    <div class="address-item">
-                      <input type="radio" id="address-{{ addr.id }}" name="delivery_address" value="{{ addr.id }}" class="custom-radio-input" />
-                      <label for="address-{{ addr.id }}" class="custom-radio-label">
-                        <span class="address-name">{{ addr.name }} : {{ addr.phone_number }}</span><br />
-                        <span class="address-details">
-                          {{ addr.street_address }}, {{ addr.city }},
-                          {{ addr.state }}, {{ addr.country }}, {{ addr.pin_code }}
-                        </span>
-                      </label>
-                    </div>
-                  {% endfor %}
-                </div>
+                  {% if addresses %}
+                    {% for addr in addresses %}
+                      <div class="address-item">
+                        <input type="radio" id="address-{{ addr.id }}" name="delivery_address" value="{{ addr.id }}" class="custom-radio-input" {% if forloop.first %}checked{% endif %}/>
+                        <label for="address-{{ addr.id }}" class="custom-radio-label">
+                          <span class="address-name">{{ addr.name }} : {{ addr.phone_number }}</span><br />
+                          <span class="address-details">
+                            {{ addr.street_address }}, {{ addr.city }},
+                            {{ addr.state }}, {{ addr.country }}, {{ addr.pin_code }}
+                          </span>
+                        </label>
+                      </div>
+                    {% endfor %}
+                  {% else %}
+                    <p>No addresses found. <a href="{% url 'user_dashboard' user.id %}" >Add an address</a>.</p>
+                  {% endif %}
+                </div>         
               </div>
 
               <div class="payment-method-selection">
@@ -237,4 +275,14 @@
       event.stopPropagation()
     })
   </script>
+
+  <script>
+    function openAddAddressModal() {
+      document.getElementById("addAddressModal").style.display = "block";
+    }
+    
+    function closeAddAddressModal() {
+      document.getElementById("addAddressModal").style.display = "none";
+    }
+    </script>
 {% endblock %}

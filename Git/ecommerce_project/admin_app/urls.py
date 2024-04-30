@@ -111,6 +111,10 @@ urlpatterns = [
     path('sneakerheads/admin/coupon/update_coupon/<str:coupon_id>/', update_coupon, name='update_coupon'),
     path('sneakerheads/admin/coupon/delete_coupon/<str:coupon_id>/', delete_coupon, name='delete_coupon'),
     
+    
+    path('sneakerheads/admin/banner/', banner_view_page, name='banner_view_page'),
+    path('sneakerheads/admin/banner/add-banner-page/', banner_add_page_view, name='banner_add_page_view'),
+    
 ]
 
 

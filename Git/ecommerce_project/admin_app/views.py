@@ -99,6 +99,8 @@ total_customers = Customer.objects.all().count()
 if total_customers > 0:
     increase_of_customer_in_five_days = round(
         (customers_last_5_days / total_customers) * 100, 2)
+    
+    increase_of_customer_in_five_days = max(0, increase_of_customer_in_five_days)
 else:
     increase_of_customer_in_five_days = 0
 
@@ -111,6 +113,8 @@ total_orders = OrderItem.objects.all().count()
 if total_orders > 0:
     increase_of_order_in_five_days = round(
         (orders_last_5_days / total_orders) * 100, 2)
+    
+    increase_of_order_in_five_days = max(0, increase_of_order_in_five_days)
 else:
     increase_of_order_in_five_days = 0
 
@@ -122,11 +126,15 @@ todays_order = OrderItem.objects.filter(order__placed_at__date=today).count()
 if orders_last_5_days > 0:
     todays_order_vs_order_in_five_days = round(
         ((todays_order - orders_last_5_days) / orders_last_5_days) * 100, 2)
+    
+    todays_order_vs_order_in_five_days = max(0, todays_order_vs_order_in_five_days)
 else:
     todays_order_vs_order_in_five_days = 0
 
 
+
 # 5 DAYS PRODUCTS--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 products_last_5_days = ProductColorImage.objects.filter(
     created_at__gte=five_days_ago).count()
 total_products = ProductColorImage.objects.all().count()
@@ -134,8 +142,11 @@ total_products = ProductColorImage.objects.all().count()
 if total_products > 0:
     increase_of_products_in_five_days = round(
         (products_last_5_days / total_products) * 100, 2)
+    
+    increase_of_products_in_five_days = max(0, increase_of_products_in_five_days)
 else:
     increase_of_products_in_five_days = 0
+
 
 
 def get_data(request):
@@ -159,7 +170,7 @@ def get_data(request):
     return data
 
 
-# ---------------------------------------------------------------- ADMIN LOGIN FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ------------------------------------------------------------------- CC_ADMIN LOGIN FUNCTIONS STARTING FROM HERE -------------------------------------------------------------------
 
 
 # ADMIN LOGIN PAGE
@@ -228,7 +239,7 @@ def page_not_found(request):
         return render(request, 'pages/samples/error-404.html')
 
 
-# ---------------------------------------------------------------- ADMIN CUSTOMER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN CUSTOMER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 # CUSTOMER SHOW FUNCTION
@@ -292,7 +303,7 @@ def search_user(request):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- ADMIN CATEGORIES PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN CATEGORIES PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 # CATEGORIES PAGES FUNCTION
@@ -541,7 +552,7 @@ def restore_categories(request, cat_id):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- ADMIN PRODUCT PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN PRODUCT PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 # PRODUCTS VIEW PAGE FUNCTION
@@ -901,7 +912,7 @@ def restore_product(request, pdt_id):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- ADMIN EDIT PRODUCT COLOR & IMAGE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN EDIT PRODUCT COLOR & IMAGE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 # EDIT PRODUCT COLOR PAGE VIEW FUNCTION
@@ -1081,7 +1092,7 @@ def delete_product(request, pdt_id):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- ADMIN EDIT PRODUCT SIZE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN EDIT PRODUCT SIZE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 # EDIT PRODUCT SIZE PAGE VIEW FUNCTION
@@ -1170,7 +1181,7 @@ def edit_product_size(request, p_id):
         return redirect(admin_login_page)
 
 
-# ---------------------------------------------------------------- ADMIN ADD PRODUCT IMAGE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN ADD PRODUCT IMAGE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 # ADD PRODUCT IMAGE PAGE VIEW FUNCTION
@@ -1279,7 +1290,7 @@ def add_product_image(request):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- ADMIN PRODUCT VARIANTS PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN PRODUCT VARIANTS PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 adult_sizes = [6, 7, 8, 9, 10, 11, 12]
@@ -1397,7 +1408,7 @@ def add_size(request):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- ADMIN BRAND PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN BRAND PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 # BRAND PAGE FUNCTION
 
@@ -1681,7 +1692,7 @@ def un_list_the_brand(request, brand_id):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- ADMIN ORDER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_ADMIN ORDER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 @never_cache
@@ -1854,7 +1865,7 @@ def return_product(request, order_items_id):
         return redirect(admin_login_page)
 
 
-# ----------------------------------------------------------------  SALES REPORT PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ----------------------------------------------------------------  CC_SALES REPORT PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 current_date = timezone.now().date()
@@ -2209,7 +2220,7 @@ def download_sales_report(request):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- PRODUCT OFFER MODULE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_PRODUCT OFFER MODULE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 @never_cache
@@ -2439,7 +2450,7 @@ def delete_offer(request, product_offer_id):
         return redirect('admin_login_page')
 
 
-# ---------------------------------------------------------------- PRODUCT OFFER MODULE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ---------------------------------------------------------------- CC_PRODUCT OFFER MODULE PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 @never_cache
@@ -2660,7 +2671,7 @@ def delete_category_offer(request, category_offer_id):
         return redirect('admin_login_page')
 
 
-# ----------------------------------------------------------------  COUPON PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+# ----------------------------------------------------------------  CC_COUPON PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
 
 
 @never_cache
@@ -2932,5 +2943,42 @@ def delete_coupon(request, coupon_id):
         except Coupon.DoesNotExist:
             messages.error(request, 'Coupon not found.')
         return redirect('coupon_page_view')
+    else:
+        return redirect('admin_login_page')
+
+
+
+
+
+
+
+# ----------------------------------------------------------------  CC_BANNER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
+
+
+
+
+@never_cache
+@clear_old_messages
+def banner_view_page(request):
+    if request.user.is_superuser:
+        context = {
+            'is_active_banner' : is_active_banner,
+        }
+        return render(request, 'pages/banner/banner_page.html', context)
+    else:
+        return redirect('admin_login_page')
+    
+    
+    
+
+
+@never_cache
+@clear_old_messages
+def banner_add_page_view(request):
+    if request.user.is_superuser:
+        context = {
+            'is_active_banner' : is_active_banner
+        }
+        return render(request, 'pages/banner/banner_add_page.html', context)
     else:
         return redirect('admin_login_page')

@@ -74,7 +74,7 @@ def get_cart_wishlist_address_order_data(request):
         wishlist = Wishlist.objects.get(customer=customer)
         wishlist_item_count = WishlistItem.objects.filter(
             wishlist=wishlist).count()
-        addresses = Address.objects.filter(customer=customer)
+        addresses = Address.objects.filter(customer=customer).order_by('name')
         orders = Orders.objects.filter(customer=customer)
         order_items = OrderItem.objects.filter(
             order__customer=customer).order_by('-order__placed_at')
@@ -217,59 +217,60 @@ def register_function(request):
         password = request.POST['password']
         confirm_password = request.POST['confirm_password']
         referral_code = request.POST.get('referral_code', None)
-        
+
         is_every_field_valid = True
-        
+
         if name and email and password and confirm_password:
             cleaned_name = clean_string(name)
             cleaned_password = clean_string(password)
             cleaned_confirm_password = clean_string(confirm_password)
-            
+
             email = normalize_newlines(email).strip()
-            
+
             try:
                 validate_email(email)
             except ValidationError:
                 is_every_field_valid = False
                 messages.error(request, 'Enter a valid email address')
-                
+
             if not alphabets_pattern.match(name):
                 is_every_field_valid = False
                 messages.error(request, 'Name should be in alphabetic format.')
-            
+
             elif not 3 <= len(cleaned_name) <= 100:
                 is_every_field_valid = False
-                messages.error(request, 'Name should not consist solely of special characters or be blank.')
-            
-            
+                messages.error(
+                    request, 'Name should not consist solely of special characters or be blank.')
+
             elif User.objects.filter(username=email).exists():
                 is_every_field_valid = False
                 messages.error(request, 'Email already exits, try logging in')
-                
+
             elif not len(cleaned_password) >= 8:
                 is_every_field_valid = False
-                messages.error(request, 'Password should not consist solely of special characters or be blank.')
-                
+                messages.error(
+                    request, 'Password should not consist solely of special characters or be blank.')
+
             elif len(password) < 8:
                 is_every_field_valid = False
                 messages.error(
                     request, 'Password must be at least 8 characters long.')
-                
+
             elif ' ' in password:
                 is_every_field_valid = False
                 messages.error(request, 'Password cannot contain spaces.')
-                
+
             elif password != confirm_password:
                 is_every_field_valid = False
                 messages.error(request, 'Passwords not match.')
-                
+
             elif not len(cleaned_confirm_password) >= 8:
                 is_every_field_valid = False
-                messages.error(request, 'Confirm Password should not consist solely of special characters or be blank.')
-                
+                messages.error(
+                    request, 'Confirm Password should not consist solely of special characters or be blank.')
+
             if referral_code:
                 request.session['referral_code'] = referral_code
-                
 
             if is_every_field_valid:
                 try:
@@ -297,7 +298,7 @@ def register_function(request):
                 return redirect('sign_up_page')
         else:
             messages.error(request, 'Please fill all the fields.')
-            
+
     return redirect('sign_up_page')
 
 
@@ -339,7 +340,7 @@ def otp_verification_page(request):
                 if str(otp_entered) == str(otp):
                     user_data = request.session.get('user_data')
                     referral_code = request.session.get('referral_code')
-                    
+
                     if user_data:
                         user = User.objects.create_user(
                             username=user_data['email'],
@@ -351,36 +352,36 @@ def otp_verification_page(request):
                         del request.session['user_data']
                         del request.session['otp']
                         del request.session['otp_created_at']
-                        
-        
+
                         if referral_code:
-                            customer = Customer.objects.get(user = user)
+                            customer = Customer.objects.get(user=user)
                             customer.used_referral_code = referral_code
                             customer.save()
-                            
-                            referring_customer = Customer.objects.get(referral_code=referral_code)
-                            
+
+                            referring_customer = Customer.objects.get(
+                                referral_code=referral_code)
+
                             if referring_customer:
-                                referring_wallet = Wallet.objects.get(user=referring_customer.user)
+                                referring_wallet = Wallet.objects.get(
+                                    user=referring_customer.user)
                                 referring_wallet.balance += 250
                                 referring_wallet.save()
                                 WalletTransaction.objects.create(
                                     wallet=referring_wallet,
                                     money_deposit=250,
                                 )
-                                
+
                                 joining_wallet = Wallet.objects.get(user=user)
                                 joining_wallet.balance += 100
                                 joining_wallet.save()
-                                
+
                                 WalletTransaction.objects.create(
                                     wallet=joining_wallet,
                                     money_deposit=100,
                                 )
-                            
-                            
+
                             del request.session['referral_code']
-                        
+
                         messages.success(
                             request, 'Registration Successfully, Login Now')
                         return redirect('sign_in_page')
@@ -962,55 +963,64 @@ def user_details_edit(request):
             dob = request.POST.get('dob')
             gender = request.POST.get('gender')
 
-            is_valid_phone = True
+            is_every_field_valid = True
 
-            email = normalize_newlines(email).strip()
-            is_valid_email = True
+            if first_name:
+                cleaned_first_name = clean_string(first_name)
+                if not 3 <= len(cleaned_first_name) <= 100:
+                    is_every_field_valid = False
+                    messages.error(
+                        request, 'First name must be between 3 and 100 characters.')
 
-            try:
-                validate_email(email)
-            except ValidationError as e:
-                is_valid_email = False
-                messages.error(request, f'Invalid email: {e}')
+            if email:
+                email = normalize_newlines(email).strip()
+                try:
+                    validate_email(email)
+                except ValidationError as e:
+                    is_every_field_valid = False
+                    messages.error(request, 'Email address is invalid.')
+                else:
+                    if User.objects.exclude(pk=user.pk).filter(email=email).exists():
+                        is_every_field_valid = False
+                        messages.error(
+                            request, 'Email already exists for another user.')
 
-            current_user_email = request.user.email
-            if User.objects.filter(~Q(username=current_user_email), username=email).exists():
-                is_valid_email = False
-                messages.error(
-                    request, 'Email already exists for another user')
+            if phone:
+                if not phone.isdigit():
+                    is_every_field_valid = False
+                    messages.error(request, 'Phone number should be digits.')
+                elif len(phone) != 10:
+                    is_every_field_valid = False
+                    messages.error(request, 'Phone number must be 10 digits.')
 
-            if not re.match(r'^\d{10}$', phone):
-                is_valid_phone = False
-                messages.error(request, 'Phone number must be 10 digits')
-
-            if is_valid_email and is_valid_phone:
-                user.first_name = first_name
-                user.last_name = last_name
-                user.username = email
-                user.email = email
-                customer.phone_number = phone
-                customer.dob = dob
-                customer.gender = gender
+            if is_every_field_valid:
+                if first_name:
+                    user.first_name = first_name
+                if last_name:
+                    user.last_name = last_name
+                if email:
+                    user.email = email
+                if phone:
+                    customer.phone_number = phone
+                if dob:
+                    customer.dob = dob
+                if gender:
+                    customer.gender = gender
 
                 user.save()
                 customer.save()
-                messages.success(request, 'Profile Updated')
-            return redirect(reverse('user_dashboard', kwargs={'user_id': user_id}))
+                messages.success(request, 'Profile updated successfully.')
+                return redirect(reverse('user_dashboard', kwargs={'user_id': user_id}))
+            else:
+                return redirect(reverse('user_dashboard', kwargs={'user_id': user_id}))
         else:
-            messages.error(
-                request, 'Not able to change user details at this moment')
+            messages.error(request, 'User details not found.')
             return redirect(index_page)
     else:
         return redirect(index_page)
-    
-    
-    
-
 
 
 # -------------------------------------------------------------------------------- CC_REFERRALS DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
-
-
 
 
 @never_cache
@@ -1019,30 +1029,32 @@ def referrals_page_view(request):
     if request.user.is_authenticated:
         context = {}
         user = request.user
-        customer = Customer.objects.get(user = user)
+        customer = Customer.objects.get(user=user)
         referral_code = customer.referral_code
-        
+
         sign_up_url = reverse('sign_up_page')
-        
-        referral_link = request.build_absolute_uri(sign_up_url + f'?ref={referral_code}')
-        
-        referral_usage = Customer.objects.filter(used_referral_code = referral_code)
-        
+
+        referral_link = request.build_absolute_uri(
+            sign_up_url + f'?ref={referral_code}')
+
+        referral_usage = Customer.objects.filter(
+            used_referral_code=referral_code)
+
         referral_count = referral_usage.count() if referral_usage else 0
-         
+
         total_earnings = 250 * referral_count if referral_count else 0
-        
+
         cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
             request)
         context.update(cart_wishlist_address_order_data)
         context.update({
-            'user' : user,
-            'customer' : customer,
-            'referral_code' : referral_code,
-            'referral_link' : referral_link,
-            'referral_usage' : referral_usage,
-            'referral_count' : referral_count,
-            'total_earnings' : total_earnings,
+            'user': user,
+            'customer': customer,
+            'referral_code': referral_code,
+            'referral_link': referral_link,
+            'referral_usage': referral_usage,
+            'referral_count': referral_count,
+            'total_earnings': total_earnings,
         })
         return render(request, 'referrals.html', context)
     else:
