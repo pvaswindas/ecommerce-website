@@ -11,20 +11,19 @@
       <div class="collapse show" id="widget-1">
         <div class="widget-body">
           <div class="filter-items filter-items-count">
-            {% for category in category_list %}
-              <form method="post" action="{% url 'category_wise' %}">
-                  {% csrf_token %}
+            <form method="get" id="categoryForm" action="{% url 'shop_page_view' %}">
+              {% csrf_token %}
+              {% for category in category_list %}
                   <div class="filter-item">
                       <div class="custom-control custom-checkbox">
-                          <input type="checkbox" class="custom-control-input" id="cat-{{ forloop.counter }}" name="category_wise" value="{{ category.name }}" {% if category.name in selected_category %}checked{% endif %} onchange="this.form.submit()" />
+                          <input type="checkbox" class="custom-control-input" id="cat-{{ forloop.counter }}" name="category_wise" value="{{ category.name }}" {% if category.name in selected_categories %}checked{% endif %} />
                           <label class="custom-control-label" for="cat-{{ forloop.counter }}">{{ category.name }}</label>
                       </div>
                       <span class="item-count">{{ category.product_count }}</span>
                   </div>
-                  <input type="hidden" name="category_wise" value="{{ category.name }}">
-              </form>
-            {% endfor %}
-          </div>
+              {% endfor %}
+            </form>
+          </div>        
         </div>
       </div>
     </div>

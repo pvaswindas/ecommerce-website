@@ -1,12 +1,13 @@
 import re
 import time
 import random
-import logging
 import razorpay  # type: ignore
-from random import shuffle
 from datetime import datetime
-from user_app.models import *
-from admin_app.models import *
+from user_app.models import Customer, Address
+from admin_app.models import Category, Brand, ProductColorImage, ProductSize
+from admin_app.models import ProductOffer, CategoryOffer, Coupon, Payment
+from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction
+from admin_app.models import Wishlist, WishlistItem, Cart, CartProducts
 from django.db.models import Q
 from datetime import timedelta
 from django.db.models import *
@@ -18,11 +19,9 @@ from django.db import transaction
 from urllib.parse import urlencode
 from django.contrib import messages
 from django.http import JsonResponse
-from django.http import HttpResponse
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
 from django.utils.html import format_html
-from django.core.mail import EmailMessage
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from django.http import HttpResponseBadRequest
@@ -30,7 +29,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.text import normalize_newlines
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
@@ -625,22 +624,6 @@ def search_for_product(request):
 
 @never_cache
 @clear_old_messages
-def category_wise(request):
-    if request.method == 'POST':
-        category_wise = request.POST.get('category_wise')
-        selected_category = request.session.get('selected_category', [])
-        if category_wise in selected_category:
-            selected_category.remove(category_wise)
-        else:
-            selected_category.append(category_wise)
-        request.session['selected_category'] = selected_category
-        return redirect('shop_page_view')
-    else:
-        return redirect('index_page')
-
-
-@never_cache
-@clear_old_messages
 def brand_wise(request):
     if request.method == 'POST':
         brand_wise = request.POST.get('brand_wise')
@@ -665,10 +648,13 @@ def clean_all(request):
     return redirect('shop_page_view')
 
 
+
+
+
 @never_cache
 @clear_old_messages
 def shop_page_view(request):
-    global search, default, a_z, new_arrival, low_to_high, high_to_low, selected_category, selected_brand
+    global search
     context = {}
 
     price_ranges = [
@@ -680,23 +666,27 @@ def shop_page_view(request):
         {"min": 5000, "max": None},
     ]
     if request.user.is_authenticated:
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
-            request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
         context.update(cart_wishlist_address_order_data)
 
-    product_color_list = ProductColorImage.objects.filter(
-        is_deleted=False, is_listed=True)
+    sortby = request.GET.get('sortby', 'default')
+    selected_categories = request.GET.getlist('category_wise')
 
-    selected_category = request.session.get('selected_category', [])
-    selected_brand = request.session.get('selected_brand', [])
+    if selected_categories:
+        product_color_list = ProductColorImage.objects.filter(
+            products__category__name__in=selected_categories, is_deleted=False, is_listed=True)
+    else:
+        product_color_list = ProductColorImage.objects.filter(
+            is_deleted=False, is_listed=True)
 
-    if selected_category and selected_brand:
-        product_color_list = product_color_list.filter(
-            Q(products__category__name__in=selected_category) & Q(products__brand__name__in=selected_brand))
-
-    if selected_category or selected_brand:
-        product_color_list = product_color_list.filter(
-            Q(products__category__name__in=selected_category) | Q(products__brand__name__in=selected_brand))
+    if sortby == 'a_z':
+        product_color_list = product_color_list.order_by('products__name')
+    elif sortby == 'new_arrival':
+        product_color_list = product_color_list.order_by('-created_at')
+    elif sortby == 'low_to_high':
+        product_color_list = product_color_list.order_by('price')
+    elif sortby == 'high_to_low':
+        product_color_list = product_color_list.order_by('-price')
 
     if not search == "":
         product_color = product_color_list.filter(
@@ -712,15 +702,6 @@ def shop_page_view(request):
 
         search = ""
 
-    if a_z:
-        product_color_list = product_color_list.order_by('products__name')
-    elif new_arrival:
-        product_color_list = product_color_list.order_by('-created_at')
-    elif low_to_high:
-        product_color_list = product_color_list.order_by('price')
-    elif high_to_low:
-        product_color_list = product_color_list.order_by('-price')
-
     latest_products = ProductColorImage.objects.filter(
         is_deleted=False, is_listed=True).order_by('-created_at')[:3]
 
@@ -734,22 +715,12 @@ def shop_page_view(request):
         'category_list': category_list,
         'price_ranges': price_ranges,
         'latest_products': latest_products,
-        'default': default,
-        'a_z': a_z,
-        'new_arrival': new_arrival,
-        'low_to_high': low_to_high,
-        'high_to_low': high_to_low,
-        'selected_category': selected_category,
-        'selected_brand': selected_brand,
-
+        'selected_categories': selected_categories,
+        'sortby': sortby,
     })
-    default = False
-    a_z = False
-    new_arrival = False
-    low_to_high = False
-    high_to_low = False
 
     return render(request, 'shop_page.html', context)
+
 
 
 # -------------------------------------------------------------------------------- CC_PRODUCT SINGLE PAGE FUNCTIONS --------------------------------------------------------------------------------

@@ -1,55 +1,47 @@
-import calendar
-from django.shortcuts import render, redirect
 import re
-from django.contrib.auth.models import User
-from user_app.models import Customer
-from admin_app.models import *
 import time
-import json
-from django.core.exceptions import ValidationError
-from PIL import Image # type: ignore
+import calendar
+from io import BytesIO
 import pytz  # type: ignore
-from django.urls import reverse
-from datetime import datetime
-from datetime import timedelta
-from django.utils import timezone
-from django.contrib.auth import authenticate
+from django.db.models import Q
 from django.contrib import auth
+from django.db.models import Sum
+from django.utils import timezone
 from django.db import transaction
+import xlsxwriter  # type: ignore
 from django.contrib import messages
+from django.http import HttpResponse
+from user_app.models import Customer
+from django.http import JsonResponse
+from PIL import Image  # type: ignore
+from django.contrib.auth.models import User
 from django.utils.timezone import make_aware
-from django.db.models import F, ExpressionWrapper, DecimalField, Case, When, Value, Subquery, Count, OuterRef, IntegerField
+from django.contrib.auth import authenticate
+from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404
+from datetime import date, datetime, timedelta
+from django.core.exceptions import ValidationError
+from django.views.decorators.http import require_GET
 from django.views.decorators.cache import never_cache
 
-import datetime
-import xlsxwriter  # type: ignore
+from django.db.models import F, ExpressionWrapper, DecimalField, Case, When
+from django.db.models import Value, Subquery, Count, OuterRef, IntegerField
+from admin_app.models import ProductOffer, CategoryOffer, Coupon
+from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction
+from admin_app.models import Category, Brand
+from admin_app.models import Products, ProductColorImage, ProductSize
 
-from django.db.models import Q
-
-from reportlab.lib.pagesizes import letter  # type: ignore
 from reportlab.lib import colors  # type: ignore
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle  # type: ignore
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle  # type: ignore
 from reportlab.lib.units import inch  # type: ignore
-from reportlab.platypus import Paragraph, Spacer  # type: ignore
-
-
-from reportlab.platypus import Paragraph  # type: ignore
-from reportlab.lib.styles import getSampleStyleSheet  # type: ignore
-
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from reportlab.pdfgen import canvas  # type: ignore
+from reportlab.platypus import TableStyle  # type: ignore
 from reportlab.lib.pagesizes import letter  # type: ignore
-from reportlab.lib import colors  # type: ignore
-from reportlab.platypus import Table, TableStyle  # type: ignore
-from io import BytesIO
+from reportlab.lib.styles import ParagraphStyle  # type: ignore
+from reportlab.platypus import Paragraph, Spacer  # type: ignore
+from reportlab.lib.styles import getSampleStyleSheet  # type: ignore
+from reportlab.platypus import SimpleDocTemplate, Table  # type: ignore
 
-from django.http import JsonResponse
-from django.views.decorators.http import require_GET
-from django.db.models import Sum
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+
+# -------------------------------------------------------------
 
 
 is_active_dashboard = True
@@ -71,14 +63,15 @@ def clean_string(input_string):
     clean_string = re.sub(r'[^a-zA-Z0-9]', '', input_string)
     return clean_string
 
+
 def validate_image(file):
     try:
         img = Image.open(file)
         img.verify()
     except Exception as e:
         raise ValidationError("Invalid image file: {}".format(e))
-        
-        
+
+
 five_days_ago = timezone.now() - timedelta(days=5)
 
 
@@ -91,7 +84,9 @@ def clear_old_messages(view_func):
     return only_new_messages
 
 
-# 5 DAYS CUSTOMERS-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 5 DAYS CUSTOMERS-------------------------------------------------------------
+
+
 customers_last_5_days = User.objects.filter(
     date_joined__gte=five_days_ago).count()
 total_customers = Customer.objects.all().count()
@@ -99,13 +94,16 @@ total_customers = Customer.objects.all().count()
 if total_customers > 0:
     increase_of_customer_in_five_days = round(
         (customers_last_5_days / total_customers) * 100, 2)
-    
-    increase_of_customer_in_five_days = max(0, increase_of_customer_in_five_days)
+
+    increase_of_customer_in_five_days = max(0,
+                                            increase_of_customer_in_five_days)
 else:
     increase_of_customer_in_five_days = 0
 
 
-# 5 DAYS ORDERS---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# 5 DAYS ORDERS----------------------------------------------------------------
+
+
 orders_last_5_days = OrderItem.objects.filter(
     order__placed_at__gte=five_days_ago).count()
 total_orders = OrderItem.objects.all().count()
@@ -113,28 +111,29 @@ total_orders = OrderItem.objects.all().count()
 if total_orders > 0:
     increase_of_order_in_five_days = round(
         (orders_last_5_days / total_orders) * 100, 2)
-    
+
     increase_of_order_in_five_days = max(0, increase_of_order_in_five_days)
 else:
     increase_of_order_in_five_days = 0
 
 
-# TODAY'S ORDER---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# TODAY'S ORDER----------------------------------------------------------------
+
+
 today = date.today()
 todays_order = OrderItem.objects.filter(order__placed_at__date=today).count()
 
 if orders_last_5_days > 0:
     todays_order_vs_order_in_five_days = round(
         ((todays_order - orders_last_5_days) / orders_last_5_days) * 100, 2)
-    
-    todays_order_vs_order_in_five_days = max(0, todays_order_vs_order_in_five_days)
+
+    todays_order_vs_order_in_five_days = max(
+        0, todays_order_vs_order_in_five_days)
 else:
     todays_order_vs_order_in_five_days = 0
 
 
-
-# 5 DAYS PRODUCTS--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+# 5 DAYS PRODUCTS--------------------------------------------------------------
 products_last_5_days = ProductColorImage.objects.filter(
     created_at__gte=five_days_ago).count()
 total_products = ProductColorImage.objects.all().count()
@@ -142,11 +141,11 @@ total_products = ProductColorImage.objects.all().count()
 if total_products > 0:
     increase_of_products_in_five_days = round(
         (products_last_5_days / total_products) * 100, 2)
-    
-    increase_of_products_in_five_days = max(0, increase_of_products_in_five_days)
+
+    increase_of_products_in_five_days = max(
+        0, increase_of_products_in_five_days)
 else:
     increase_of_products_in_five_days = 0
-
 
 
 def get_data(request):
@@ -379,7 +378,7 @@ def add_categories(request):
                             messages.error(
                                 request, 'Category already exists, create new category')
                             return redirect(admin_add_category_page)
-                    except:
+                    except Exception:
                         messages.error(
                             request, 'Unable to add a category at this moment, try after sometime.')
                 return redirect(admin_add_category_page)
@@ -959,20 +958,22 @@ def edit_product_color(request, p_id):
 
             if color and price and main_image and side_image and top_image and back_image:
                 try:
-                    product_color_image = ProductColorImage.objects.get(pk=p_id)
+                    product_color_image = ProductColorImage.objects.get(
+                        pk=p_id)
                 except ProductColorImage.DoesNotExist:
                     messages.error(request, 'Product color not found.')
                     return redirect('list_product_page')
 
                 is_every_field_valid = True
-                
+
                 try:
                     validate_image(main_image)
                     validate_image(side_image)
                     validate_image(top_image)
                     validate_image(back_image)
                 except:
-                    messages.error(request, 'Image files should be in valid format.')
+                    messages.error(
+                        request, 'Image files should be in valid format.')
                     return redirect('admin_add_image_page')
 
                 try:
@@ -1020,7 +1021,8 @@ def edit_product_color(request, p_id):
                 else:
                     return redirect('list_product_page')
             else:
-                messages.error(request, 'Please fill all the fields to continue.')
+                messages.error(
+                    request, 'Please fill all the fields to continue.')
                 return redirect('list_product_page')
         else:
             return render(request, 'edit_product_color.html', {'product_color_image': product_color_image, 'is_active_product': is_active_product})
@@ -1195,9 +1197,6 @@ def admin_add_image_page(request):
         return redirect(admin_login_page)
 
 
-
-    
-
 # ADD PRODUCT IMAGE FUNCTION
 @never_cache
 @clear_old_messages
@@ -1219,14 +1218,15 @@ def add_product_image(request):
             if product_id and color and price and main_image and side_image and top_image and back_image:
 
                 cleaned_color = clean_string(color)
-                
+
                 try:
                     validate_image(main_image)
                     validate_image(side_image)
                     validate_image(top_image)
                     validate_image(back_image)
                 except:
-                    messages.error(request, 'Image files should be in valid format.')
+                    messages.error(
+                        request, 'Image files should be in valid format.')
                     return redirect('admin_add_image_page')
 
                 try:
@@ -1740,7 +1740,7 @@ def change_order_status(request, order_id):
                     order_item.order.payment.pending = False
                     order_item.order.payment.success = True
                     order_item.order.payment.save()
-                    
+
                 order_item.delivery_date = today
                 order_item.save()
             messages.success(request, 'Order Status Updated')
@@ -1872,12 +1872,12 @@ current_date = timezone.now().date()
 start_date = current_date - timedelta(days=current_date.weekday())
 end_date = start_date + timedelta(days=6)
 
-start_date = timezone.make_aware(datetime.datetime.combine(
-    start_date, datetime.datetime.min.time()), pytz.utc)
+start_date = timezone.make_aware(datetime.combine(
+    start_date, datetime.min.time()), pytz.utc)
 
 
-end_date = timezone.make_aware(datetime.datetime.combine(
-    end_date, datetime.datetime.max.time()), pytz.utc)
+end_date = timezone.make_aware(datetime.combine(
+    end_date, datetime.max.time()), pytz.utc)
 
 
 now = timezone.now()
@@ -1895,7 +1895,7 @@ def sales_report_page(request):
         global current_year, start_date, end_date
 
         today = timezone.now()
-        
+
         sales_data = None
 
         if request.method == 'GET':
@@ -1908,9 +1908,11 @@ def sales_report_page(request):
                     Q(order_status='Delivered') &
                     Q(order__placed_at__range=(start_date, end_date))
                 )
-                request.session['start_date'] = start_date.strftime('%Y-%m-%d %H:%M:%S')
-                request.session['end_date'] = end_date.strftime('%Y-%m-%d %H:%M:%S')
-                
+                request.session['start_date'] = start_date.strftime(
+                    '%Y-%m-%d %H:%M:%S')
+                request.session['end_date'] = end_date.strftime(
+                    '%Y-%m-%d %H:%M:%S')
+
             if filter_option == 'monthly':
                 current_year_and_month = request.GET.get('year_month')
 
@@ -1921,7 +1923,7 @@ def sales_report_page(request):
                         hour=0, minute=0, second=0, microsecond=0)
                     last_day_of_month = timezone.datetime(
                         year, month, calendar.monthrange(year, month)[1], 23, 59, 59, 999999)
-                    
+
                     first_day_of_month = make_aware(first_day_of_month)
                     last_day_of_month = make_aware(last_day_of_month)
 
@@ -1932,8 +1934,10 @@ def sales_report_page(request):
                         Q(order__placed_at__range=(
                             first_day_of_month, last_day_of_month))
                     )
-                    request.session['start_date'] = first_day_of_month.strftime('%Y-%m-%d %H:%M:%S')
-                    request.session['end_date'] = last_day_of_month.strftime('%Y-%m-%d %H:%M:%S')
+                    request.session['start_date'] = first_day_of_month.strftime(
+                        '%Y-%m-%d %H:%M:%S')
+                    request.session['end_date'] = last_day_of_month.strftime(
+                        '%Y-%m-%d %H:%M:%S')
                 else:
                     messages.error(
                         request, "Please select a month to continue")
@@ -1945,15 +1949,15 @@ def sales_report_page(request):
                 if filter_year:
                     year = int(filter_year)
 
-                    start_date_of_year = datetime.datetime(year, 1, 1, 0, 0, 0)
+                    start_date_of_year = datetime(year, 1, 1, 0, 0, 0)
 
                     if year % 4 == 0 and (year % 100 != 0 or year % 400 == 0):
-                        end_date_of_year = datetime.datetime(
+                        end_date_of_year = datetime(
                             year, 12, 31, 23, 59, 59)
                     else:
-                        end_date_of_year = datetime.datetime(
+                        end_date_of_year = datetime(
                             year, 12, 31, 23, 59, 59)
-                        
+
                     start_date_of_year = make_aware(start_date_of_year)
                     end_date_of_year = make_aware(end_date_of_year)
 
@@ -1964,8 +1968,10 @@ def sales_report_page(request):
                         Q(order__placed_at__range=(
                             start_date_of_year, end_date_of_year))
                     )
-                    request.session['start_date'] = start_date_of_year.strftime('%Y-%m-%d %H:%M:%S')
-                    request.session['end_date'] = end_date_of_year.strftime('%Y-%m-%d %H:%M:%S')
+                    request.session['start_date'] = start_date_of_year.strftime(
+                        '%Y-%m-%d %H:%M:%S')
+                    request.session['end_date'] = end_date_of_year.strftime(
+                        '%Y-%m-%d %H:%M:%S')
                 else:
                     messages.error(
                         request, "Please select a year to continue.")
@@ -1976,14 +1982,14 @@ def sales_report_page(request):
                 custom_end_date = request.GET.get('end_date')
 
                 if custom_start_date and custom_end_date:
-                    start_datetime = datetime.datetime.strptime(
+                    start_datetime = datetime.strptime(
                         custom_start_date, '%Y-%m-%d')
-                    end_datetime = datetime.datetime.strptime(
+                    end_datetime = datetime.strptime(
                         custom_end_date, '%Y-%m-%d')
 
                     start_datetime = make_aware(start_datetime)
                     end_datetime = make_aware(end_datetime)
-                    
+
                     if start_datetime < end_datetime and start_datetime <= today:
                         start_datetime = start_datetime.replace(
                             hour=0, minute=0, second=0, microsecond=0)
@@ -1999,10 +2005,13 @@ def sales_report_page(request):
                                 start_datetime, end_datetime
                             ))
                         )
-                        request.session['start_date'] = start_datetime.strftime('%Y-%m-%d %H:%M:%S')
-                        request.session['end_date'] = end_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                        request.session['start_date'] = start_datetime.strftime(
+                            '%Y-%m-%d %H:%M:%S')
+                        request.session['end_date'] = end_datetime.strftime(
+                            '%Y-%m-%d %H:%M:%S')
                     else:
-                        messages.error(request, 'Please select a valid date range.')
+                        messages.error(
+                            request, 'Please select a valid date range.')
                         return redirect('sales_report_page')
                 else:
                     messages.error(
@@ -2027,7 +2036,8 @@ def sales_report_page(request):
                 discount_amount=Case(
                     When(order__coupon_applied=True, then=ExpressionWrapper(
                         F('order__discount_price') / F('order_item_count'),
-                        output_field=DecimalField(max_digits=10, decimal_places=2)
+                        output_field=DecimalField(
+                            max_digits=10, decimal_places=2)
                     )),
                     default=Value(None),
                     output_field=DecimalField(max_digits=10, decimal_places=2)
@@ -2039,14 +2049,12 @@ def sales_report_page(request):
             'total_amount'] if sales_data else 0
         overall_discount = sales_data.aggregate(total_discount=Sum(
             'discount_amount'))['total_discount'] if sales_data else 0
-        
+
         if sales_data:
             request.session['overall_sales_count'] = overall_sales_count
             request.session['overall_order_amount'] = overall_order_amount
             request.session['overall_discount'] = overall_discount
-        
 
-        
         context = {
             'sales_data': sales_data,
             'is_active_sales': is_active_sales,
@@ -2057,165 +2065,166 @@ def sales_report_page(request):
         return render(request, 'admin_sales_report.html', context)
     else:
         return redirect('admin_login_page')
-    
-    
-    
+
+
 @never_cache
 @clear_old_messages
 def download_sales_report(request):
     if request.user.is_superuser:
-            if request.method == 'POST':
-                
-                start_date_str = request.session.get('start_date')
-                end_date_str = request.session.get('end_date')
-                
-                print("Session Start Date :", start_date_str)
-                print("Session End Date :", end_date_str)
-                
-                start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d %H:%M:%S')
-                end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d %H:%M:%S')
-                
-                sales_data = OrderItem.objects.filter(
-                    Q(cancel_product=False) &
-                    Q(return_product=False) &
-                    Q(order_status='Delivered') &
-                    Q(order__placed_at__range=(start_date, end_date))
-                )
-                
-                overall_sales_count = request.session.get('overall_sales_count')
-                overall_order_amount = request.session.get('overall_order_amount')
-                overall_discount = request.session.get('overall_discount')
-                
-                if 'sales_report' in request.POST and request.POST['sales_report'] == 'pdf':
-                    buffer = BytesIO()
+        if request.method == 'POST':
 
-                    doc = SimpleDocTemplate(buffer, pagesize=letter)
+            start_date_str = request.session.get('start_date')
+            end_date_str = request.session.get('end_date')
 
-                    styles = getSampleStyleSheet()
-                    centered_style = ParagraphStyle(
-                        name='Centered', parent=styles['Heading1'], alignment=1)
+            print("Session Start Date :", start_date_str)
+            print("Session End Date :", end_date_str)
 
-                    today_date = datetime.datetime.now().strftime("%Y-%m-%d")
+            start_date = datetime.strptime(
+                start_date_str, '%Y-%m-%d %H:%M:%S')
+            end_date = datetime.strptime(
+                end_date_str, '%Y-%m-%d %H:%M:%S')
 
-                    content = []
+            sales_data = OrderItem.objects.filter(
+                Q(cancel_product=False) &
+                Q(return_product=False) &
+                Q(order_status='Delivered') &
+                Q(order__placed_at__range=(start_date, end_date))
+            )
 
-                    company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {
-                        today_date}"
-                    content.append(Paragraph(company_details, styles['Normal']))
-                    content.append(Spacer(1, 0.5 * inch))
+            overall_sales_count = request.session.get('overall_sales_count')
+            overall_order_amount = request.session.get('overall_order_amount')
+            overall_discount = request.session.get('overall_discount')
 
-                    content.append(
-                        Paragraph("<b>Sales Report</b>", centered_style))
-                    content.append(Spacer(1, 0.5 * inch))
+            if 'sales_report' in request.POST and request.POST['sales_report'] == 'pdf':
+                buffer = BytesIO()
 
-                    data = [["Product", "Quantity", "Total Price", "Date"]]
-                    for sale in sales_data:
-                        formatted_date = sale.order.placed_at.strftime(
-                            "%a, %d %b %Y")
-                        data.append(
-                            [sale.product, sale.quantity, sale.each_price, formatted_date])
+                doc = SimpleDocTemplate(buffer, pagesize=letter)
 
-                    table = Table(data, repeatRows=1)
-                    table.setStyle(TableStyle([
-                        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                        ('TOPPADDING', (0, 0), (-1, 0), 12),
-                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                        ('GRID', (0, 0), (-1, -1), 1, colors.black)
-                    ]))
+                styles = getSampleStyleSheet()
+                centered_style = ParagraphStyle(
+                    name='Centered', parent=styles['Heading1'], alignment=1)
 
-                    content.append(table)
+                today_date = datetime.now().strftime("%Y-%m-%d")
 
-                    content.append(Spacer(1, 0.5 * inch))
+                content = []
 
-                    overall_sales_count_text = f"<b>Overall Sales Count:</b> {
-                        overall_sales_count}"
-                    overall_order_amount_text = f"<b>Overall Order Amount:</b> {
-                        overall_order_amount}"
-                    overall_discount_amount_text = f"<b>Overall Discount:</b> {
-                        overall_discount}"
+                company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {
+                    today_date}"
+                content.append(Paragraph(company_details, styles['Normal']))
+                content.append(Spacer(1, 0.5 * inch))
 
-                    content.append(
-                        Paragraph(overall_sales_count_text, styles['Normal']))
-                    content.append(
-                        Paragraph(overall_order_amount_text, styles['Normal']))
-                    content.append(
-                        Paragraph(overall_discount_amount_text, styles['Normal']))
+                content.append(
+                    Paragraph("<b>Sales Report</b>", centered_style))
+                content.append(Spacer(1, 0.5 * inch))
 
-                    doc.build(content)
+                data = [["Product", "Quantity", "Total Price", "Date"]]
+                for sale in sales_data:
+                    formatted_date = sale.order.placed_at.strftime(
+                        "%a, %d %b %Y")
+                    data.append(
+                        [sale.product, sale.quantity, sale.each_price, formatted_date])
 
-                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-                    file_name = f"Sales_Report_{current_time}.pdf"
+                table = Table(data, repeatRows=1)
+                table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('TOPPADDING', (0, 0), (-1, 0), 12),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                ]))
 
-                    response = HttpResponse(
-                        buffer.getvalue(), content_type='application/pdf')
-                    response['Content-Disposition'] = f'attachment; filename="{
-                        file_name}"'
+                content.append(table)
 
-                    return response
+                content.append(Spacer(1, 0.5 * inch))
 
-                elif 'sales_report' in request.POST and request.POST['sales_report'] == 'excel':
-                    output = BytesIO()
-                    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
-                    worksheet = workbook.add_worksheet('Sales Report')
+                overall_sales_count_text = f"<b>Overall Sales Count:</b> {
+                    overall_sales_count}"
+                overall_order_amount_text = f"<b>Overall Order Amount:</b> {
+                    overall_order_amount}"
+                overall_discount_amount_text = f"<b>Overall Discount:</b> {
+                    overall_discount}"
 
-                    headings = ["Product", "Color", "Quantity",
-                                "Total Price", "Date", "Size"]
-                    header_format = workbook.add_format(
-                        {'border': 1, 'bold': True})
-                    for col, heading in enumerate(headings):
-                        worksheet.write(0, col, heading, header_format)
+                content.append(
+                    Paragraph(overall_sales_count_text, styles['Normal']))
+                content.append(
+                    Paragraph(overall_order_amount_text, styles['Normal']))
+                content.append(
+                    Paragraph(overall_discount_amount_text, styles['Normal']))
 
-                    for row, sale in enumerate(sales_data, start=1):
-                        formatted_date = sale.order.placed_at.strftime(
-                            "%a, %d %b %Y")
-                        color = sale.product.product_color_image.color
-                        size = sale.product.size
+                doc.build(content)
 
-                        worksheet.write(
-                            row, 0, sale.product.product_color_image.products.name)
-                        worksheet.write(row, 1, color)
-                        worksheet.write(row, 2, sale.quantity)
-                        worksheet.write(row, 3, sale.each_price)
-                        worksheet.write(row, 4, formatted_date)
-                        worksheet.write(row, 5, size)
+                current_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                file_name = f"Sales_Report_{current_time}.pdf"
 
-                    overall_row = len(sales_data) + 2
-                    worksheet.write(overall_row, 0, "Overall Sales Count:")
-                    worksheet.write(overall_row, 1, overall_sales_count)
-                    worksheet.write(overall_row + 1, 0, "Overall Order Amount:")
-                    worksheet.write(overall_row + 1, 1, overall_order_amount)
-                    worksheet.write(overall_row + 2, 0, "Overall Discount:")
-                    worksheet.write(overall_row + 2, 1, overall_discount)
+                response = HttpResponse(
+                    buffer.getvalue(), content_type='application/pdf')
+                response['Content-Disposition'] = f'attachment; filename="{
+                    file_name}"'
 
-                    for i, heading in enumerate(headings):
-                        max_length = max([len(str(getattr(row, heading.lower(), "")))
-                                        for row in sales_data] + [len(heading)])
-                        worksheet.set_column(i, i, max_length + 2)
+                return response
 
-                    date_width = max(
-                        [len(sale.order.placed_at.strftime("%a, %d %b %Y")) for sale in sales_data])
-                    worksheet.set_column(4, 4, date_width + 2)
-                    color_width = max([len(color) for color in [
-                        sale.product.product_color_image.color for sale in sales_data]])
-                    worksheet.set_column(1, 1, color_width + 2)
+            elif 'sales_report' in request.POST and request.POST['sales_report'] == 'excel':
+                output = BytesIO()
+                workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+                worksheet = workbook.add_worksheet('Sales Report')
 
-                    workbook.close()
+                headings = ["Product", "Color", "Quantity",
+                            "Total Price", "Date", "Size"]
+                header_format = workbook.add_format(
+                    {'border': 1, 'bold': True})
+                for col, heading in enumerate(headings):
+                    worksheet.write(0, col, heading, header_format)
 
-                    output.seek(0)
-                    response = HttpResponse(output.getvalue(),
-                                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                    current_time = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-                    file_name = f"Sales Report {current_time}.xlsx"
-                    response['Content-Disposition'] = f'attachment; filename="{
-                        file_name}"'
+                for row, sale in enumerate(sales_data, start=1):
+                    formatted_date = sale.order.placed_at.strftime(
+                        "%a, %d %b %Y")
+                    color = sale.product.product_color_image.color
+                    size = sale.product.size
 
-                    return response
-            else:
-                return redirect('admin_dashboard')
+                    worksheet.write(
+                        row, 0, sale.product.product_color_image.products.name)
+                    worksheet.write(row, 1, color)
+                    worksheet.write(row, 2, sale.quantity)
+                    worksheet.write(row, 3, sale.each_price)
+                    worksheet.write(row, 4, formatted_date)
+                    worksheet.write(row, 5, size)
+
+                overall_row = len(sales_data) + 2
+                worksheet.write(overall_row, 0, "Overall Sales Count:")
+                worksheet.write(overall_row, 1, overall_sales_count)
+                worksheet.write(overall_row + 1, 0, "Overall Order Amount:")
+                worksheet.write(overall_row + 1, 1, overall_order_amount)
+                worksheet.write(overall_row + 2, 0, "Overall Discount:")
+                worksheet.write(overall_row + 2, 1, overall_discount)
+
+                for i, heading in enumerate(headings):
+                    max_length = max([len(str(getattr(row, heading.lower(), "")))
+                                      for row in sales_data] + [len(heading)])
+                    worksheet.set_column(i, i, max_length + 2)
+
+                date_width = max(
+                    [len(sale.order.placed_at.strftime("%a, %d %b %Y")) for sale in sales_data])
+                worksheet.set_column(4, 4, date_width + 2)
+                color_width = max([len(color) for color in [
+                    sale.product.product_color_image.color for sale in sales_data]])
+                worksheet.set_column(1, 1, color_width + 2)
+
+                workbook.close()
+
+                output.seek(0)
+                response = HttpResponse(output.getvalue(),
+                                        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                current_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+                file_name = f"Sales Report {current_time}.xlsx"
+                response['Content-Disposition'] = f'attachment; filename="{
+                    file_name}"'
+
+                return response
+        else:
+            return redirect('admin_dashboard')
     else:
         return redirect('admin_login_page')
 
@@ -2289,9 +2298,9 @@ def product_offer_update(request, product_offer_id):
                         return redirect('product_offer_edit_page', product_offer.product_color_image.products.name, product_offer.product_color_image.color)
 
                     try:
-                        start_date = datetime.datetime.strptime(
+                        start_date = datetime.strptime(
                             start_date_str, '%Y-%m-%d').date()
-                        end_date = datetime.datetime.strptime(
+                        end_date = datetime.strptime(
                             end_date_str, '%Y-%m-%d').date()
                     except ValueError:
                         messages.error(
@@ -2380,7 +2389,7 @@ def add_product_offer(request):
                         request, 'Discount percentage should be a number without decimals or symbols.')
                     return redirect('product_offer_add_page')
                 try:
-                    end_date = datetime.datetime.strptime(
+                    end_date = datetime.strptime(
                         end_date_str, '%Y-%m-%d').date()
                 except ValueError:
                     messages.error(
@@ -2503,7 +2512,7 @@ def add_category_offer(request):
                         request, 'Discount percentage should be a number without decimals or symbols.')
                     return redirect('category_offers_add_page')
                 try:
-                    end_date = datetime.datetime.strptime(
+                    end_date = datetime.strptime(
                         end_date_str, '%Y-%m-%d').date()
                 except ValueError:
                     messages.error(
@@ -2604,9 +2613,9 @@ def category_offer_update(request, category_offer_id):
                             request, 'Discount percentage should be a number without decimals or symbols.')
                         return redirect('category_offer_edit_page', category_offer.category.name)
                     try:
-                        start_date = datetime.datetime.strptime(
+                        start_date = datetime.strptime(
                             start_date_str, '%Y-%m-%d').date()
-                        end_date = datetime.datetime.strptime(
+                        end_date = datetime.strptime(
                             end_date_str, '%Y-%m-%d').date()
                     except ValueError:
                         messages.error(
@@ -2736,7 +2745,7 @@ def add_coupon(request):
                     return redirect('add_coupon_page')
 
                 try:
-                    end_date = datetime.datetime.strptime(
+                    end_date = datetime.strptime(
                         end_date_str, '%Y-%m-%d').date()
                 except ValueError:
                     messages.error(
@@ -2865,9 +2874,9 @@ def update_coupon(request, coupon_id):
                                 request, 'Discount percentage should be a number without decimals or symbols.')
 
                         try:
-                            start_date = datetime.datetime.strptime(
+                            start_date = datetime.strptime(
                                 start_date_str, '%Y-%m-%d').date()
-                            end_date = datetime.datetime.strptime(
+                            end_date = datetime.strptime(
                                 end_date_str, '%Y-%m-%d').date()
                         except ValueError:
                             valid_start_date = False
@@ -2947,14 +2956,7 @@ def delete_coupon(request, coupon_id):
         return redirect('admin_login_page')
 
 
-
-
-
-
-
 # ----------------------------------------------------------------  CC_BANNER PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
-
-
 
 
 @never_cache
@@ -2962,14 +2964,11 @@ def delete_coupon(request, coupon_id):
 def banner_view_page(request):
     if request.user.is_superuser:
         context = {
-            'is_active_banner' : is_active_banner,
+            'is_active_banner': is_active_banner,
         }
         return render(request, 'pages/banner/banner_page.html', context)
     else:
         return redirect('admin_login_page')
-    
-    
-    
 
 
 @never_cache
@@ -2977,7 +2976,7 @@ def banner_view_page(request):
 def banner_add_page_view(request):
     if request.user.is_superuser:
         context = {
-            'is_active_banner' : is_active_banner
+            'is_active_banner': is_active_banner
         }
         return render(request, 'pages/banner/banner_add_page.html', context)
     else:

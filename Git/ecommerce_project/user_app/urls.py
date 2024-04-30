@@ -28,15 +28,11 @@ urlpatterns = [
     path('sneakerheads/shop/get_product_sort/', get_product_sort, name='get_product_sort'),
     
     
-    path('sneakerheads/user/category-wise/', category_wise, name='category_wise'),
     path('sneakerheads/user/brand-wise', brand_wise, name='brand_wise'),
     path('sneakerheads/user/clean-category/', clean_all, name='clean_all'),
     
-    
     path('sneakerheads/shop/page/', shop_page_view, name='shop_page_view'),
     path('sneakerheads/<str:product_name>/<int:pdt_id>/', product_single_view_page, name='product_single_view_page'),
-    
-    
     
     path('sneakerheads/user/dashboard/<int:user_id>/', user_dashboard, name='user_dashboard'),
     path('sneakerheads/user/details-update/', user_details_edit, name='user_details_edit'),
