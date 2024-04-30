@@ -56,6 +56,8 @@
                   <input type="password" class="form-control rounded-0" name="confirm_password" required />
                 </div>
 
+                <input type="hidden" name="referral_code" value="{{ request.GET.ref }}" />
+
                 <div class="container mb-3 d-flex justify-content-between align-items-center pt-4">
                   <button type="submit" class="btn btn-outline-success w-100 rounded-0 sign-in-button"><span class="fs-5">SIGN UP</span></button>
                 </div>

@@ -1,0 +1,77 @@
+{% extends 'main_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'user/css/referrals.css' %}" />
+{% endblock %}
+
+{% block bcactive %}
+  <li class="breadcrumb-item active" aria-current="page">My Referrals</li>
+{% endblock %}
+
+{% block page_header %}
+  <div class="page-header text-center" style="background-image: url('{% static 'user/assets/images/page-header-bg.jpg' %}')">
+    <div class="container">
+      {% block page_header_title %}
+        <h1 class="page-title">My Referrals</h1>
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block page_content %}
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-4 mx-2 d-flex referral_code_column flex-column">
+        <h2>Your Referral Details</h2>
+        <p>
+          Your referral code: <strong>{{ referral_code }}</strong>
+        </p>
+        <p class="my-2">Share your referral link:</p>
+        <input type="text" value="{{ referral_link }}" class="form-control mb-3" readonly />
+        <button class="btn btn-primary w-25" onclick="copyToClipboard()">Copy Referral Link</button>
+      </div>
+      <div class="col-md-3 referral_code_column mx-2 d-flex flex-column">
+        <h2>Total Earnings</h2>
+        <p>Total Amount Earned: ₹{{ total_earnings }}</p>
+        <p>Total Referrals: {{ referral_count }}</p>
+      </div>
+      <div class="col-md-4 referral_usage_column mx-2 d-flex flex-column">
+        <h2>Details of Referral Usage</h2>
+        {% if referral_usage %}
+          {% for customer in referral_usage %}
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title">{{ customer.user.first_name }} {{ customer.user.last_name }}</h5>
+                <p class="card-text">Email: {{ customer.user.email }}</p>
+                <p class="card-text">Joined: {{ customer.user.date_joined|date:'F d, Y' }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p>No one has used your referral code yet.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script>
+    function copyToClipboard() {
+      var copyText = document.querySelector('input[type="text"]')
+      copyText.select()
+      copyText.setSelectionRange(0, 99999)
+      document.execCommand('copy')
+    
+      var alertBox = document.createElement('div')
+      alertBox.textContent = 'Copied the referral link: ' + copyText.value
+      alertBox.className = 'alert-box'
+      document.body.appendChild(alertBox)
+    
+      setTimeout(function () {
+        document.body.removeChild(alertBox)
+      }, 1000)
+    }
+  </script>
+{% endblock %}

@@ -48,6 +48,7 @@ today = datetime.now().date()
 alphabets_pattern = re.compile(r"^[a-zA-Z\s]+$")
 street_address_pattern = re.compile(r'^[a-zA-Z0-9\s,]+$')
 
+
 def clear_old_messages(view_func):
     def only_new_messages(request, *args, **kwargs):
         response = view_func(request, *args, **kwargs)
@@ -56,9 +57,11 @@ def clear_old_messages(view_func):
         return response
     return only_new_messages
 
+
 def clean_string(input_string):
     clean_string = re.sub(r'[^a-zA-Z0-9]', '', input_string)
     return clean_string
+
 
 @clear_old_messages
 def get_cart_wishlist_address_order_data(request):
@@ -182,20 +185,20 @@ def generate_otp():
 
 def send_otp_email(email, otp):
     subject = 'OTP for Email Verification'
-    
+
     html_message = render_to_string('send_otp_in_sign_up.html', {'otp': otp})
-    
+
     plain_message = strip_tags(html_message)
-    
+
     email_message = EmailMultiAlternatives(
         subject=subject,
         body=plain_message,
         from_email='sneakerheadsweb@gmail.com',
         to=[email]
     )
-    
+
     email_message.attach_alternative(html_message, "text/html")
-    
+
     email_message.send()
 
 
@@ -213,56 +216,88 @@ def register_function(request):
         email = request.POST['email']
         password = request.POST['password']
         confirm_password = request.POST['confirm_password']
-
-        email = normalize_newlines(email).strip()
-        is_valid_email = True
-        try:
-            validate_email(email)
-        except ValidationError as e:
-            is_valid_email = False
-            messages.error(request, f'Invalid email: {e}')
-
-        if User.objects.filter(username=email).exists():
-            messages.error(request, 'Email already exits, try logging in')
-            is_valid_email = False
-
-        is_valid_password = True
-        if len(password) < 8:
-            messages.error(
-                request, 'Password must be at least 8 characters long.')
-            is_valid_password = False
-        elif ' ' in password:
-            messages.error(request, 'Password cannot contain spaces.')
-            is_valid_password = False
-
-        is_valid_confirm_password = True
-        if password != confirm_password:
-            messages.error(request, 'Passwords not match.')
-            is_valid_confirm_password = False
-
-        if is_valid_email and is_valid_password and is_valid_confirm_password:
+        referral_code = request.POST.get('referral_code', None)
+        
+        is_every_field_valid = True
+        
+        if name and email and password and confirm_password:
+            cleaned_name = clean_string(name)
+            cleaned_password = clean_string(password)
+            cleaned_confirm_password = clean_string(confirm_password)
+            
+            email = normalize_newlines(email).strip()
+            
             try:
-                user = User(first_name=name, username=email, email=email)
-                otp = generate_otp()
-                email = user.email
-                if otp:
-                    send_otp_email(user, otp)
-                    request.session['otp'] = otp
-                    request.session['otp_created_at'] = timezone.now().strftime(
-                        '%Y-%m-%d %H:%M:%S')
-                    request.session['user_data'] = {
-                        'name': name,
-                        'email': email,
-                        'password': password
-                    }
-                    return redirect('otp_verification_page')
-                else:
-                    messages.error(request, 'Error generating OTP')
-                    return redirect('sign_up')
-            except Exception as e:
-                messages.error(request, f'Error creating user: {str(e)}')
-                return redirect('sign_up_page')
+                validate_email(email)
+            except ValidationError:
+                is_every_field_valid = False
+                messages.error(request, 'Enter a valid email address')
+                
+            if not alphabets_pattern.match(name):
+                is_every_field_valid = False
+                messages.error(request, 'Name should be in alphabetic format.')
+            
+            elif not 3 <= len(cleaned_name) <= 100:
+                is_every_field_valid = False
+                messages.error(request, 'Name should not consist solely of special characters or be blank.')
+            
+            
+            elif User.objects.filter(username=email).exists():
+                is_every_field_valid = False
+                messages.error(request, 'Email already exits, try logging in')
+                
+            elif not len(cleaned_password) >= 8:
+                is_every_field_valid = False
+                messages.error(request, 'Password should not consist solely of special characters or be blank.')
+                
+            elif len(password) < 8:
+                is_every_field_valid = False
+                messages.error(
+                    request, 'Password must be at least 8 characters long.')
+                
+            elif ' ' in password:
+                is_every_field_valid = False
+                messages.error(request, 'Password cannot contain spaces.')
+                
+            elif password != confirm_password:
+                is_every_field_valid = False
+                messages.error(request, 'Passwords not match.')
+                
+            elif not len(cleaned_confirm_password) >= 8:
+                is_every_field_valid = False
+                messages.error(request, 'Confirm Password should not consist solely of special characters or be blank.')
+                
+            if referral_code:
+                request.session['referral_code'] = referral_code
+                
 
+            if is_every_field_valid:
+                try:
+                    user = User(first_name=name, username=email, email=email)
+                    otp = generate_otp()
+                    email = user.email
+                    if otp:
+                        send_otp_email(user, otp)
+                        request.session['otp'] = otp
+                        request.session['otp_created_at'] = timezone.now().strftime(
+                            '%Y-%m-%d %H:%M:%S')
+                        request.session['user_data'] = {
+                            'name': name,
+                            'email': email,
+                            'password': password
+                        }
+                        return redirect('otp_verification_page')
+                    else:
+                        messages.error(request, 'Error generating OTP')
+                        return redirect('sign_up')
+                except Exception as e:
+                    messages.error(request, f'Error creating user: {str(e)}')
+                    return redirect('sign_up_page')
+            else:
+                return redirect('sign_up_page')
+        else:
+            messages.error(request, 'Please fill all the fields.')
+            
     return redirect('sign_up_page')
 
 
@@ -303,6 +338,8 @@ def otp_verification_page(request):
             if (now - otp_created_at).total_seconds() <= 120:
                 if str(otp_entered) == str(otp):
                     user_data = request.session.get('user_data')
+                    referral_code = request.session.get('referral_code')
+                    
                     if user_data:
                         user = User.objects.create_user(
                             username=user_data['email'],
@@ -314,6 +351,36 @@ def otp_verification_page(request):
                         del request.session['user_data']
                         del request.session['otp']
                         del request.session['otp_created_at']
+                        
+        
+                        if referral_code:
+                            customer = Customer.objects.get(user = user)
+                            customer.used_referral_code = referral_code
+                            customer.save()
+                            
+                            referring_customer = Customer.objects.get(referral_code=referral_code)
+                            
+                            if referring_customer:
+                                referring_wallet = Wallet.objects.get(user=referring_customer.user)
+                                referring_wallet.balance += 250
+                                referring_wallet.save()
+                                WalletTransaction.objects.create(
+                                    wallet=referring_wallet,
+                                    money_deposit=250,
+                                )
+                                
+                                joining_wallet = Wallet.objects.get(user=user)
+                                joining_wallet.balance += 100
+                                joining_wallet.save()
+                                
+                                WalletTransaction.objects.create(
+                                    wallet=joining_wallet,
+                                    money_deposit=100,
+                                )
+                            
+                            
+                            del request.session['referral_code']
+                        
                         messages.success(
                             request, 'Registration Successfully, Login Now')
                         return redirect('sign_in_page')
@@ -935,6 +1002,51 @@ def user_details_edit(request):
             return redirect(index_page)
     else:
         return redirect(index_page)
+    
+    
+    
+
+
+
+# -------------------------------------------------------------------------------- CC_REFERRALS DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
+
+
+
+
+@never_cache
+@clear_old_messages
+def referrals_page_view(request):
+    if request.user.is_authenticated:
+        context = {}
+        user = request.user
+        customer = Customer.objects.get(user = user)
+        referral_code = customer.referral_code
+        
+        sign_up_url = reverse('sign_up_page')
+        
+        referral_link = request.build_absolute_uri(sign_up_url + f'?ref={referral_code}')
+        
+        referral_usage = Customer.objects.filter(used_referral_code = referral_code)
+        
+        referral_count = referral_usage.count() if referral_usage else 0
+         
+        total_earnings = 250 * referral_count if referral_count else 0
+        
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
+        context.update(cart_wishlist_address_order_data)
+        context.update({
+            'user' : user,
+            'customer' : customer,
+            'referral_code' : referral_code,
+            'referral_link' : referral_link,
+            'referral_usage' : referral_usage,
+            'referral_count' : referral_count,
+            'total_earnings' : total_earnings,
+        })
+        return render(request, 'referrals.html', context)
+    else:
+        return redirect('sign_up_page')
 
 
 # -------------------------------------------------------------------------------- CC_WALLET DETAILS PAGE FUNCTIONS --------------------------------------------------------------------------------
@@ -982,20 +1094,20 @@ def update_address(request, address_id):
             state = request.POST.get('state')
             country = request.POST.get('country')
             pin_code = request.POST.get('pin_code')
-            
+
             user = request.user
             user_id = user.id
-                    
+
             is_every_field_valid = True
-            
+
             if name and phone_number and street_address and city and state and country and pin_code:
-                
+
                 try:
-                     address = Address.objects.get(pk=address_id)
+                    address = Address.objects.get(pk=address_id)
                 except Address.DoesNotExist:
                     messages.error(request, 'Address not found.')
                     return redirect('user_dashboard', user_id=user_id)
-                    
+
                 cleaned_name = clean_string(name)
                 cleaned_phone = clean_string(phone_number)
                 cleaned_country = clean_string(country)
@@ -1003,75 +1115,78 @@ def update_address(request, address_id):
                 cleaned_city = clean_string(city)
                 cleaned_street_address = clean_string(street_address)
                 cleaned_pin_code = clean_string(pin_code)
-                
-                   
-                    
+
                 if not 3 <= len(cleaned_name) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'Name field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'Name field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_phone) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'Phone Number field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'Phone Number field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_country) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'Country field should not consist solely of special characters or be blank')
-            
+                    messages.error(
+                        request, 'Country field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_state) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'State field should not consist solely of special characters or be blank')
-                
+                    messages.error(
+                        request, 'State field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_city) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'City field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'City field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_street_address) <= 500:
                     is_every_field_valid = False
-                    messages.error(request, 'Street Address field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'Street Address field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_pin_code) <= 50:
                     is_every_field_valid = False
-                    messages.error(request, 'Pincode field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'Pincode field should not consist solely of special characters or be blank')
+
                 elif not alphabets_pattern.match(name):
                     is_every_field_valid = False
                     messages.error(request, 'Name should be in alphabets')
-                    
+
                 elif not phone_number.isdigit():
                     is_every_field_valid = False
-                    messages.error(request, 'Phone number should only contain numeric digits.')
-                
-                
+                    messages.error(
+                        request, 'Phone number should only contain numeric digits.')
+
                 elif not re.match(r'^\d{10}$', phone_number):
                     is_every_field_valid = False
                     messages.error(request, 'Phone number must be 10 digits')
-                    
-                    
+
                 elif not alphabets_pattern.match(country):
                     is_every_field_valid = False
-                    messages.error(request, 'Country should only contain letters, numbers, and spaces.')
-                    
-                    
+                    messages.error(
+                        request, 'Country should only contain letters, numbers, and spaces.')
+
                 elif not alphabets_pattern.match(state):
                     is_every_field_valid = False
-                    messages.error(request, 'State should only contain letters, numbers, and spaces.')
- 
-                
+                    messages.error(
+                        request, 'State should only contain letters, numbers, and spaces.')
+
                 elif not street_address_pattern .match(street_address):
                     is_every_field_valid = False
-                    messages.error(request, 'Street address should only contain letters, numbers, and spaces.')
-                    
+                    messages.error(
+                        request, 'Street address should only contain letters, numbers, and spaces.')
+
                 elif not pin_code.isdigit():
                     is_every_field_valid = False
-                    messages.error(request, 'Pin code should only contain numeric digits.')
-                    
-                
+                    messages.error(
+                        request, 'Pin code should only contain numeric digits.')
+
                 elif not re.match(r'^\d{6}$', pin_code):
                     is_every_field_valid = False
                     messages.error(request, 'Pin code must be 6 digits')
-                    
-                    
 
                 if is_every_field_valid:
                     address.name = name
@@ -1096,7 +1211,6 @@ def update_address(request, address_id):
         return redirect('index_page')
 
 
-
 @never_cache
 @clear_old_messages
 def add_new_address(request, customer_id):
@@ -1114,7 +1228,7 @@ def add_new_address(request, customer_id):
             pin_code = request.POST.get('pincode')
 
             is_every_field_valid = True
-            
+
             if customer and name and phone_number and street_address and city and state and country and pin_code:
                 cleaned_name = clean_string(name)
                 cleaned_phone = clean_string(phone_number)
@@ -1123,75 +1237,79 @@ def add_new_address(request, customer_id):
                 cleaned_city = clean_string(city)
                 cleaned_street_address = clean_string(street_address)
                 cleaned_pin_code = clean_string(pin_code)
-                
-                   
-                    
+
                 if not 3 <= len(cleaned_name) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'Name field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'Name field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_phone) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'Phone Number field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'Phone Number field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_country) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'Country field should not consist solely of special characters or be blank')
-            
+                    messages.error(
+                        request, 'Country field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_state) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'State field should not consist solely of special characters or be blank')
-                
+                    messages.error(
+                        request, 'State field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_city) <= 100:
                     is_every_field_valid = False
-                    messages.error(request, 'City field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'City field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_street_address) <= 500:
                     is_every_field_valid = False
-                    messages.error(request, 'Street Address field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'Street Address field should not consist solely of special characters or be blank')
+
                 elif not 3 <= len(cleaned_pin_code) <= 50:
                     is_every_field_valid = False
-                    messages.error(request, 'Pincode field should not consist solely of special characters or be blank')
-                    
+                    messages.error(
+                        request, 'Pincode field should not consist solely of special characters or be blank')
+
                 elif not alphabets_pattern.match(name):
                     is_every_field_valid = False
                     messages.error(request, 'Name should be in alphabets')
-                    
+
                 elif not phone_number.isdigit():
                     is_every_field_valid = False
-                    messages.error(request, 'Phone number should only contain numeric digits.')
-                
-                
+                    messages.error(
+                        request, 'Phone number should only contain numeric digits.')
+
                 elif not re.match(r'^\d{10}$', phone_number):
                     is_every_field_valid = False
                     messages.error(request, 'Phone number must be 10 digits')
-                    
-                    
+
                 elif not alphabets_pattern.match(country):
                     is_every_field_valid = False
-                    messages.error(request, 'Country should only contain letters, numbers, and spaces.')
-                    
-                    
+                    messages.error(
+                        request, 'Country should only contain letters, numbers, and spaces.')
+
                 elif not alphabets_pattern.match(state):
                     is_every_field_valid = False
-                    messages.error(request, 'State should only contain letters, numbers, and spaces.')
- 
-                
+                    messages.error(
+                        request, 'State should only contain letters, numbers, and spaces.')
+
                 elif not street_address_pattern .match(street_address):
                     is_every_field_valid = False
-                    messages.error(request, 'Street address should only contain letters, numbers, and spaces.')
-                    
+                    messages.error(
+                        request, 'Street address should only contain letters, numbers, and spaces.')
+
                 elif not pin_code.isdigit():
                     is_every_field_valid = False
-                    messages.error(request, 'Pin code should only contain numeric digits.')
-                    
-                
+                    messages.error(
+                        request, 'Pin code should only contain numeric digits.')
+
                 elif not re.match(r'^\d{6}$', pin_code):
                     is_every_field_valid = False
                     messages.error(request, 'Pin code must be 6 digits')
 
-                
                 if is_every_field_valid:
                     address = Address.objects.create(
                         customer=customer,
@@ -1210,7 +1328,8 @@ def add_new_address(request, customer_id):
                 else:
                     return redirect('user_dashboard', user_id=user_id)
             else:
-                messages.error(request, 'Please fill all the fields to add the address')
+                messages.error(
+                    request, 'Please fill all the fields to add the address')
                 return redirect('user_dashboard', user_id=user_id)
     else:
         return redirect(index_page)

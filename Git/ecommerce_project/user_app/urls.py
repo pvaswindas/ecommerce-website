@@ -76,6 +76,9 @@ urlpatterns = [
     
     path('sneakerheads/user/wallet/<int:user_id>/', wallet_page_view, name='wallet_page_view'),
     
+    
+    path('sneakerheads/user/referrals/', referrals_page_view, name='referrals_page_view'),
+    
 ]
 
 
