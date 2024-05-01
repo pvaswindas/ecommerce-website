@@ -2,7 +2,7 @@
   <div class="sidebar sidebar-shop">
     <div class="widget widget-clean">
       <label>Filters:</label>
-      <a href="{% url 'clean_all' %}">Clean All</a>
+      <a href="{% url 'shop_page_view' %}">Clean All</a>
     </div>
 
     <div class="widget widget-collapsible">
@@ -21,6 +21,9 @@
                       </div>
                       <span class="item-count">{{ category.product_count }}</span>
                   </div>
+              {% endfor %}
+              {% for brand in selected_brands %}
+                <input type="hidden" name="brand_wise" value="{{ brand }}">
               {% endfor %}
             </form>
           </div>        
@@ -53,22 +56,27 @@
       <div class="collapse show" id="widget-4">
         <div class="widget-body">
           <div class="filter-items">
-            {% for brand in brand_list %}
-              <form action="{% url 'brand_wise' %}" method="post">
-                  {% csrf_token %}
-                  <div class="filter-item filter-items-count">
-                      <div class="custom-control custom-checkbox">
-                          <input type="checkbox" class="custom-control-input" name="brand_wise" value="{{ brand.name }}" id="brand-{{ forloop.counter }}" {% if brand.name in selected_brand %}checked{% endif %} onchange="this.form.submit()" />
-                          <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
-                      </div>
-                      <span class="item-count">{{ brand.product_count }}</span>
-                  </div>
-                  <input type="hidden" name="brand_wise" value="{{ brand.name }}">
-              </form>
-            {% endfor %}
+            <form id="brandForm" action="{% url 'shop_page_view' %}" method="get">
+              {% csrf_token %}
+              {% for brand in brand_list %}
+              <div class="filter-item filter-items-count">
+                <div class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" name="brand_wise" value="{{ brand.name }}" id="brand-{{ forloop.counter }}" {% if brand.name in selected_brands %}checked{% endif %} onchange="this.form.submit()" />
+                  <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
+                </div>
+                <span class="item-count">{{ brand.product_count }}</span>
+              </div>
+              {% endfor %}
+
+              {% for category in selected_categories %}
+                <input type="hidden" name="category_wise" value="{{ category }}">
+              {% endfor %}
+              <input type="hidden" name="sortby" value="{{ sortby }}">
+            </form>
           </div>
         </div>
       </div>
+      
     </div>
 
     {% comment %} <div class="widget widget-collapsible">

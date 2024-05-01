@@ -39,7 +39,7 @@
 
           <div class="toolbox-right">
             <div class="toolbox-sort">
-                <form id="sortForm" action="" method="get">
+                <form id="sortForm" action="{% url 'shop_page_view' %}" method="get">
                     {% csrf_token %}
                     <label for="sortby">Sort by:</label>
                     <div class="select-custom">
@@ -54,6 +54,11 @@
                     {% comment %} Add hidden input field to include selected categories {% endcomment %}
                     {% for category in selected_categories %}
                         <input type="hidden" name="category_wise" value="{{ category }}">
+                    {% endfor %}
+
+                    
+                    {% for brand in selected_brands %}
+                      <input type="hidden" name="brand_wise" value="{{ brand }}">
                     {% endfor %}
                 </form>
             </div>
@@ -76,25 +81,25 @@
   <script src="{% static 'user/assets/js/jquery.waypoints.min.js' %}"></script>
   <script src="{% static 'user/assets/js/owl.carousel.min.js' %}"></script>
   <script src="{% static 'user/assets/js/jquery.magnific-popup.min.js' %}"></script>
-  <script>
-    $(document).ready(function() {
-        $('#sortby').change(function() {
-            $('#sortForm').submit();
-        });
-    });
-  </script>
-  
+
+
 <script>
-    $(document).ready(function() {
+  $(document).ready(function() {
+      // Submit the form when a category checkbox is changed
       $('.custom-control-input').change(function() {
-          $('#categoryForm').submit(); // Submit the category form
+          $('#categoryForm').submit();
       });
 
+      // Submit the form when the sort dropdown is changed
       $('#sortby').change(function() {
-          $('#sortForm').submit(); // Submit the sort form
+          $('#sortForm').submit();
+      });
+
+      // Submit the form when a brand checkbox is changed
+      $('#brandForm .custom-control-input').change(function() {
+          $('#brandForm').submit();
       });
   });
-
 </script>
 
 {% endblock %}

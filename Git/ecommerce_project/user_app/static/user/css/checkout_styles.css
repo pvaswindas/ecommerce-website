@@ -100,14 +100,27 @@
     color: #666;
 }
 
+.payment-method-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .payment-method-item {
+    flex: 0 0 calc(33.33% - 20px); /* Adjust the width as needed */
+    margin-right: 20px; /* Adjust the spacing between items */
     margin-bottom: 15px;
 }
 
 .payment-method-label {
     cursor: pointer;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     transition: transform 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .payment-method-label:hover {
@@ -115,10 +128,11 @@
 }
 
 .payment-method-image {
-    width: 100px;
-    /* Adjust as needed */
+    width: 100px; /* Adjust as needed */
     height: auto;
+    margin: 0 auto; /* Center the image horizontally */
 }
+
 
 /* Adjustments for radio buttons */
 .payment-method {

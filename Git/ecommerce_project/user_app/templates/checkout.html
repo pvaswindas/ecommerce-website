@@ -36,39 +36,6 @@
         <div class="row">
           <div class="col-lg-9">
 
-            {% comment %} <div id="addAddressModal" class="modal" style="display: none;">
-              <div class="modal-content">
-                <span class="close" onclick="closeAddAddressModal()">&times;</span>
-                <div class="shipping-address-info">
-                  <form action="" method="post" id="shipping-address-form">
-                    {% csrf_token %}
-                    <label for="name">Name</label><br />
-                    <input type="text" required name="name"/><br>
-            
-                    <label for="phone_number">Phone Number</label><br />
-                    <input type="text" required name="phone_number"/><br>
-            
-                    <label for="country">Country</label><br />
-                    <input type="text" name="country"/><br>
-            
-                    <label for="state">State</label> <br>
-                    <input type="text" required name="state"/><br />
-            
-                    <label for="city">City</label><br />
-                    <input type="text" required name="city"/><br>
-            
-                    <label for="street_address">Street Address</label><br />
-                    <input type="text" required name="street_address"/><br>
-            
-                    <label for="pincode">Pincode</label><br />
-                    <input type="text" required name="pincode"/><br>
-            
-                    <br><button type="submit" form="shipping-address-form" class="save-button btn btn-primary w-100 my-3">Save</button>
-                  </form>
-                </div>
-              </div>
-            </div> {% endcomment %}
-
             <form action="{% url 'place_order' %}" method="post" id="checkout_form">
               {% csrf_token %}
               <div class="delivery-address-container">
@@ -78,7 +45,7 @@
                   {% if addresses %}
                     {% for addr in addresses %}
                       <div class="address-item">
-                        <input type="radio" id="address-{{ addr.id }}" name="delivery_address" value="{{ addr.id }}" class="custom-radio-input" {% if forloop.first %}checked{% endif %}/>
+                        <input type="radio" id="address-{{ addr.id }}" name="delivery_address" value="{{ addr.id }}" class="custom-radio-input"/>
                         <label for="address-{{ addr.id }}" class="custom-radio-label">
                           <span class="address-name">{{ addr.name }} : {{ addr.phone_number }}</span><br />
                           <span class="address-details">
@@ -98,28 +65,37 @@
                 <h2 class="payment-method-heading">Payment Method</h2>
                 <p class="payment-method-info">Please select a payment method:</p>
                 <div class="payment-method-list">
-                  <div class="payment-method-item">
-                    <input type="radio" id="payment_method_cash" class="payment-method" name="payment_method" value="Cash On Delivery" />
-                    <label for="payment_method_cash" class="payment-method-label" style="max-width: 100px;"><img style="max-width: 70px;" src="{% static 'user/images/payment_logo/cash-on-delivery.png' %}" alt="Cash on Delivery" class="payment-method-image" /></label>
-                  </div>
-                  <div class="payment-method-item">
-                    <input type="radio" id="payment_method_razorpay" class="payment-method" name="payment_method" value="Razorpay" />
-                    <label for="payment_method_razorpay" class="payment-method-label" style="max-width: 200px;"><img style="max-width: 70px;" src="{% static 'user/images/payment_logo/razorpay.png' %}" alt="Razorpay" class="payment-method-image" /></label>
-                  </div>
-                  {% if wallet_balance >= total_charge %}
-                  <div class="payment-method-item">
-                    <input type="radio" id="payment_method_wallet" class="payment-method" name="payment_method" value="Wallet" />
-                    <label for="payment_method_wallet" aria-disabled="true" class="payment-method-label" style="max-width: 100px;"><img style="max-width: 70px;" src="{% static 'user/images/payment_logo/wallet.png' %}" alt="Wallet" class="payment-method-image" /></label>
-                  </div>
-                  {% else %}
+                    {% if total_charge <= 3000 %}
                     <div class="payment-method-item">
-                      <label for="payment_method_wallet" class="payment-method-label" style="max-width: 100px;">
-                        <img style="max-width: 70px; filter: grayscale(50%);" src="{% static 'user/images/payment_logo/wallet.png' %}" alt="Wallet" class="payment-method-image" />
-                      </label>
+                        <input type="radio" id="payment_method_cash" class="payment-method" name="payment_method" value="Cash On Delivery" />
+                        <label for="payment_method_cash" class="payment-method-label" style="max-width: 200px;">
+                            <img style="max-width: 70px;" src="{% static 'user/images/payment_logo/cash-on-delivery.png' %}" alt="Cash on Delivery" class="payment-method-image" />
+                        </label>
                     </div>
-                  {% endif %}
+                    {% endif %}
+                    <div class="payment-method-item">
+                        <input type="radio" id="payment_method_razorpay" class="payment-method" name="payment_method" value="Razorpay" />
+                        <label for="payment_method_razorpay" class="payment-method-label" style="max-width: 200px;">
+                            <img style="max-width: 70px;" src="{% static 'user/images/payment_logo/razorpay.png' %}" alt="Razorpay" class="payment-method-image" />
+                        </label>
+                    </div>
+                    {% if wallet_balance >= total_charge %}
+                    <div class="payment-method-item">
+                        <input type="radio" id="payment_method_wallet" class="payment-method" name="payment_method" value="Wallet" />
+                        <label for="payment_method_wallet" aria-disabled="true" class="payment-method-label" style="max-width: 200px;">
+                            <img style="max-width: 70px;" src="{% static 'user/images/payment_logo/wallet.png' %}" alt="Wallet" class="payment-method-image" />
+                        </label>
+                    </div>
+                    {% else %}
+                    <div class="payment-method-item">
+                        <label for="payment_method_wallet" class="payment-method-label" style="max-width: 100px;">
+                            <img style="max-width: 70px; filter: grayscale(50%);" src="{% static 'user/images/payment_logo/wallet.png' %}" alt="Wallet" class="payment-method-image" />
+                        </label>
+                    </div>
+                    {% endif %}
                 </div>
               </div>
+            
 
               {% if cart.coupon_applied %}
                 <div class="applied-coupon">

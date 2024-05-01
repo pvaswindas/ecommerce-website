@@ -134,7 +134,7 @@
 
                     <div class="header-search">
                       <a href="#" class="search-toggle" role="button"><i class="icon-search"></i></a>
-                      <form action="{% url 'search_for_product' %}" method="post">
+                      <form action="{% url 'shop_page_view' %}" method="get">
                         {% csrf_token %}
                         <div class="header-search-wrapper">
                           <label for="search_query" class="sr-only">Search</label>

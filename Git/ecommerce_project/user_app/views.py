@@ -3,11 +3,6 @@ import time
 import random
 import razorpay  # type: ignore
 from datetime import datetime
-from user_app.models import Customer, Address
-from admin_app.models import Category, Brand, ProductColorImage, ProductSize
-from admin_app.models import ProductOffer, CategoryOffer, Coupon, Payment
-from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction
-from admin_app.models import Wishlist, WishlistItem, Cart, CartProducts
 from django.db.models import Q
 from datetime import timedelta
 from django.db.models import *
@@ -24,6 +19,7 @@ from django.utils.html import strip_tags
 from django.utils.html import format_html
 from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
+from user_app.models import Customer, Address
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 from django.utils.text import normalize_newlines
@@ -36,7 +32,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.hashers import check_password
-
+from admin_app.models import Category, Brand, ProductColorImage, ProductSize
+from admin_app.models import ProductOffer, CategoryOffer, Coupon, Payment
+from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction
+from admin_app.models import Wishlist, WishlistItem, Cart, CartProducts
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # ---------------------------------------------------------------------------------- CC_INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
@@ -567,85 +567,6 @@ def logout(request):
 
 
 # ---------------------------------------------------------------------------------- CC_SHOP PAGE FUNCTIONS ----------------------------------------------------------------------------------
-default = False
-a_z = False
-new_arrival = False
-low_to_high = False
-high_to_low = False
-
-
-@never_cache
-@clear_old_messages
-def get_product_sort(request):
-    global default, a_z, new_arrival, low_to_high, high_to_low
-
-    if request.method == 'POST':
-        sortby = request.POST.get('sortby')
-
-        default = False
-        a_z = False
-        new_arrival = False
-        low_to_high = False
-        high_to_low = False
-
-        if sortby == 'a_z':
-            a_z = True
-        elif sortby == 'new_arrival':
-            new_arrival = True
-        elif sortby == 'low_to_high':
-            low_to_high = True
-        elif sortby == 'high_to_low':
-            high_to_low = True
-        else:
-            default = True
-
-    return redirect('shop_page_view')
-
-
-search = ""
-
-
-@never_cache
-@clear_old_messages
-def search_for_product(request):
-    global search
-
-    time.sleep(1)
-
-    if request.method == 'POST':
-        search_query = request.POST.get('search_query')
-
-        if not str(search_query) == "":
-            search = str(search_query)
-        return redirect('shop_page_view')
-    else:
-        return redirect('shop_page_view')
-
-
-@never_cache
-@clear_old_messages
-def brand_wise(request):
-    if request.method == 'POST':
-        brand_wise = request.POST.get('brand_wise')
-        selected_brand = request.session.get('selected_brand', [])
-        if brand_wise in selected_brand:
-            selected_brand.remove(brand_wise)
-        else:
-            selected_brand.append(brand_wise)
-        request.session['selected_brand'] = selected_brand
-        return redirect('shop_page_view')
-    else:
-        return redirect('index_page')
-
-
-@never_cache
-@clear_old_messages
-def clean_all(request):
-    if 'selected_category' in request.session:
-        del request.session['selected_category']
-    if 'selected_brand' in request.session:
-        del request.session['selected_brand']
-    return redirect('shop_page_view')
 
 
 
@@ -654,7 +575,6 @@ def clean_all(request):
 @never_cache
 @clear_old_messages
 def shop_page_view(request):
-    global search
     context = {}
 
     price_ranges = [
@@ -668,16 +588,31 @@ def shop_page_view(request):
     if request.user.is_authenticated:
         cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
         context.update(cart_wishlist_address_order_data)
-
+        
     sortby = request.GET.get('sortby', 'default')
     selected_categories = request.GET.getlist('category_wise')
+    selected_brands = request.GET.getlist('brand_wise')
+    search_query = request.GET.get('search_query')
+
+    product_color_list = ProductColorImage.objects.filter(
+        is_deleted=False, is_listed=True)
+    
 
     if selected_categories:
-        product_color_list = ProductColorImage.objects.filter(
-            products__category__name__in=selected_categories, is_deleted=False, is_listed=True)
-    else:
-        product_color_list = ProductColorImage.objects.filter(
-            is_deleted=False, is_listed=True)
+        product_color_list = product_color_list.filter(products__category__name__in=selected_categories)
+
+    if selected_brands:
+        product_color_list = product_color_list.filter(products__brand__name__in=selected_brands)
+        
+    if search_query:
+        product_color_list = product_color_list.filter(
+            Q(products__name__icontains=search_query) |
+            Q(color__icontains=search_query) |
+            Q(price__icontains=search_query) |
+            Q(products__type__icontains=search_query) |
+            Q(products__category__name__icontains=search_query) |
+            Q(products__brand__name__icontains=search_query)
+        )
 
     if sortby == 'a_z':
         product_color_list = product_color_list.order_by('products__name')
@@ -688,38 +623,36 @@ def shop_page_view(request):
     elif sortby == 'high_to_low':
         product_color_list = product_color_list.order_by('-price')
 
-    if not search == "":
-        product_color = product_color_list.filter(
-            Q(products__name__icontains=search) |
-            Q(color__icontains=search) |
-            Q(price__icontains=search) |
-            Q(products__type__icontains=search) |
-            Q(products__category__name__icontains=search) |
-            Q(products__brand__name__icontains=search)
-        )
-        if product_color:
-            product_color_list = product_color
+    paginator = Paginator(product_color_list, 12)
 
-        search = ""
+    page_number = request.GET.get('page')
+    try:
+        product_color_list = paginator.page(page_number)
+    except PageNotAnInteger:
+        product_color_list = paginator.page(1)
+    except EmptyPage:
+        product_color_list = paginator.page(paginator.num_pages)
 
     latest_products = ProductColorImage.objects.filter(
         is_deleted=False, is_listed=True).order_by('-created_at')[:3]
 
     category_list = Category.objects.annotate(product_count=Count('products'))
-
     brand_list = Brand.objects.annotate(product_count=Count('products'))
-
+    
     context.update({
         'product_color_list': product_color_list,
         'brand_list': brand_list,
         'category_list': category_list,
         'price_ranges': price_ranges,
         'latest_products': latest_products,
-        'selected_categories': selected_categories,
-        'sortby': sortby,
+        'selected_categories' : selected_categories,
+        'selected_brands' : selected_brands,
+        'sortby' : sortby,
+        'search_query': search_query,
     })
 
     return render(request, 'shop_page.html', context)
+
 
 
 

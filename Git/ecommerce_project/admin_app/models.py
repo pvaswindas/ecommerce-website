@@ -224,6 +224,7 @@ class OrderItem(models.Model):
     quantity = models.PositiveBigIntegerField(default=1)
     order_status = models.CharField(max_length=100)
     each_price = models.PositiveBigIntegerField(default=0)
+    request_cancel = models.BooleanField(default=False)
     cancel_product = models.BooleanField(default=False)
     return_product = models.BooleanField(default=False)
     request_return = models.BooleanField(default=False)

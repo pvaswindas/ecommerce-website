@@ -22,15 +22,6 @@ urlpatterns = [
     path('sneakerheads/user/reset_password_change/<int:user_id>/', reset_password_change, name='reset_password_change'),
     
     
-    
-    path('sneakerheads/shop/search_for_product/', search_for_product, name='search_for_product'),
-    
-    path('sneakerheads/shop/get_product_sort/', get_product_sort, name='get_product_sort'),
-    
-    
-    path('sneakerheads/user/brand-wise', brand_wise, name='brand_wise'),
-    path('sneakerheads/user/clean-category/', clean_all, name='clean_all'),
-    
     path('sneakerheads/shop/page/', shop_page_view, name='shop_page_view'),
     path('sneakerheads/<str:product_name>/<int:pdt_id>/', product_single_view_page, name='product_single_view_page'),
     
