@@ -85,7 +85,7 @@
             <td class="align-middle">{{ color.products.category.name }}</td>
             <td class="align-middle">{{ color.products.brand.name }}</td>
             <td class="align-middle">
-              {% for size in color.productsize_set.all %}
+              {% for size in color.product_sizes.all %}
                 <div>
                   <span class="size">{{ size.size }}</span>
                 </div>
@@ -93,7 +93,7 @@
               {% endfor %}
             </td>
             <td class="align-middle">
-              {% for size in color.productsize_set.all %}
+              {% for size in color.product_sizes.all %}
                 <div>
                   {% if size.quantity == 0 %}
                     <span class="quantity text-warning">{{ size.quantity }}</span>
@@ -103,7 +103,7 @@
                 </div>
                 {% empty %}No Quantity Available
               {% endfor %}
-            </td>
+            </td>            
             {% if color.total_quantity == 0 %}
               <td class="align-middle text-warning">{{ color.total_quantity }}</td>
             {% else %}
@@ -126,6 +126,27 @@
         {% endfor %}
       </tbody>
     </table>
+    
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center mt-4">
+        {% if product_color.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page=1">&laquo;</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ product_color.previous_page_number }}">Previous</a></li>
+        {% endif %}
+        {% for i in product_color.paginator.page_range %}
+          {% if product_color.number == i %}
+            <li class="page-item active" aria-current="page"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if product_color.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ product_color.next_page_number }}">Next</a></li>
+          <li class="page-item"><a class="page-link" href="?page={{ product_color.paginator.num_pages }}">&raquo;</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+
   </div>
 
   {% if not product_color %}

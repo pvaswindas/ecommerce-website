@@ -38,7 +38,6 @@ from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction
 from admin_app.models import Wishlist, WishlistItem, Cart, CartProducts
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-# ---------------------------------------------------------------------------------- CC_INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
 
 
 today = datetime.now().date()
@@ -133,16 +132,8 @@ def get_cart_wishlist_address_order_data(request):
     return data
 
 
-@never_cache
-@clear_old_messages
-def index_page(request):
-    if request.user.is_authenticated:
-        context = {}
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
-            request)
-        context.update(cart_wishlist_address_order_data)
-        return render(request, 'index.html', context)
-    return render(request, 'index.html')
+
+
 
 
 @never_cache
@@ -161,6 +152,67 @@ def sign_up(request):
         return redirect('index_page')
     else:
         return render(request, 'signup.html')
+    
+    
+
+
+
+# ---------------------------------------------------------------------------------- CC_INDEX PAGE FUNCTIONS ----------------------------------------------------------------------------------
+
+
+
+
+@never_cache
+@clear_old_messages
+def index_page(request):
+    if request.user.is_authenticated:
+        context = {}
+        all_products = ProductColorImage.objects.filter(
+            is_listed=True, is_deleted=False)
+        newest_five_products = all_products.order_by('-id').distinct()[:5]
+        newest_women_products = all_products.filter(
+            products__category__name='WOMEN').order_by('-id').distinct()[:5]
+        newest_men_products = all_products.filter(
+            products__category__name='MEN').order_by('-id').distinct()[:5]
+        women_products_count = all_products.filter(
+            products__category__name = 'WOMEN').count()
+        men_products_count = all_products.filter(
+            products__category__name = 'MEN').count()
+        kids_products_count = all_products.filter(
+            products__category__name = 'KIDS').count()
+        
+        ordered_items = OrderItem.objects.filter(order_status = 'Delivered')
+
+        best_selling_products = ProductColorImage.objects.filter(
+            is_listed=True, is_deleted=False,
+            product_sizes__orderitems__in=ordered_items
+        ).annotate(
+            num_orders=Count('product_sizes__orderitems')
+        ).order_by(
+            '-num_orders'
+        )
+        top_selling_products = best_selling_products.distinct()[:10]
+        women_top_selling_products = best_selling_products.filter(
+            products__category__name='WOMEN').distinct()[:10]
+        men_top_selling_products = best_selling_products.filter(
+            products__category__name='MEN').distinct()[:10]
+        context.update({
+            'newest_five_products' : newest_five_products,
+            'newest_women_products' : newest_women_products,
+            'newest_men_products' : newest_men_products,
+            'women_products_count' : women_products_count,
+            'men_products_count' : men_products_count,
+            'kids_products_count' : kids_products_count,
+            'top_selling_products' : top_selling_products,
+            'women_top_selling_products' : women_top_selling_products,
+            'men_top_selling_products' : men_top_selling_products,
+        })
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
+        context.update(cart_wishlist_address_order_data)
+        return render(request, 'index.html', context)
+    return render(request, 'index.html')
+
 
 
 # ---------------------------------------------------------------------------------- CC_OTP GENERATE FUNCTIONS ----------------------------------------------------------------------------------
@@ -634,10 +686,10 @@ def shop_page_view(request):
         product_color_list = paginator.page(paginator.num_pages)
 
     latest_products = ProductColorImage.objects.filter(
-        is_deleted=False, is_listed=True).order_by('-created_at')[:3]
+        is_deleted=False, is_listed=True).order_by('-created_at')[:5]
 
-    category_list = Category.objects.annotate(product_count=Count('products'))
-    brand_list = Brand.objects.annotate(product_count=Count('products'))
+    category_list = Category.objects.annotate(product_count=Count('products__product_color_image'))
+    brand_list = Brand.objects.annotate(product_count=Count('products__product_color_image'))
     
     context.update({
         'product_color_list': product_color_list,
@@ -1816,6 +1868,35 @@ def apply_coupon(request):
             return redirect('checkout_page')
     else:
         return redirect('sign_in_page')
+    
+
+
+
+# ---------------------------------------------------------------------------------- CC_ORDER CONFIRMATION EMAIL FUNCTIONS ----------------------------------------------------------------------------------
+    
+
+
+
+def send_order_confirmation_email(order):
+    print("ENTERED")
+    subject = 'Order Confirmation'
+
+    html_message = render_to_string('order_confirmation_email.html', {'order': order})
+
+    plain_message = strip_tags(html_message)
+
+    email_message = EmailMultiAlternatives(
+        subject=subject,
+        body=plain_message,
+        from_email='sneakerheadsweb@example.com',
+        to=[order.customer.user.email]
+    )
+
+    email_message.attach_alternative(html_message, "text/html")
+
+    email_message.send()
+    
+    
 
 
 # -------------------------------------------------------------------------------- CC_PLACE ORDER FUNCTIONS --------------------------------------------------------------------------------
@@ -1987,7 +2068,8 @@ def place_order(request):
                                     wallet.balance -= price_of_each
                                     wallet.save()
                                     wallet_transaction.save()
-
+                            
+                            send_order_confirmation_email(order)
                             cart_items.delete()
 
                             time.sleep(2)
@@ -2110,6 +2192,8 @@ def razorpay_payment(request, user_id):
                     product_size = ProductSize.objects.get(pk=product_size_id)
                     product_size.quantity -= item.quantity
                     product_size.save()
+                
+                send_order_confirmation_email(order)
                 cart_items.delete()
 
                 time.sleep(2)

@@ -34,8 +34,8 @@ class Products(models.Model):
     description = models.TextField()
     information = models.TextField()
     type = models.CharField(max_length=50)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='products')
     is_deleted = models.BooleanField(default=False)
     is_listed = models.BooleanField(default=True)
 
@@ -44,7 +44,8 @@ class Products(models.Model):
 
 
 class ProductColorImage(models.Model):
-    products = models.ForeignKey(Products, on_delete=models.CASCADE)
+    products = models.ForeignKey(
+        Products, on_delete=models.CASCADE, related_name='product_color_image')
     color = models.CharField(max_length=50)
     price = models.PositiveBigIntegerField()
     main_image = models.FileField(upload_to=' product_all_images/')
@@ -62,7 +63,7 @@ class ProductColorImage(models.Model):
 
 class ProductSize(models.Model):
     product_color_image = models.ForeignKey(
-        ProductColorImage, on_delete=models.CASCADE)
+        ProductColorImage, on_delete=models.CASCADE, related_name='product_sizes')
     size = models.CharField(max_length=50)
     quantity = models.PositiveBigIntegerField()
     is_listed = models.BooleanField(default=True)
@@ -220,7 +221,8 @@ class OrderItem(models.Model):
         primary_key=True, max_length=12, unique=True)
     order = models.ForeignKey(
         Orders, on_delete=models.CASCADE, related_name='order')
-    product = models.ForeignKey(ProductSize, on_delete=models.PROTECT)
+    product = models.ForeignKey(
+        ProductSize, on_delete=models.PROTECT, related_name='orderitems')
     quantity = models.PositiveBigIntegerField(default=1)
     order_status = models.CharField(max_length=100)
     each_price = models.PositiveBigIntegerField(default=0)
@@ -391,7 +393,7 @@ class CartProducts(models.Model):
             if highest_discount > 0:
                 discount_amount = round((
                     highest_discount * self.product.product_color_image.price)
-                                        / 100)
+                    / 100)
                 price = self.product.product_color_image.price
                 highest_offer_price = price - discount_amount
             else:

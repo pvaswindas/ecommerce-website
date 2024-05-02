@@ -44,204 +44,43 @@
                             }
                         }
                     }'>
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">Sale</span>
-                            <span class="product-label label-sale">30% off</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-1.jpg' %}" alt="Product image" class="product-image">
-                            </a>
+                    {% for new in newest_five_products %}
+                        <div class="product product-3 text-center">
+                            <figure class="product-media">
+                                {% if not new.in_stock %}
+                                <span class="product-label bg-danger text-white">Out of stock</span>
+                                {% endif %}
+                                <a href="{% url 'product_single_view_page' new.products.name new.id %}">
+                                    <img src="{{new.main_image.url}}" alt="Product image" class="product-image">
+                                </a>
 
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
+                                <div class="product-action-vertical">
+                                    
+                                
+                                    {% if not wishlist_items.product == product_color %}
+                                        {% if not in_wishlist %}
+                                            <a href="{% url 'add_to_wishlist' newd.id %}" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
+                                        {% else %}
+                                            <a href="{% url 'remove_from_wishlist' newd.id %}" class="btn-product-icon bi bi-heart-fill btn-expandable"><span>add to wishlist</span></a>
+                                        {% endif %}
+                                    {% endif %}
+                            </div>
+                            </figure>
 
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Men’s</a>,
-                                <a href="#">Boots</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">The North Face Back-To-Berkeley Remtlz Mesh</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                <span class="new-price">Now $50.00</span>
-                                <span class="old-price">$84.00</span>
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 60%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 4 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-2.jpg' %}" alt="Product image" class="product-image">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Men’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Nike Air Zoom Wildhorse 4</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                $77.99
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-                            
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 0%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 0 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">New</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-3.jpg' %}" alt="Product image" class="product-image">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-3-2.jpg' %}" alt="Product image" class="product-image-hover">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Women’s</a>,
-                                <a href="#">Sandals</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Eric Michael Joan</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                $35.99
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 40%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 2 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">Out Of Stock</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-4.jpg' %}" alt="Product image" class="product-image">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Women’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Nike Air Max Motion LW Racer</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                <span class="out-price">$54.99</span>
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 3 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">Sale</span>
-                            <span class="product-label label-sale">40% off</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-5.jpg' %}" alt="Product image" class="product-image">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Men’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">ASICS Tiger Gel-Lyte MT</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                <span class="new-price">Now $77.99</span>
-                                <span class="old-price">$130.00</span>
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 0%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 0 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-                </div><!-- End .owl-carousel -->
-            </div><!-- .End .tab-pane -->
+                            <div class="product-body">
+                                <div class="product-cat">
+                                    <span>{{ new.products.type }}</span>
+                                </div>
+                                <h3 class="product-title"><a href="{% url 'product_single_view_page' new.products.name new.id %}">{{ new.products.name }}</a></h3>
+                                <div class="product-price">
+                                    <span class="text-dark">₹{{ new.price }}.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% comment %} WOMEN {% endcomment %}
             <div class="tab-pane tab-pane-shadow p-0 fade" id="new-women-tab" role="tabpanel" aria-labelledby="new-women-link">
                 <div class="owl-carousel owl-simple carousel-equal-height" data-toggle="owl" 
                     data-owl-options='{
@@ -268,201 +107,31 @@
                             }
                         }
                     }'>
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">Out Of Stock</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-4.jpg' %}" alt="Product image" class="product-image">
-                            </a>
+                    {% for women in newest_women_products  %}
+                        <div class="product product-3 text-center">
+                            <figure class="product-media">
+                                {% if not women.in_stock %}
+                                    <span class="product-label bg-danger">Out Of Stock</span>
+                                {% endif %}
+                                <a href="{% url 'product_single_view_page' women.products.name women.id %}">
+                                    <img src="{{ women.main_image.url }}" alt="Product image" class="product-image">
+                                </a>
+                            </figure>
 
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Women’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Nike Air Max Motion LW Racer</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                <span class="out-price">$54.99</span>
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 3 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">New</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-3.jpg' %}" alt="Product image" class="product-image">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-3-2.jpg' %}" alt="Product image" class="product-image-hover">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Women’s</a>,
-                                <a href="#">Sandals</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Eric Michael Joan</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                $35.99
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 40%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 2 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">Sale</span>
-                            <span class="product-label label-sale">40% off</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-5.jpg' %}" alt="Product image" class="product-image">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Men’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">ASICS Tiger Gel-Lyte MT</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                <span class="new-price">Now $77.99</span>
-                                <span class="old-price">$130.00</span>
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 0%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 0 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">Sale</span>
-                            <span class="product-label label-sale">30% off</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-1.jpg' %}" alt="Product image" class="product-image">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Men’s</a>,
-                                <a href="#">Boots</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">The North Face Back-To-Berkeley Remtlz Mesh</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                <span class="new-price">Now $50.00</span>
-                                <span class="old-price">$84.00</span>
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 60%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 4 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-2.jpg' %}" alt="Product image" class="product-image">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Men’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Nike Air Zoom Wildhorse 4</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                $77.99
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-                            
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 0%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 0 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-                </div><!-- End .owl-carousel -->
-            </div><!-- .End .tab-pane -->
+                            <div class="product-body">
+                                <div class="product-cat">
+                                    <span>{{ women.products.type }}</span>
+                                </div>
+                                <h3 class="product-title"><a href="{% url 'product_single_view_page' women.products.name women.id %}">{{ women.products.name }}</a></h3>
+                                <div class="product-price">
+                                    <span class="text-success">₹{{ women.price }}.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% comment %} MEN {% endcomment %}
             <div class="tab-pane tab-pane-shadow p-0 fade" id="new-men-tab" role="tabpanel" aria-labelledby="new-men-link">
                 <div class="owl-carousel owl-simple carousel-equal-height" data-toggle="owl" 
                     data-owl-options='{
@@ -489,161 +158,30 @@
                             }
                         }
                     }'>
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">Sale</span>
-                            <span class="product-label label-sale">40% off</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-5.jpg' %}" alt="Product image" class="product-image">
-                            </a>
+                    {% for men in newest_men_products %}
+                        <div class="product product-3 text-center">
+                            <figure class="product-media">
+                                {% if not men.in_stock %}
+                                    <span class="product-label bg-danger">Out of stock</span>
+                                {% endif %}
+                                <a href="{% url 'product_single_view_page' men.products.name men.id %}">
+                                    <img src="{{ men.main_image.url }}" alt="Product image" class="product-image">
+                                </a>
+                            </figure>
 
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Men’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">ASICS Tiger Gel-Lyte MT</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                <span class="new-price">Now $77.99</span>
-                                <span class="old-price">$130.00</span>
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 0%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 0 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">New</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-3.jpg' %}" alt="Product image" class="product-image">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-3-2.jpg' %}" alt="Product image" class="product-image-hover">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Women’s</a>,
-                                <a href="#">Sandals</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Eric Michael Joan</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                $35.99
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 40%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 2 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-2.jpg' %}" alt="Product image" class="product-image">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Men’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Nike Air Zoom Wildhorse 4</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                $77.99
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-                            
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 0%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 0 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-
-                    <div class="product product-3 text-center">
-                        <figure class="product-media">
-                            <span class="product-label label-primary">Out Of Stock</span>
-                            <a href="product.html">
-                                <img src="{% static 'user/assets/images/demos/demo-10/products/product-4.jpg' %}" alt="Product image" class="product-image">
-                            </a>
-
-                            <div class="product-action-vertical">
-                                <a href="#" class="btn-product-icon btn-wishlist btn-expandable"><span>add to wishlist</span></a>
-                            </div><!-- End .product-action-vertical -->
-                        </figure><!-- End .product-media -->
-
-                        <div class="product-body">
-                            <div class="product-cat">
-                                <a href="#">Women’s</a>,
-                                <a href="#">Sneakers</a>
-                            </div><!-- End .product-cat -->
-                            <h3 class="product-title"><a href="product.html">Nike Air Max Motion LW Racer</a></h3><!-- End .product-title -->
-                            <div class="product-price">
-                                <span class="out-price">$54.99</span>
-                            </div><!-- End .product-price -->
-                        </div><!-- End .product-body -->
-
-                        <div class="product-footer">
-                            <div class="ratings-container">
-                                <div class="ratings">
-                                    <div class="ratings-val" style="width: 80%;"></div><!-- End .ratings-val -->
-                                </div><!-- End .ratings -->
-                                <span class="ratings-text">( 3 Reviews )</span>
-                            </div><!-- End .rating-container -->
-
-                            <div class="product-action">
-                                <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-                                <a href="popup/quickView.html" class="btn-product btn-quickview"><span>quick view</span></a>
-                            </div><!-- End .product-action -->
-                        </div><!-- End .product-footer -->
-                    </div><!-- End .product -->
-                </div><!-- End .owl-carousel -->
-            </div><!-- .End .tab-pane -->
-        </div><!-- End .tab-content -->
-    </div><!-- End .container -->
-</div><!-- End .bg-light -->
+                            <div class="product-body">
+                                <div class="product-cat">
+                                    <span>{{ men.products.type }}</span>
+                                </div>
+                                <h3 class="product-title"><a href="{% url 'product_single_view_page' men.products.name men.id %}">{{ men.products.name }}</a></h3>
+                                <div class="product-price">
+                                    <span class="text-primary">₹{{ men.price }}.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

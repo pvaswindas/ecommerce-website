@@ -2,6 +2,9 @@ from django.db.models.signals import post_save, post_delete, pre_delete, pre_sav
 from django.dispatch import receiver
 from admin_app.models import *
 from django.utils import timezone
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 
 
@@ -104,3 +107,6 @@ def delete_expired_product_offers(sender, instance, **kwargs):
 def delete_expired_coupon(sender, instance, **kwargs):
     if instance.end_date < timezone.now().date():
         instance.delete()
+        
+        
+        

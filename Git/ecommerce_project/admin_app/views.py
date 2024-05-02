@@ -39,6 +39,7 @@ from reportlab.lib.styles import ParagraphStyle  # type: ignore
 from reportlab.platypus import Paragraph, Spacer  # type: ignore
 from reportlab.lib.styles import getSampleStyleSheet  # type: ignore
 from reportlab.platypus import SimpleDocTemplate, Table  # type: ignore
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 # -------------------------------------------------------------
@@ -561,7 +562,10 @@ def list_product_page(request):
     if request.user.is_superuser:
         query = request.GET.get('query', '')
         product_color = ProductColorImage.objects.filter(is_deleted=False).prefetch_related(
-            'productsize_set').annotate(total_quantity=Sum('productsize__quantity'))
+            'product_sizes'
+        ).annotate(
+            total_quantity=Sum('product_sizes__quantity')
+        ).order_by('-created_at')
 
         if query:
             product_color = product_color.filter(
@@ -570,6 +574,15 @@ def list_product_page(request):
                 Q(products__category__name__icontains=query) |
                 Q(products__brand__name__icontains=query)
             )
+
+        paginator = Paginator(product_color, 10)
+        page_number = request.GET.get('page')
+        try:
+            product_color = paginator.page(page_number)
+        except PageNotAnInteger:
+            product_color = paginator.page(1)
+        except EmptyPage:
+            product_color = paginator.page(paginator.num_pages)
 
         context = {
             'product_color': product_color,
@@ -672,11 +685,6 @@ def add_products(request):
                         is_every_field_valid = False
                         messages.error(
                             request, 'Description should not consist solely of special characters or be blank.')
-
-                    elif not description_pattern.match(description):
-                        is_every_field_valid = False
-                        messages.error(
-                            request, 'Description should only contain letters, numbers, spaces, periods, commas, hyphens, and underscores.')
 
                     elif not min_length <= len(information) <= 1000:
                         is_every_field_valid = False
@@ -956,7 +964,7 @@ def edit_product_color(request, p_id):
             top_image = request.FILES.get('top_image')
             back_image = request.FILES.get('back_image')
 
-            if color and price and main_image and side_image and top_image and back_image:
+            if color and price:
                 try:
                     product_color_image = ProductColorImage.objects.get(
                         pk=p_id)
@@ -967,14 +975,18 @@ def edit_product_color(request, p_id):
                 is_every_field_valid = True
 
                 try:
-                    validate_image(main_image)
-                    validate_image(side_image)
-                    validate_image(top_image)
-                    validate_image(back_image)
+                    if main_image:
+                        validate_image(main_image)
+                    if side_image:   
+                        validate_image(side_image)
+                    if top_image:    
+                        validate_image(top_image)
+                    if back_image:   
+                        validate_image(back_image)
                 except:
                     messages.error(
                         request, 'Image files should be in valid format.')
-                    return redirect('admin_add_image_page')
+                    return redirect('list_product_page')
 
                 try:
                     price = int(price)
@@ -995,10 +1007,10 @@ def edit_product_color(request, p_id):
                     messages.error(
                         request, 'The color name should be between 3 and 30 characters long.')
 
-                elif not 800 <= price <= 100000:
+                elif not 500 <= price <= 100000:
                     is_every_field_valid = False
                     messages.error(
-                        request, 'Price should be between ₹800 and ₹100,000.')
+                        request, 'Price should be between ₹500 and ₹100,000.')
 
                 if is_every_field_valid:
                     product_color_image.color = color
@@ -1191,7 +1203,7 @@ def edit_product_size(request, p_id):
 @never_cache
 def admin_add_image_page(request):
     if request.user.is_superuser:
-        product_list = Products.objects.all()
+        product_list = Products.objects.all().order_by('name')
         return render(request, 'pages/products/add_product_image.html', {'product_list': product_list, 'is_active_product': is_active_product})
     else:
         return redirect(admin_login_page)
@@ -1257,10 +1269,10 @@ def add_product_image(request):
                             messages.error(
                                 request, 'The color name should be between 3 and 30 characters long.')
 
-                        elif not 800 <= price <= 100000:
+                        elif not 500 <= price <= 100000:
                             is_every_field_valid = False
                             messages.error(
-                                request, 'Price should be between ₹800 and ₹100,000.')
+                                request, 'Price should be between ₹500 and ₹100,000.')
 
                         if is_every_field_valid:
                             product_color_image = ProductColorImage.objects.create(
@@ -1304,7 +1316,7 @@ def admin_add_variants(request):
     if request.user.is_superuser:
         sizes = adult_sizes
         products = Products.objects.all().order_by('name')
-        product_color = ProductColorImage.objects.all().order_by('color')
+        product_color = ProductColorImage.objects.all().order_by('-created_at')
         return render(request, 'pages/products/add_product_variant.html', {'products': products, 'product_color': product_color, 'sizes': sizes, 'is_active_product': is_active_product})
     else:
         return redirect(admin_login_page)
@@ -1335,7 +1347,7 @@ def get_sizes_view(request):
             if product_id:
                 try:
                     product = Products.objects.get(pk=product_id)
-                    if product.category.name.lower() == "kid's":
+                    if product.category.name.lower() == "kids":
                         sizes = ['8C', '9C', '10C', '11C', '12C', '13C']
                     else:
                         sizes = ['6', '7', '8', '9', '10', '11', '12']

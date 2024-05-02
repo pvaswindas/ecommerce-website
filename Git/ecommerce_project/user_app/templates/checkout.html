@@ -130,7 +130,7 @@
               <form action="{% url 'apply_coupon' %}" method="post">
                 {% csrf_token %}
                 <div class="input-group">
-                  <select class="form-control" id="coupon_code" name="coupon_code">
+                  <select class="form-control" id="coupon_code" name="coupon_code" required>
                     <option selected disabled value="">Select a coupon</option>
                     {% for coupon in available_coupons %}
                       <option value="{{ coupon.coupon_code }}">{{ coupon.name }}{{ coupon.discount_percentage }}</option>
@@ -145,37 +145,37 @@
           </div>
 
           <aside class="col-lg-3">
-            <div class="summary">
+            <div class="summary bg-light">
               <h3 class="summary-title">Your Order</h3>
 
-              <table class="table table-summary">
+              <table class="table table-summary  bg-light">
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Total</th>
+                    <th class="bg-light">Product</th>
+                    <th class="bg-light">Total</th>
                   </tr>
                 </thead>
 
                 <tbody>
                   {% for item in cart_items %}
-                    <tr>
-                      <td>
+                    <tr class="bg-light">
+                      <td class="bg-light">
                         <a href="#">{{ item.product.product_color_image.products.name }} × {{ item.quantity }}</a>
                       </td>
-                      <td>₹{{ item.total_price }}.00</td>
+                      <td class="bg-light">₹{{ item.total_price }}.00</td>
                     </tr>
                   {% endfor %}
 
                   {% if cart.coupon_applied %}
-                    <tr class="summary-subtotal">
-                      <td>Discount:</td>
-                      <td>₹ {{ discount_amount }} .00</td>
+                    <tr class="summary-subtotal bg-light">
+                      <td class="bg-light">Discount:</td>
+                      <td class="bg-light">₹ {{ discount_amount }} .00</td>
                     </tr>
                   {% endif %}
 
                   <tr class="summary-subtotal">
-                    <td>Subtotal:</td>
-                    <td>
+                    <td class="bg-light">Subtotal:</td>
+                    <td class="bg-light">
                       ₹{% if cart.coupon_applied %}
                         {{ total_charge_discounted }}
                       {% else %}
@@ -184,8 +184,8 @@
                     </td>
                   </tr>
                   <tr>
-                    <td>Shipping:</td>
-                    <td>
+                    <td class="bg-light">Shipping:</td>
+                    <td class="bg-light">
                       ₹{% if cart.coupon_applied %}
                         {{ charge_for_shipping }}
                       {% else %}
@@ -194,8 +194,8 @@
                     </td>
                   </tr>
                   <tr class="summary-total">
-                    <td>Total:</td>
-                    <td>
+                    <td class="bg-light">Total:</td>
+                    <td class="bg-light">
                       ₹{% if cart.coupon_applied %}
                         {{ total_charge_discounted }}
                       {% else %}
