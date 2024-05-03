@@ -42,7 +42,7 @@ urlpatterns = [
          views.admin_add_variants, name='admin_add_variants'),
     path('sneakerheads/admin/product/add-product-size/',
          views.add_size, name='add_size'),
-    path('sneakerheads/admin/product/add-product-image/',
+    path('sneakerheads/admin/product/add-product-image/', 
          views.admin_add_image_page, name='admin_add_image_page'),
     path('sneakerheads/admin/product/add-product-color-image/',
          views.add_product_image, name='add_product_image'),
@@ -128,7 +128,10 @@ urlpatterns = [
          views.order_detailed_view, name='order_detailed_view'),
     path('sneakerheads/admin/change-order-status/<str:order_id>/',
          views.change_order_status, name='change_order_status'),
-
+    
+    
+    path('sneakerheads/admin/order/cancel-product/<str:order_items_id>/',
+         views.cancel_product, name='cancel_product'),
     path('sneakerheads/admin/order/return-product/<str:order_items_id>/',
          views.return_product, name='return_product'),
 

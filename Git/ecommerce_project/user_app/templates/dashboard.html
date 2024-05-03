@@ -4,7 +4,7 @@
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'user/css/user_details.css' %}" />
   <link rel="stylesheet" href="{% static 'user/css/edit_address.css' %}" />
-  <link rel="stylesheet" href="{% static 'user/css/order_details.css' %}">
+  <link rel="stylesheet" href="{% static 'user/css/order_dashboard.css' %}">
 {% endblock %}
 
 {% block bcactive %}
@@ -62,7 +62,7 @@
 
               {% comment %}ORDER DETAILS{% endcomment %}
               <div class="tab-pane fade" id="tab-orders" role="tabpanel" aria-labelledby="tab-orders-link">
-                {% include "dashboard/orders/orders.html" %}
+                {% include "dashboard/orders/order_dashboard.html" %}
               </div>
 
               

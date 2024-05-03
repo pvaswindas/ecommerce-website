@@ -64,7 +64,9 @@
                   <input type="checkbox" class="custom-control-input" name="brand_wise" value="{{ brand.name }}" id="brand-{{ forloop.counter }}" {% if brand.name in selected_brands %}checked{% endif %} onchange="this.form.submit()" />
                   <label class="custom-control-label" for="brand-{{ forloop.counter }}">{{ brand.name }}</label>
                 </div>
-                <span class="item-count">{{ brand.product_count }}</span>
+                {% if brand.product_count > 0 %}
+                  <span class="item-count">{{ brand.product_count }}</span>
+                {% endif %}
               </div>
               {% endfor %}
 

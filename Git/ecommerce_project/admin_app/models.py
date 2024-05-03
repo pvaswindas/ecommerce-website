@@ -34,8 +34,10 @@ class Products(models.Model):
     description = models.TextField()
     information = models.TextField()
     type = models.CharField(max_length=50)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='products')
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, related_name='products')
+    brand = models.ForeignKey(
+        Brand, on_delete=models.CASCADE, related_name='products')
     is_deleted = models.BooleanField(default=False)
     is_listed = models.BooleanField(default=True)
 
@@ -179,6 +181,7 @@ class Orders(models.Model):
     number_of_orders = models.PositiveBigIntegerField(default=1)
     subtotal = models.PositiveBigIntegerField(default=0)
     shipping_charge = models.PositiveBigIntegerField(default=0)
+    order_status = models.CharField(max_length=100, blank=True, null=True, default='Order Placed')
     total_charge = models.PositiveBigIntegerField(default=0)
     razorpay_id = models.CharField(max_length=100, blank=True, null=True)
     paid = models.BooleanField(default=False)
@@ -296,7 +299,7 @@ class WalletTransaction(models.Model):
         item = self.order_item
         name = f"{self.wallet.user.first_name} {self.wallet.user.last_name}"
         time = self.time_of_transaction
-        return f"{id} | {item} - {name} : {time} | {money}"
+        return f"{id} | {item} - {name} : {time} |"
 
     def save(self, *args, **kwargs):
         if not self.transaction_id:

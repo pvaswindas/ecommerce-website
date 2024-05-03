@@ -840,11 +840,6 @@ def edit_product_update(request, p_id):
                         messages.error(
                             request, 'Description should not consist solely of special characters or be blank.')
 
-                    elif not description_pattern.match(description):
-                        is_every_field_valid = False
-                        messages.error(
-                            request, 'Description should only contain letters, numbers, spaces, periods, commas, hyphens, and underscores.')
-
                     elif not min_length <= len(cleaned_information) <= 1000:
                         is_every_field_valid = False
                         messages.error(
@@ -1203,10 +1198,23 @@ def edit_product_size(request, p_id):
 @never_cache
 def admin_add_image_page(request):
     if request.user.is_superuser:
-        product_list = Products.objects.all().order_by('name')
-        return render(request, 'pages/products/add_product_image.html', {'product_list': product_list, 'is_active_product': is_active_product})
+        brand_list = Brand.objects.all().order_by('name')
+        if request.method == 'GET':
+            brand_name = request.GET.get('brand_id')
+            product_list = Products.objects.filter(brand__name = brand_name).order_by('name')
+        else:
+            brand_name = None 
+            product_list = None
+        context = {
+            'brand_name' : brand_name,
+            'product_list': product_list,
+            'is_active_product': is_active_product,
+            'brand_list' : brand_list
+        }
+        return render(request, 'pages/products/add_product_image.html', context)
     else:
         return redirect(admin_login_page)
+    
 
 
 # ADD PRODUCT IMAGE FUNCTION
@@ -1757,9 +1765,148 @@ def change_order_status(request, order_id):
                 order_item.save()
             messages.success(request, 'Order Status Updated')
             return redirect('orders_view_page')
-
     else:
         return redirect('admin_login_page')
+    
+    
+
+
+@never_cache
+@clear_old_messages
+def cancel_product(request, order_items_id):
+    if request.user.is_superuser:
+        print("Entered")
+        try:
+            try:
+                order_item = OrderItem.objects.get(pk=order_items_id)
+                print(order_item)
+            except OrderItem.DoesNotExist:
+                return redirect('orders_view_page')
+            product_size = order_item.product
+            order = order_item.order
+            user = order.customer.user
+            print(user)
+            wallet = Wallet.objects.get(user=user)
+            with transaction.atomic():
+                if order.payment.method_name in ["Razorpay", "Wallet"]:
+                    print("ENTERED")
+                    refund_money = 0
+                    other_item_price = 0
+                    sum_of_all_other = 0
+                    refund_money = 0
+                    other_item_price = 0
+                    sum_of_all_other = 0
+                    if order.number_of_orders > 1:
+                        print("1st IF")
+                        if order_item.order.coupon_applied:
+                            minimum_amount = order.coupon_minimum_amount
+                            maximum_amount = order.coupon_maximum_amount
+                            other_order_items = OrderItem.objects.filter(
+                                order=order, return_product=False, cancel_product=False).exclude(order_items_id=order_items_id)
+                            total_of_other_order = 0
+                            for item in other_order_items:
+                                total_of_other_order += item.each_price
+
+                            item_price = order_item.each_price
+
+                            total_after_reducing = order.total_charge - order_item.each_price
+
+                            if minimum_amount <= total_of_other_order <= maximum_amount:
+                                print("2nd IF")
+
+                                if other_order_items:
+                                    if total_after_reducing > 0:
+                                        order.total_charge = total_after_reducing
+                                        order.save()
+
+                                refund_money = order_item.each_price
+
+                                wallet_transaction = WalletTransaction.objects.create(
+                                    wallet=wallet,
+                                    order_item=order_item,
+                                    money_deposit=refund_money
+                                )
+                                wallet_transaction.save()
+
+                            else:
+                                print("1st ELSE")
+                                order_total = order.total_charge
+                                sum_of_all_other = 0
+                                for item in other_order_items:
+                                    other_item_price = item.each_price
+                                    sum_of_all_other += other_item_price
+
+                                refund_money = int(
+                                    order_total - sum_of_all_other)
+
+                                wallet_transaction = WalletTransaction.objects.create(
+                                    wallet=wallet,
+                                    order_item=order_item,
+                                    money_deposit=refund_money
+                                )
+                                wallet_transaction.save()
+
+                                order_item.each_price = refund_money
+                                order_item.save()
+
+                                order.total_charge = sum_of_all_other
+                                order.coupon_applied = False
+                                order.coupon_name = None
+                                order.discount_price = None
+                                order.coupon_discount_percent = None
+                                order.coupon_minimum_amount = None
+                                order.coupon_maximum_amount = None
+                                order.save()
+                        else:
+                            print("2nd ELSE")
+                            item_price = order_item.each_price
+                            refund_money = item_price
+                            wallet_transaction = WalletTransaction.objects.create(
+                                wallet=wallet,
+                                order_item=order_item,
+                                money_deposit=refund_money,
+                            )
+                            wallet_transaction.save()
+
+                            order_total = order.total_charge
+                            order.total_charge = order_total - refund_money
+                            order.save()
+                    else:
+                        print("3rd ELSE")
+                        refund_money = order.total_charge
+                        wallet_transaction = WalletTransaction.objects.create(
+                            wallet=wallet,
+                            order_item=order_item,
+                            money_deposit=refund_money,
+                        )
+                        wallet_transaction.save()
+
+                        order_total = order.total_charge
+                        order.total_charge = order_total - refund_money
+                        order.save()
+
+                    new_wallet_balance = wallet.balance + refund_money
+                    wallet.balance = new_wallet_balance
+                    wallet.save()
+
+                product_size.quantity += order_item.quantity
+                product_size.save()
+
+                if order.payment.method_name not in ["Razorpay", "Wallet"]:
+                    print("3rd IF")
+                    order.total_charge -= order_item.each_price
+                    if order.total_charge < 0:
+                        order.total_charge = 0
+                    order.save()
+                order_item.cancel_product = True
+                order_item.order_status = 'Cancelled'
+                order_item.save()
+                time.sleep(1)
+                return redirect('order_detailed_view', order_items_id)
+        except:
+            return redirect('order_detailed_view', order_items_id)
+    else:
+        return redirect('admin_dashboard')
 
 
 @never_cache

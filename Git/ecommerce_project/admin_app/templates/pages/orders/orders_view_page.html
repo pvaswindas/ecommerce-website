@@ -40,11 +40,13 @@
               <a href="{% url 'order_detailed_view' item.order_items_id %}">{{ item.order_items_id }}</a>
               {% if item.cancel_product %}
                 <span class="cancel-request">Cancelled</span>
+              {% elif item.request_cancel %}
+                <span class="return-request">Cancel Requested</span>
               {% elif item.request_return %}
                 {% if item.return_product %}
                   <span class="return-request">Order Returned</span>
                 {% else %}
-                  <span class="return-request">Return Request</span>
+                  <span class="return-request">Return Requested</span>
                 {% endif %}
               {% endif %}
             </td>

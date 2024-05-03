@@ -687,9 +687,13 @@ def shop_page_view(request):
 
     latest_products = ProductColorImage.objects.filter(
         is_deleted=False, is_listed=True).order_by('-created_at')[:5]
+    
+    brand_list = Brand.objects.filter(is_deleted=False, is_listed=True)
 
-    category_list = Category.objects.annotate(product_count=Count('products__product_color_image'))
-    brand_list = Brand.objects.annotate(product_count=Count('products__product_color_image'))
+    category_list = Category.objects.filter(is_deleted=False, is_listed=True).annotate(product_count=Count('products__product_color_image'))
+    brand_list = brand_list.annotate(
+        product_count=Count('products__product_color_image', filter=Q(products__product_color_image__in=product_color_list))
+    )
     
     context.update({
         'product_color_list': product_color_list,
@@ -1389,9 +1393,11 @@ def order_detail(request, order_id):
                 delivered = True
             user = request.user
             wallet = Wallet.objects.get(user=user)
+            
             if order_items.cancel_product == True:
-                wallet_transaction = WalletTransaction.objects.get(
-                    wallet=wallet, money_withdrawn=0, order_item=order_items)
+                if not order_items.order.payment.method_name == 'Cash On Delivery':
+                    wallet_transaction = WalletTransaction.objects.get(
+                        wallet=wallet, money_withdrawn=0, order_item=order_items)
             else:
                 wallet_transaction = None
             context = {
@@ -1424,121 +1430,11 @@ def cancel_order(request, order_items_id):
                 order_item = OrderItem.objects.get(pk=order_items_id)
             except OrderItem.DoesNotExist:
                 return redirect('index_page')
-            product_size = order_item.product
-            order = order_item.order
-            user = request.user
-            wallet = Wallet.objects.get(user=user)
-            with transaction.atomic():
-                if order.payment.method_name in ["Razorpay", "Wallet"]:
-                    refund_money = 0
-                    other_item_price = 0
-                    sum_of_all_other = 0
-                    refund_money = 0
-                    other_item_price = 0
-                    sum_of_all_other = 0
-                    if order.number_of_orders > 1:
-                        if order_item.order.coupon_applied:
-                            minimum_amount = order.coupon_minimum_amount
-                            maximum_amount = order.coupon_maximum_amount
-                            other_order_items = OrderItem.objects.filter(
-                                order=order, return_product=False, cancel_product=False).exclude(order_items_id=order_items_id)
-                            total_of_other_order = 0
-                            for item in other_order_items:
-                                total_of_other_order += item.each_price
-
-                            item_price = order_item.each_price
-
-                            total_after_reducing = order.total_charge - order_item.each_price
-
-                            if minimum_amount <= total_of_other_order <= maximum_amount:
-
-                                if other_order_items:
-                                    if total_after_reducing > 0:
-                                        order.total_charge = total_after_reducing
-                                        order.save()
-
-                                refund_money = order_item.each_price
-
-                                wallet_transaction = WalletTransaction.objects.create(
-                                    wallet=wallet,
-                                    order_item=order_item,
-                                    money_deposit=refund_money
-                                )
-                                wallet_transaction.save()
-
-                            else:
-                                order_total = order.total_charge
-                                sum_of_all_other = 0
-                                for item in other_order_items:
-                                    other_item_price = item.each_price
-                                    sum_of_all_other += other_item_price
-
-                                refund_money = int(
-                                    order_total - sum_of_all_other)
-
-                                wallet_transaction = WalletTransaction.objects.create(
-                                    wallet=wallet,
-                                    order_item=order_item,
-                                    money_deposit=refund_money
-                                )
-                                wallet_transaction.save()
-
-                                order_item.each_price = refund_money
-                                order_item.save()
-
-                                order.total_charge = sum_of_all_other
-                                order.coupon_applied = False
-                                order.coupon_name = None
-                                order.discount_price = None
-                                order.coupon_discount_percent = None
-                                order.coupon_minimum_amount = None
-                                order.coupon_maximum_amount = None
-                                order.save()
-                        else:
-                            item_price = order_item.each_price
-                            refund_money = item_price
-                            wallet_transaction = WalletTransaction.objects.create(
-                                wallet=wallet,
-                                order_item=order_item,
-                                money_deposit=refund_money,
-                            )
-                            wallet_transaction.save()
-
-                            order_total = order.total_charge
-                            order.total_charge = order_total - refund_money
-                            order.save()
-                    else:
-                        refund_money = order.total_charge
-                        wallet_transaction = WalletTransaction.objects.create(
-                            wallet=wallet,
-                            order_item=order_item,
-                            money_deposit=refund_money,
-                        )
-                        wallet_transaction.save()
-
-                        order_total = order.total_charge
-                        order.total_charge = order_total - refund_money
-                        order.save()
-
-                    new_wallet_balance = wallet.balance + refund_money
-                    wallet.balance = new_wallet_balance
-                    wallet.save()
-
-                product_size.quantity += order_item.quantity
-                product_size.save()
-
-                if order.payment.method_name not in ["Razorpay", "Wallet"]:
-                    order.total_charge -= order_item.each_price
-                    if order.total_charge < 0:
-                        order.total_charge = 0
-                    order.save()
-                order_item.cancel_product = True
-                order_item.order_status = 'Cancelled'
-                order_item.save()
-
-                time.sleep(2)
-
-                return redirect('order_detail', order_items_id)
+            order_item.request_cancel = True
+            order_item.order_status = 'Cancel Requested'
+            order_item.save()
+            time.sleep(1)
+            return redirect('order_detail', order_items_id)
         except:
             return redirect('order_detail', order_items_id)
     else:
@@ -1878,7 +1774,6 @@ def apply_coupon(request):
 
 
 def send_order_confirmation_email(order):
-    print("ENTERED")
     subject = 'Order Confirmation'
 
     html_message = render_to_string('order_confirmation_email.html', {'order': order})

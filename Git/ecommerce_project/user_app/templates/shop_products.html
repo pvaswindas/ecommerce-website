@@ -32,21 +32,21 @@
     <ul class="pagination justify-content-center">
       {% if product_color_list.has_previous %}
         <li class="page-item">
-          <a class="page-link" href="?page=1">&laquo;</a>
+          <a class="page-link" href="?page=1&{{ request.GET.urlencode }}">&laquo;</a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ product_color_list.previous_page_number }}">{{ product_color_list.previous_page_number }}</a>
+          <a class="page-link" href="?page={{ product_color_list.previous_page_number }}&{{ request.GET.urlencode }}">{{ product_color_list.previous_page_number }}</a>
         </li>
       {% endif %}
       <li class="page-item active">
-        <a class="page-link" href="?page={{ product_color_list.number }}">{{ product_color_list.number }}</a>
+        <a class="page-link" href="?page={{ product_color_list.number }}&{{ request.GET.urlencode }}">{{ product_color_list.number }}</a>
       </li>
       {% if product_color_list.has_next %}
         <li class="page-item">
-          <a class="page-link" href="?page={{ product_color_list.next_page_number }}">{{ product_color_list.next_page_number }}</a>
+          <a class="page-link" href="?page={{ product_color_list.next_page_number }}&{{ request.GET.urlencode }}">{{ product_color_list.next_page_number }}</a>
         </li>
         <li class="page-item">
-          <a class="page-link" href="?page={{ product_color_list.paginator.num_pages }}">&raquo;</a>
+          <a class="page-link" href="?page={{ product_color_list.paginator.num_pages }}&{{ request.GET.urlencode }}">&raquo;</a>
         </li>
       {% endif %}
     </ul>

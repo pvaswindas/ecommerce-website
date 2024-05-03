@@ -58,7 +58,7 @@
       </div>
       <div class="col-lg-6">
         {% if not order_items.request_return %}
-          {% if not order_items.cancel_product %}
+          {% if not order_items.request_cancel %}
             <div class="order-status m-5">
               <h2>Delivery Tracking</h2>
               <div class="delivery-tracking">
@@ -94,7 +94,7 @@
                 <button id="cancelOrderBtn" class="btn btn-danger">Cancel Order</button>
               {% endif %}
             </div>
-          {% else %}
+          {% elif order_items.cancel_product %}
             <div class="order-status m-5">
               <div class="tracking-item {% if placed or shipped or delivery or order_items.cancel_product %}active{% endif %}">
                 <div class="tracking-icon"></div>
@@ -129,6 +129,29 @@
                   </div>
               </div>
             {% endif %}
+          {% else %}
+            <div class="order-status m-5">
+              <div class="refund-tracking">
+                <div class="tracking-item {% if order_items.request_cancel %}active{% endif %}">
+                  <div class="tracking-icon"></div>
+                  <div class="tracking-text">
+                    Order Placed
+                  </div>
+                </div>
+                <div class="tracking-item {% if order_items.request_cancel %}active{% endif %}">
+                  <div class="tracking-icon"></div>
+                  <div class="tracking-text">
+                    Cancel requested
+                  </div>
+                </div>
+                <div class="tracking-item {% if order_items.cancel_product %}active{% endif %}">
+                  <div class="tracking-icon"></div>
+                  <div class="tracking-text">
+                    Cancelled
+                  </div>
+                </div>
+              </div>
+            </div>
           {% endif %}
         {% else %}
           <div class="order-status m-5">

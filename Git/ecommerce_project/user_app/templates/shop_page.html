@@ -85,17 +85,14 @@
 
 <script>
   $(document).ready(function() {
-      // Submit the form when a category checkbox is changed
       $('.custom-control-input').change(function() {
           $('#categoryForm').submit();
       });
 
-      // Submit the form when the sort dropdown is changed
       $('#sortby').change(function() {
           $('#sortForm').submit();
       });
 
-      // Submit the form when a brand checkbox is changed
       $('#brandForm .custom-control-input').change(function() {
           $('#brandForm').submit();
       });

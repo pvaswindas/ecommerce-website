@@ -19,9 +19,18 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
+        .company-details {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .company-logo {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
         h1 {
             color: #333;
             text-align: center;
+            margin-top: 0;
         }
         p {
             color: #666;
@@ -35,11 +44,9 @@
             margin-bottom: 20px;
             border-bottom: 1px solid #eee;
             padding-bottom: 20px;
-        }
-        img {
-            display: block;
-            margin: 0 auto;
-            max-width: 100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .footer {
             margin-top: 20px;
@@ -51,7 +58,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Order Confirmation</h1>
+        <div class="company-details">
+            <h1>SneakerHeads</h1>
+            <p>Unleash your Sneaker Obsession</p>
+        </div>
+        <h2>Order Confirmation</h2>
         <p>Dear {{ order.customer.user.first_name }},</p>
         
         <p>Your order with the following details has been confirmed:</p>
@@ -62,13 +73,17 @@
         <p><strong>Shipping Charge:</strong> ₹{{ order.shipping_charge }}</p>
         <p><strong>Total Charge:</strong> ₹{{ order.total_charge }}</p>
         
-        <h2>Ordered Items:</h2>
+        <h3>Ordered Items:</h3>
         <ul>
             {% for order_item in order.order.all %}
                 <li>
-                    <p><strong>Product:</strong> {{ order_item.product.product_color_image.products.name }}</p>
-                    <p><strong>Quantity:</strong> {{ order_item.quantity }}</p>
-                    <p><strong>Price:</strong> ₹{{ order_item.each_price }}</p>
+                    <div>
+                        <div>
+                            <p><strong>Product:</strong> {{ order_item.product.product_color_image.products.name }}</p>
+                            <p><strong>Quantity:</strong> {{ order_item.quantity }}</p>
+                            <p><strong>Price:</strong> ₹{{ order_item.each_price }}</p>
+                        </div>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
@@ -76,7 +91,7 @@
         <p>Thank you for shopping with us!</p>
     </div>
     <div class="footer">
-        <p>SneakerHeads - Your ultimate destination for trendy footwear</p>
+        <p>Step up your sneaker game with SneakerHeads</p>
     </div>
 </body>
 </html>

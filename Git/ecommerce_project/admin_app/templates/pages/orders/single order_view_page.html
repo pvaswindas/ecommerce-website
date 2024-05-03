@@ -41,35 +41,43 @@
     </div>
     <div class="order-status-form">
       {% if not order_item.cancel_product %}
-        {% if not order_item.order_status == 'Delivered' %}
-          {% if not order_item.order_status == 'Returned' %}
-            <h2>Change Order Status</h2>
-            <form action="{% url 'change_order_status' order_item.order_items_id %}" method="post">
-              {% csrf_token %}
-              <select name="order_status" class="status-select">
-                <option value="Order Placed" {% if order_item.order_status == "Order Placed" %} selected {% endif %}>Order Placed</option>
-                <option value="Shipped" {% if order_item.order_status == "Shipped" %} selected {% endif %}>Shipped</option>
-                <option value="Out for Delivery" {% if order_item.order_status == "Out for Delivery" %} selected {% endif %}>Out for Delivery</option>
-                <option value="Delivered" {% if order_item.order_status == "Delivered" %} selected {% endif %}>Delivered</option>
-              </select>
-              <button type="submit" class="status-button">Change Status</button>
-            </form>
-          {% else %}
-            <span class="bg-warning text-black py-1 px-2 rounded rounded-1"><strong>Order Returned and Refund completed</strong></span>
-          {% endif %}
-        {% else %}
-          {% if order_item.request_return %}
-            {% if not order_item.return_product %}
-              <a href="{% url 'return_product' order_item.order_items_id %}">
-                <button class="btn btn-warning rounded rounded-1">Accept Return</button>
-              </a>
+        {% if not order_item.request_cancel %}
+          {% if not order_item.order_status == 'Delivered' %}
+            {% if not order_item.order_status == 'Returned' %}
+              <h2>Change Order Status</h2>
+              <form action="{% url 'change_order_status' order_item.order_items_id %}" method="post">
+                {% csrf_token %}
+                <select name="order_status" class="status-select">
+                  <option value="Order Placed" {% if order_item.order_status == "Order Placed" %} selected {% endif %}>Order Placed</option>
+                  <option value="Shipped" {% if order_item.order_status == "Shipped" %} selected {% endif %}>Shipped</option>
+                  <option value="Out for Delivery" {% if order_item.order_status == "Out for Delivery" %} selected {% endif %}>Out for Delivery</option>
+                  <option value="Delivered" {% if order_item.order_status == "Delivered" %} selected {% endif %}>Delivered</option>
+                </select>
+                <button type="submit" class="status-button">Change Status</button>
+              </form>
+            {% else %}
+              <span class="bg-warning text-black py-1 px-2 rounded rounded-1"><strong>Order Returned and Refund completed</strong></span>
             {% endif %}
           {% else %}
-            <p><strong>Order Status :</strong> Delivered</p>
+            {% if order_item.request_return %}
+              {% if not order_item.return_product %}
+                <a href="{% url 'return_product' order_item.order_items_id %}">
+                  <button class="btn btn-warning rounded rounded-1">Accept Return</button>
+                </a>
+              {% endif %}
+            {% else %}
+              <p><strong>Order Status :</strong> Delivered</p>
+            {% endif %}
+          {% endif %}
+        {% else %}
+          {% if order_item.request_cancel %}
+            <a href="{% url 'cancel_product' order_item.order_items_id %}">
+              <button class="btn btn-danger rounded rounded-1">Accept Cancel</button>
+            </a>
           {% endif %}
         {% endif %}
       {% else %}
-        <span class="bg-danger text-black py-1 px-2 rounded rounded-1"><strong>Order Cancelled</strong></span>
+        <span class="bg-danger text-white py-2 px-2 rounded rounded-1"><strong>Order Cancelled</strong></span>
       {% endif %}
     </div>    
   </div>
