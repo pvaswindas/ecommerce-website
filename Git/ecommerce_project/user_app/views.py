@@ -649,23 +649,53 @@ def shop_page_view(request):
     product_color_list = ProductColorImage.objects.filter(
         is_deleted=False, is_listed=True)
     
+    selected_price_ranges = request.GET.getlist('price_range')
 
-    if selected_categories:
-        product_color_list = product_color_list.filter(products__category__name__in=selected_categories)
-
-    if selected_brands:
-        product_color_list = product_color_list.filter(products__brand__name__in=selected_brands)
+    if selected_price_ranges:
+        price_range_filters = []
         
-    if search_query:
-        product_color_list = product_color_list.filter(
-            Q(products__name__icontains=search_query) |
-            Q(color__icontains=search_query) |
-            Q(price__icontains=search_query) |
-            Q(products__type__icontains=search_query) |
-            Q(products__category__name__icontains=search_query) |
-            Q(products__brand__name__icontains=search_query)
-        )
+        for price_range in selected_price_ranges:
+            min_price, max_price = price_range.split('-')
+            
+            price_range_tuple = (min_price, max_price)
+            
+            price_range_filters.append(price_range_tuple)
 
+        price_filters = []
+
+        for price_range_tuple in price_range_filters:
+            min_price = price_range_tuple[0]
+            max_price = price_range_tuple[1]
+            price_filter = Q(price__gte=min_price)
+            if max_price:
+                price_filter &= Q(price__lte=max_price)
+            
+            price_filters.append(price_filter)
+
+        final_price_filter = Q()
+        for price_filter in price_filters:
+            final_price_filter |= price_filter
+
+        product_color_list = product_color_list.filter(final_price_filter)
+        
+        if selected_categories:
+            product_color_list = product_color_list.filter(products__category__name__in=selected_categories)
+
+        if selected_brands:
+            product_color_list = product_color_list.filter(products__brand__name__in=selected_brands)
+            
+        if search_query:
+            product_color_list = product_color_list.filter(
+                Q(products__name__icontains=search_query) |
+                Q(color__icontains=search_query) |
+                Q(price__icontains=search_query) |
+                Q(products__type__icontains=search_query) |
+                Q(products__category__name__icontains=search_query) |
+                Q(products__brand__name__icontains=search_query)
+            )
+    
+    
+    
     if sortby == 'a_z':
         product_color_list = product_color_list.order_by('products__name')
     elif sortby == 'new_arrival':
@@ -695,6 +725,8 @@ def shop_page_view(request):
         product_count=Count('products__product_color_image', filter=Q(products__product_color_image__in=product_color_list))
     )
     
+    print(selected_price_ranges)
+    
     context.update({
         'product_color_list': product_color_list,
         'brand_list': brand_list,
@@ -705,6 +737,7 @@ def shop_page_view(request):
         'selected_brands' : selected_brands,
         'sortby' : sortby,
         'search_query': search_query,
+        'selected_price_ranges' : selected_price_ranges,
     })
 
     return render(request, 'shop_page.html', context)

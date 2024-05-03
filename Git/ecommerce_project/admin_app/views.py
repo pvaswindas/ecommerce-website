@@ -1775,21 +1775,17 @@ def change_order_status(request, order_id):
 @clear_old_messages
 def cancel_product(request, order_items_id):
     if request.user.is_superuser:
-        print("Entered")
         try:
             try:
                 order_item = OrderItem.objects.get(pk=order_items_id)
-                print(order_item)
             except OrderItem.DoesNotExist:
                 return redirect('orders_view_page')
             product_size = order_item.product
             order = order_item.order
             user = order.customer.user
-            print(user)
             wallet = Wallet.objects.get(user=user)
             with transaction.atomic():
                 if order.payment.method_name in ["Razorpay", "Wallet"]:
-                    print("ENTERED")
                     refund_money = 0
                     other_item_price = 0
                     sum_of_all_other = 0
@@ -1797,7 +1793,6 @@ def cancel_product(request, order_items_id):
                     other_item_price = 0
                     sum_of_all_other = 0
                     if order.number_of_orders > 1:
-                        print("1st IF")
                         if order_item.order.coupon_applied:
                             minimum_amount = order.coupon_minimum_amount
                             maximum_amount = order.coupon_maximum_amount
@@ -1812,7 +1807,6 @@ def cancel_product(request, order_items_id):
                             total_after_reducing = order.total_charge - order_item.each_price
 
                             if minimum_amount <= total_of_other_order <= maximum_amount:
-                                print("2nd IF")
 
                                 if other_order_items:
                                     if total_after_reducing > 0:
@@ -1829,7 +1823,6 @@ def cancel_product(request, order_items_id):
                                 wallet_transaction.save()
 
                             else:
-                                print("1st ELSE")
                                 order_total = order.total_charge
                                 sum_of_all_other = 0
                                 for item in other_order_items:
@@ -1858,7 +1851,6 @@ def cancel_product(request, order_items_id):
                                 order.coupon_maximum_amount = None
                                 order.save()
                         else:
-                            print("2nd ELSE")
                             item_price = order_item.each_price
                             refund_money = item_price
                             wallet_transaction = WalletTransaction.objects.create(
@@ -1872,7 +1864,6 @@ def cancel_product(request, order_items_id):
                             order.total_charge = order_total - refund_money
                             order.save()
                     else:
-                        print("3rd ELSE")
                         refund_money = order.total_charge
                         wallet_transaction = WalletTransaction.objects.create(
                             wallet=wallet,
@@ -1893,7 +1884,6 @@ def cancel_product(request, order_items_id):
                 product_size.save()
 
                 if order.payment.method_name not in ["Razorpay", "Wallet"]:
-                    print("3rd IF")
                     order.total_charge -= order_item.each_price
                     if order.total_charge < 0:
                         order.total_charge = 0
@@ -2234,9 +2224,6 @@ def download_sales_report(request):
 
             start_date_str = request.session.get('start_date')
             end_date_str = request.session.get('end_date')
-
-            print("Session Start Date :", start_date_str)
-            print("Session End Date :", end_date_str)
 
             start_date = datetime.strptime(
                 start_date_str, '%Y-%m-%d %H:%M:%S')
