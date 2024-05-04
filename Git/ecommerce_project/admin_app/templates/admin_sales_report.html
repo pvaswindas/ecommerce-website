@@ -102,17 +102,12 @@
               <div class="form-group w-50 my-2">
                 <label for="filter">Filter by:</label>
                 <select class="form-control" id="filter" name="filter">
+                  <option selected disabled>Select a filter</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                   <option value="yearly">Yearly</option>
                   <option value="custom">Custom Dates</option>
                 </select>
-              </div>
-              <div id="yearly-dates" class="hidden w-50">
-                <div class="form-group">
-                  <label for="year">Select Year:</label>
-                  <select class="form-control" id="year" name="year"></select>
-                </div>
               </div>
               <div id="monthly-dates" class="hidden w-50">
                 <div class="form-group">
@@ -120,12 +115,18 @@
                   <input type="month" class="form-control" id="year_month" name="year_month" />
                 </div>
               </div>
-              <div id="custom-dates" class="hidden w-50">
+              <div id="yearly-dates" class="hidden w-50">
                 <div class="form-group">
+                  <label for="year">Select Year:</label>
+                  <select class="form-control" id="year" name="year"></select>
+                </div>
+              </div>
+              <div id="custom-dates" class="hidden w-50">
+                <div id="start-date" class="form-group">
                   <label for="start_date">Start Date:</label>
                   <input type="date" class="form-control" id="start_date" name="start_date" />
                 </div>
-                <div class="form-group">
+                <div id="end-date" class="form-group">
                   <label for="end_date">End Date:</label>
                   <input type="date" class="form-control" id="end_date" name="end_date" />
                 </div>
@@ -145,7 +146,6 @@
                   </div>
                 {% endfor %}
               {% endif %}
-              <button type="submit" class="btn btn-primary btn rounded my-3 rounded-1">Update Report</button>
             </form>
             <table class="table sales-table">
               <thead>
@@ -211,39 +211,85 @@
 {% block custom_scripts %}
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const filterSelect = document.getElementById('filter')
-      const yearlyDates = document.getElementById('yearly-dates')
-      const monthlyDates = document.getElementById('monthly-dates')
-      const customDates = document.getElementById('custom-dates')
-      const yearSelect = document.getElementById('year')
-      const currentYear = new Date().getFullYear()
+      const filterSelect = document.getElementById('filter');
+      const salesReportForm = document.querySelector('.sales-report-form');
+      const yearlyDates = document.getElementById('yearly-dates');
+      const monthlyDates = document.getElementById('monthly-dates');
+      const customDates = document.getElementById('custom-dates');
+      const yearMonthInput = document.getElementById('year_month');
+      const yearSelect = document.getElementById('year');
+      const currentYear = new Date().getFullYear();
+      const startDateInput = document.getElementById('start_date');
+      const endDateInput = document.getElementById('end_date');
     
+      const defaultYearOption = document.createElement('option');
+      defaultYearOption.value = '';
+      defaultYearOption.textContent = 'Select a year';
+      defaultYearOption.disabled = true;
+      defaultYearOption.selected = true;
+      yearSelect.appendChild(defaultYearOption);
+
       for (let year = currentYear; year >= currentYear - 10; year--) {
-        const option = document.createElement('option')
-        option.value = year
-        option.textContent = year
-        yearSelect.appendChild(option)
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
       }
     
       filterSelect.addEventListener('change', function () {
-        if (this.value === 'yearly') {
-          yearlyDates.classList.remove('hidden')
-          monthlyDates.classList.add('hidden')
-          customDates.classList.add('hidden')
+        if (this.value === 'weekly') {
+          salesReportForm.submit();
+        } else if (this.value === 'yearly') {
+          yearlyDates.classList.remove('hidden');
+          monthlyDates.classList.add('hidden');
+          customDates.classList.add('hidden');
         } else if (this.value === 'monthly') {
-          yearlyDates.classList.add('hidden')
-          monthlyDates.classList.remove('hidden')
-          customDates.classList.add('hidden')
+          yearlyDates.classList.add('hidden');
+          monthlyDates.classList.remove('hidden');
+          customDates.classList.add('hidden');
         } else if (this.value === 'custom') {
-          yearlyDates.classList.add('hidden')
-          monthlyDates.classList.add('hidden')
-          customDates.classList.remove('hidden')
+          yearlyDates.classList.add('hidden');
+          monthlyDates.classList.add('hidden');
+          customDates.classList.remove('hidden');
         } else {
-          yearlyDates.classList.add('hidden')
-          monthlyDates.classList.add('hidden')
-          customDates.classList.add('hidden')
+          yearlyDates.classList.add('hidden');
+          monthlyDates.classList.add('hidden');
+          customDates.classList.add('hidden');
         }
-      })
-    })
+      });
+
+      yearMonthInput.addEventListener('change', function () {
+        const selectedDate = this.value;
+        if (selectedDate !== '') {
+          salesReportForm.submit();
+        }
+      });
+
+      yearSelect.addEventListener('change', function () {
+        const selectedYear = this.value;
+        if (selectedYear !== ''){
+          salesReportForm.submit();
+        }
+      });
+
+      startDateInput.addEventListener('change', function () {
+        const startDate = this.value;
+        const endDate = endDateInput.value;
+        if (startDate !== '' && endDate !== '') {
+          salesReportForm.submit();
+        }
+      });
+
+      endDateInput.addEventListener('change', function () {
+        const startDate = startDateInput.value;
+        const endDate = this.value;
+        if (startDate !== '' && endDate !== '') {
+          salesReportForm.submit();
+        }
+      });
+
+
+    });
   </script>
 {% endblock %}
+

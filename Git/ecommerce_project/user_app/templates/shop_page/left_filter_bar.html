@@ -63,7 +63,7 @@
     </div>
 
    <div class="widget widget-collapsible">
-      <h3 class="widget-title"><a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">Price</a></h3><!-- End .widget-title -->
+      <h3 class="widget-title"><a data-toggle="collapse" href="#widget-5" role="button" aria-expanded="true" aria-controls="widget-5">Price</a></h3>
 
       <div class="collapse show" id="widget-5">
         <div class="widget-body">
@@ -72,9 +72,9 @@
               {% csrf_token %}
               {% for range in price_ranges %}
                 <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="price-range-{{ forloop.counter }}" name="price_range" value="{{ range.min }}-{% if range.max %}{{ range.max }}{% endif %}" />
+                  <input type="checkbox" class="custom-control-input" id="price-range-{{ forloop.counter }}" name="price_range" value="{{ range.min }}, {% if range.max %}{{ range.max }}{% endif %}" />
                   <label class="custom-control-label" for="price-range-{{ forloop.counter }}">
-                    ₹ {{ range.min }} -{% if range.max %}
+                    ₹ {{ range.min }} - {% if range.max %}
                       ₹ {{ range.max }}
                     {% else %}
                       ₹ 5000+
