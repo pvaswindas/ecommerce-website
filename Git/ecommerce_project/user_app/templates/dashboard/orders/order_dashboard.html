@@ -3,20 +3,22 @@
     <div class="row py-2">
         {% for order in orders %}
         <div class="col-md-6 mb-4">
-            <div class="card custom-card p-2 shadow">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Order ID: {{ order.order_id }}</h5>
+            <a href="{% url 'order_items_page' order.order_id %}">
+                <div class="card custom-card p-2 shadow">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0 p-4">Order ID: {{ order.order_id }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text"><strong>Payment Method:</strong> {{ order.payment.method_name }}</p>
+                        <p class="card-text"><strong>Total Items:</strong> {{ order.number_of_orders }}</p>
+                        <p class="card-text"><strong>Total Amount:</strong> ₹{{ order.subtotal }}</p>
+                        <p class="card-text"><strong>Status:</strong> {{ order.order_status }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <small>Ordered on: {{ order.placed_at|date:"F d Y" }}</small>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p class="card-text"><strong>Payment Method:</strong> {{ order.payment.method_name }}</p>
-                    <p class="card-text"><strong>Total Items:</strong> {{ order.number_of_orders }}</p>
-                    <p class="card-text"><strong>Total Amount:</strong> ₹{{ order.subtotal }}</p>
-                    <p class="card-text"><strong>Status:</strong> {{ order.order_status }}</p>
-                </div>
-                <div class="card-footer">
-                    <small>Ordered on: {{ order.placed_at|date:"F d Y" }}</small>
-                </div>
-            </div>
+            </a>
         </div>
         {% endfor %}
     </div>

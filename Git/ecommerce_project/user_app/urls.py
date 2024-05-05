@@ -46,11 +46,13 @@ urlpatterns = [
     path('sneakerheads/user/apply-coupon', apply_coupon, name='apply_coupon'),
     
     path('sneakerheads/user/order/order-details-page/<str:order_id>/', order_detail, name='order_detail'),
+    path('sneakerheads/user/order/order-items-page/<str:order_id>/', order_items_page, name='order_items_page'),
     path('sneakerheads/user/order/razorpay_payment/<int:user_id>/', razorpay_payment, name='razorpay_payment'),
     path('sneakerheads/user/order/place-order/', place_order, name='place_order'),
     path('sneakerheads/user/order/cancel_order/<str:order_items_id>/', cancel_order, name='cancel_order'),
     path('sneakerheads/user/order/sent_return_request/<str:order_items_id>/', sent_return_request, name='sent_return_request'),
     path('sneakerheads/user/order/placed_order_details/<str:order_id>/', order_placed_view, name='order_placed_view' ),
+    path('sneakerheads/user/order/invoice/<str:order_id>/', generate_invoice, name='generate_invoice'),
     
     
     

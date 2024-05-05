@@ -39,7 +39,13 @@ from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction
 from admin_app.models import Wishlist, WishlistItem, Cart, CartProducts
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-
+from django.http import HttpResponse
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter  # type: ignore
+from reportlab.lib import colors  # type: ignore
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle  # type: ignore
+from reportlab.pdfgen import canvas  # type: ignore
+import os 
 
 today = datetime.now().date()
 
@@ -74,7 +80,7 @@ def get_cart_wishlist_address_order_data(request):
         wishlist_item_count = WishlistItem.objects.filter(
             wishlist=wishlist).count()
         addresses = Address.objects.filter(customer=customer).order_by('name')
-        orders = Orders.objects.filter(customer=customer)
+        orders = Orders.objects.filter(customer=customer).order_by('-placed_at')
         order_items = OrderItem.objects.filter(
             order__customer=customer).order_by('-order__placed_at')
         data.update({
@@ -1390,6 +1396,111 @@ def user_change_password(request, user_id):
 
 
 # -------------------------------------------------------------------------------- CC_ORDER FUNCTIONS --------------------------------------------------------------------------------
+
+
+@never_cache
+@clear_old_messages
+def order_items_page(request, order_id):
+    if request.user.is_authenticated:
+        context = {}
+        try:
+            order = Orders.objects.get(order_id = order_id)
+            order_products = order.order.all()
+            count = sum(1 for item in order_products if item.order_status == 'Cancelled')
+            cancelled = True if count == order.number_of_orders else None
+            seven_days_ago = (timezone.now() - timedelta(days=7)).date()
+            if order.delivery_date is not None:
+                order_delivery_date = (order.delivery_date)
+                can_return_order = True if order_delivery_date >= seven_days_ago else False
+                return_end_date = order.delivery_date + timedelta(days=7)
+            else:
+                return_end_date = False
+                can_return_order = False
+            
+            context.update({
+                'order' : order,
+                'order_products' : order_products,
+                'cancelled' : cancelled,
+                'can_return_order' : can_return_order,
+                'return_end_date' : return_end_date,
+            })
+            cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+            context.update(cart_wishlist_address_order_data)
+            return render(request, 'dashboard/orders/order_items_page.html', context)
+        except Orders.DoesNotExist:
+            return redirect('user_dashboard')
+    else:
+        return redirect('sign_in_page')    
+
+
+
+
+
+
+
+def generate_invoice(request, order_id):
+    if request.user.is_authenticated:
+        try:
+            order = Orders.objects.get(order_id=order_id)
+            order_items = OrderItem.objects.filter(order=order)
+
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="invoice_{order_id}.pdf"'
+
+            c = canvas.Canvas(response, pagesize=letter)
+
+            company_name = "Your Company Name"
+            today_date = datetime.now().strftime('%Y-%m-%d')
+            order_info = f"Company: {company_name}\nDate: {today_date}\nOrder ID: {order_id}"
+            c.drawString(letter[0] - c.stringWidth(company_name) - 50, letter[1] - 50, company_name)
+            c.drawString(letter[0] - c.stringWidth(today_date) - 50, letter[1] - 70, today_date)
+            c.drawString(letter[0] - c.stringWidth(f"Order ID: {order_id}") - 50, letter[1] - 90, f"Order ID: {order_id}")
+
+            data = [
+                ['No', 'Product', 'Qty', 'Price'],
+            ]
+
+            max_lengths = [len('No  '), len('Product'), len('Qty'), len('Price')]
+            for item in order_items:
+                max_lengths[1] = max(max_lengths[1], len(item.product.product_color_image.products.name))
+                max_lengths[2] = max(max_lengths[2], len(str(item.quantity)))
+                max_lengths[3] = max(max_lengths[3], len(str(item.each_price)))
+
+            col_widths = [(length * 8) for length in max_lengths]
+            counter = 1
+            for item in order_items:
+                data.append([counter, item.product.product_color_image.products.name, item.quantity, item.each_price])
+                counter += 1
+                
+            table = Table(data, colWidths=col_widths, rowHeights=30)
+            table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.white),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('TOPPADDING', (0, 0), (-1, 0), 6),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+            ]))
+
+            table_width = sum(col_widths)
+            start_x = (letter[0] - table_width) / 2
+            start_y = letter[1] - 150
+
+            table.wrapOn(c, 0, 0)
+            table.drawOn(c, start_x, start_y)
+
+            c.save()
+            return response
+        except Orders.DoesNotExist:
+            return redirect('sign_in_page')
+    else:
+        return redirect('user_dashboard')
+
+
+
 
 
 @never_cache

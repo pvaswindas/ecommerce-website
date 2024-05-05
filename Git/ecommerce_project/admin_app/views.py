@@ -39,6 +39,7 @@ from reportlab.lib.styles import ParagraphStyle  # type: ignore
 from reportlab.platypus import Paragraph, Spacer  # type: ignore
 from reportlab.lib.styles import getSampleStyleSheet  # type: ignore
 from reportlab.platypus import SimpleDocTemplate, Table  # type: ignore
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
@@ -1750,19 +1751,36 @@ def change_order_status(request, order_id):
         order_item = OrderItem.objects.get(pk=order_id)
 
         if order_item:
+            order = order_item.order
+            order_products = OrderItem.objects.filter(order = order)
+                
             order_item.order_status = order_status
             order_item.save()
 
-            today = date.today()
 
             if order_status == 'Delivered':
                 if order_item.order.payment.method_name == 'Cash On Delivery':
+                    order_item.order.paid = True
+                    order_item.order.save()
+                    
                     order_item.order.payment.pending = False
                     order_item.order.payment.success = True
                     order_item.order.payment.save()
 
-                order_item.delivery_date = today
+                order_item.delivery_date = date.today()
                 order_item.save()
+                
+            count = sum(1 for item in order_products if item.order_status == order_status)
+            status = True if count == order.number_of_orders else None
+            
+            if status == True:
+                order.order_status = order_status
+                order.save()
+                
+            if order.order_status == 'Delivered':
+                order.delivery_date = date.today()
+                order.save()
+                
             messages.success(request, 'Order Status Updated')
             return redirect('orders_view_page')
     else:

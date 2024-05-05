@@ -1,0 +1,82 @@
+{% extends 'main_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'user/css/order_items_page.css' %}" />
+{% endblock %}
+
+{% block page_content %}
+  <div class="container-fluid p-5 main-container">
+    <div class="container-fluid bg-white shadow mt-4 mb-4">
+      <div class="row">
+        <div class="col-12 col-md-4 p-5">
+          <h5>Delivery Address</h5>
+          <p>
+            <strong>Name:</strong> {{ order.customer.user.first_name }} {{ customer.user.last_name }}
+          </p>
+          <p>
+            <strong>Address:</strong> {{ order.address.street_address }}
+          </p>
+          <p>
+            <strong>City:</strong> {{ order.address.city }}
+          </p>
+          <p>
+            <strong>State:</strong> {{ order.address.state }}
+          </p>
+          <p>
+            <strong>Pincode:</strong> {{ order.address.pin_code }}
+          </p>
+        </div>
+        <div class="col-12 col-md-4 p-5">
+          <h5>Order ({{ order.number_of_orders }})</h5>
+          <p>{{ order.order_id }}</p>
+          {% if order.total_charge > 0 %}
+            <p>₹{{ order.total_charge }}.00</p>
+          {% endif %}
+
+          {% if order.coupon_applied %}
+            <p>{{ order.coupon_name|upper }}</p>
+          {% endif %}
+
+          
+          {% if not cancelled and can_return_order %}
+            {{ order.order_status }}
+            
+            {% if order.order_status == 'Delivered' %}
+                <small>On {{ order.delivery_date }}</small>
+                <p>Return Valid till : {{ return_end_date }}</p>
+            {% endif %}
+          {% endif %}
+
+          
+          {% if order.order_status == 'Delivered' %}
+            {% if not can_return_order %}
+                <p>Delivered <small>On {{ order.delivery_date }}</small></p>
+                <p>Return Ended <small>On {{ return_end_date }}</small></p>
+            {% endif %}
+          {% endif %}
+            
+          {% if cancelled %}
+            <strong>Order Cancelled</strong>
+          {% endif %}
+        </div>
+
+        {% if not cancelled and order.order_status == 'Delivered' and not can_return_order %}
+          <div class="col-12 col-md-4 p-5">
+            <h5>Download Invoice</h5>
+            <div class="row d-flex align-items-center py-4">
+              <div class="col-auto">
+                <p>
+                  <i class="bi bi-file-earmark-text-fill text-white bg-warning rounded rounded-2 py-1 px-2 fs-3"></i>
+                </p>
+              </div>
+              <div class="col-auto">
+                <a href="{% url 'generate_invoice' order.order_id %}"><button class="btn btn-outline-warning py-1">Download</button></a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

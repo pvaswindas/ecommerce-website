@@ -196,6 +196,7 @@ class Orders(models.Model):
         blank=True, null=True)
     coupon_maximum_amount = models.PositiveBigIntegerField(
         blank=True, null=True)
+    delivery_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         paid_status = "- Paid" if self.paid else ""
