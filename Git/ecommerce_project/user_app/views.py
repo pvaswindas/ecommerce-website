@@ -1,4 +1,5 @@
 import re
+import ast
 import time
 import random
 import razorpay  # type: ignore
@@ -630,12 +631,13 @@ def shop_page_view(request):
     context = {}
 
     price_ranges = [
-        {"min": 1000, "max": 1500},
-        {"min": 1500, "max": 2500},
-        {"min": 2500, "max": 4000},
-        {"min": 2500, "max": 3500},
-        {"min": 3500, "max": 5000},
-        {"min": 5000, "max": None},
+        {"min": 500, "max": 1000},
+        {"min": 1000, "max": 2000},
+        {"min": 2000, "max": 3000},
+        {"min": 3000, "max": 5000},
+        {"min": 5000, "max": 7000},
+        {"min": 7000, "max": 10000},
+        {"min": 10000, "max": 15000},
     ]
     if request.user.is_authenticated:
         cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
@@ -651,6 +653,30 @@ def shop_page_view(request):
     
     selected_price_ranges = request.GET.getlist('price_range')
 
+    selected_price_ranges = [int(x) for x in selected_price_ranges]
+
+    price_range_mapping = {
+        1: (500, 1000),
+        2: (1000, 2000),
+        3: (2000, 3000),
+        4: (3000, 5000),
+        5: (5000, 7000),
+        6: (7000, 10000),
+        7: (10000, 15000)
+    }
+
+    price_filter = []
+    if selected_price_ranges:
+        for option in selected_price_ranges:
+            if option in price_range_mapping:
+                min_value, max_value = price_range_mapping[option]
+                price_filter.extend([min_value, max_value])
+
+        price_filter = sorted(set(price_filter))
+
+    if price_filter:
+        filter_conditions = Q(price__gte=price_filter[0]) & Q(price__lte=price_filter[-1])
+        product_color_list = product_color_list.filter(filter_conditions)
         
         
     if selected_categories:
@@ -699,7 +725,6 @@ def shop_page_view(request):
         product_count=Count('products__product_color_image')
     )
     
-    print(selected_price_ranges)
     
     context.update({
         'product_color_list': product_color_list,

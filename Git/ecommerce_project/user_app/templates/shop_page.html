@@ -51,7 +51,6 @@
                             <option value="high_to_low" {% if sortby == 'high_to_low' %}selected{% endif %}>Price: High to Low</option>
                         </select>
                     </div>
-                    {% comment %} Add hidden input field to include selected categories {% endcomment %}
                     {% for category in selected_categories %}
                         <input type="hidden" name="category_wise" value="{{ category }}">
                     {% endfor %}
@@ -59,6 +58,10 @@
                     
                     {% for brand in selected_brands %}
                       <input type="hidden" name="brand_wise" value="{{ brand }}">
+                    {% endfor %}
+
+                    {% for price in selected_price_ranges %}
+                      <input type="hidden" name="price_range" value="{{price}}">
                     {% endfor %}
                 </form>
             </div>

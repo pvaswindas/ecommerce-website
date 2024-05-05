@@ -22,8 +22,13 @@
                       <span class="item-count">{{ category.product_count }}</span>
                   </div>
               {% endfor %}
+
               {% for brand in selected_brands %}
                 <input type="hidden" name="brand_wise" value="{{ brand }}">
+              {% endfor %}
+
+              {% for price in selected_price_ranges %}
+                <input type="hidden" name="price_range" value="{{price}}">
               {% endfor %}
             </form>
           </div>        
@@ -51,10 +56,15 @@
               </div>
               {% endfor %}
 
+              <input type="hidden" name="sortby" value="{{ sortby }}">
+
               {% for category in selected_categories %}
                 <input type="hidden" name="category_wise" value="{{ category }}">
               {% endfor %}
-              <input type="hidden" name="sortby" value="{{ sortby }}">
+
+              {% for price in selected_price_ranges %}
+                <input type="hidden" name="price_range" value="{{price}}">
+              {% endfor %}
             </form>
           </div>
         </div>
@@ -71,18 +81,25 @@
             <form id="priceForm" action="{% url 'shop_page_view' %}" method="get">
               {% csrf_token %}
               {% for range in price_ranges %}
-                <div class="custom-control custom-checkbox">
-                  <input type="checkbox" class="custom-control-input" id="price-range-{{ forloop.counter }}" name="price_range" value="{{ range.min }}, {% if range.max %}{{ range.max }}{% endif %}" />
-                  <label class="custom-control-label" for="price-range-{{ forloop.counter }}">
-                    ₹ {{ range.min }} - {% if range.max %}
-                      ₹ {{ range.max }}
-                    {% else %}
-                      ₹ 5000+
-                    {% endif %}
-                  </label>
-                </div>
+                  <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="price-range-{{ forloop.counter }}" name="price_range" value="{{ forloop.counter }}" {% if forloop.counter in selected_price_ranges %}checked{% endif %}>
+                      <label class="custom-control-label" for="price-range-{{ forloop.counter }}">
+                          ₹ {{ range.min }} - ₹ {{ range.max }}
+                      </label>
+                  </div>
               {% endfor %}
-            </form>
+
+              <input type="hidden" name="sortby" value="{{ sortby }}">
+
+
+              {% for category in selected_categories %}
+                <input type="hidden" name="category_wise" value="{{ category }}">
+              {% endfor %}
+
+              {% for brand in selected_brands %}
+                <input type="hidden" name="brand_wise" value="{{ brand }}">
+              {% endfor %}
+            </form>          
           </div>
         </div>
       </div>
