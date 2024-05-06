@@ -25,7 +25,7 @@ urlpatterns = [
     path('sneakerheads/shop/page/', shop_page_view, name='shop_page_view'),
     path('sneakerheads/<str:product_name>/<int:pdt_id>/', product_single_view_page, name='product_single_view_page'),
     
-    path('sneakerheads/user/dashboard/<int:user_id>/', user_dashboard, name='user_dashboard'),
+    path('sneakerheads/user/dashboard/', user_dashboard, name='user_dashboard'),
     path('sneakerheads/user/details-update/', user_details_edit, name='user_details_edit'),
     
     path('sneakerheads/user/manage-address/update/<int:address_id>/', update_address, name='update_address'),
@@ -53,6 +53,7 @@ urlpatterns = [
     path('sneakerheads/user/order/sent_return_request/<str:order_items_id>/', sent_return_request, name='sent_return_request'),
     path('sneakerheads/user/order/placed_order_details/<str:order_id>/', order_placed_view, name='order_placed_view' ),
     path('sneakerheads/user/order/invoice/<str:order_id>/', generate_invoice, name='generate_invoice'),
+    path('sneakerheads/error/', error_page, name='error_page'),
     
     
     
@@ -68,6 +69,8 @@ urlpatterns = [
     
     path('sneakerheads/user/referrals/', referrals_page_view, name='referrals_page_view'),
     
+    
+    path('sneakerheads/user/repayment/<str:order_id>/', razorpay_repayment_payment, name='razorpay_repayment_payment')
 ]
 
 

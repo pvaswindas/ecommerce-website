@@ -7,8 +7,8 @@
 
 {% block page_content %}
   <div class="container-fluid p-5 main-container">
-    <div class="container-fluid bg-white shadow mt-4 mb-4">
-      <div class="row">
+    <div class="container-fluid">
+      <div class="row bg-white shadow mt-4 mb-4">
         <div class="col-12 col-md-4 p-5">
           <h5>Delivery Address</h5>
           <p>
@@ -38,24 +38,30 @@
             <p>{{ order.coupon_name|upper }}</p>
           {% endif %}
 
-          
           {% if not cancelled and can_return_order %}
             {{ order.order_status }}
-            
+
             {% if order.order_status == 'Delivered' %}
-                <small>On {{ order.delivery_date }}</small>
-                <p>Return Valid till : {{ return_end_date }}</p>
+              <small>On {{ order.delivery_date }}</small>
+              <p>Return Valid till : {{ return_end_date }}</p>
             {% endif %}
           {% endif %}
 
-          
           {% if order.order_status == 'Delivered' %}
             {% if not can_return_order %}
-                <p>Delivered <small>On {{ order.delivery_date }}</small></p>
-                <p>Return Ended <small>On {{ return_end_date }}</small></p>
+              <p>
+                Delivered <small>On {{ order.delivery_date }}</small>
+              </p>
+              <p>
+                Return Ended <small>On {{ return_end_date }}</small>
+              </p>
             {% endif %}
+          {% elif order.order_status == 'Payment Failed' %}
+            <strong>Payment Failed</strong>
+          {% else %}
+          <strong>{{ order.order_status }}</strong>
           {% endif %}
-            
+
           {% if cancelled %}
             <strong>Order Cancelled</strong>
           {% endif %}
@@ -75,8 +81,95 @@
               </div>
             </div>
           </div>
+        {% elif order.order_status == 'Payment Failed' %}
+          
+          {% if can_repay %}
+            {% if order_items_in_stock %}
+            <button id="pay-btn"  class="btn btn-warning">Pay Now</button>
+            {% else %}
+              <button class="btn btn-info">Currently Out of stock</button>
+            {% endif %}
+          {% endif %}
+            
+            
         {% endif %}
+      </div>
+      <div class="row bg-white shadow mt-4 mb-4">
+        <div class="col-12 p-0">
+          <table class="table custom-table">
+            <thead>
+              <tr>
+                <th class="px-5">Image</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for item in order_all_items %}
+                <tr class="table-row">
+                  <td class="w-25">
+                    {% if not item.order_status == 'Payment Failed' %}
+                      <a href="{% url 'order_detail' item.order_items_id %}"><img class="img-fluid w-25 mx-5 custom-img" src="{{ item.product.product_color_image.main_image.url }}" alt="{{ item.product.product_color_image.products.name }}" /></a>
+                    {% else %}
+                      <img class="img-fluid w-25 mx-5 custom-img" src="{{ item.product.product_color_image.main_image.url }}" alt="{{ item.product.product_color_image.products.name }}" />
+                    {% endif %}
+                  </td>
+                  <td>{{ item.product.product_color_image.products.name }} ({{ item.product.product_color_image.color }})</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>₹{{ item.each_price }}.00</td>
+
+                  <td>
+                    {% if item.order_status == 'Returned' or item.order_status == 'Return Requested' %}
+                      <strong class="badge bg-warning text-black">{{ item.order_status }}</strong>
+                    {% elif item.order_status == 'Delivered' %}
+                      <strong class="badge bg-success">{{ item.order_status }}</strong>
+                    {% elif item.order_status == 'Cancelled' or item.order_status == 'Cancel Requested' %}
+                      <strong class="badge bg-danger">{{ item.order_status }}</strong>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center">No items found.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    var options = {
+      key: '{{ settings.RAZORPAY_KEY_ID }}',
+      amount: '{{ total }}',
+      currency: '{{ currency }}',
+      name: 'Razorpay',
+      order_id: '{{ razorpay_order_id }}',
+      callback_url: '{{ callback_url }}',
+      prefill: {
+        name: '{{ user.first_name }} {{ user.last_name }}',
+        email: '{{ user.email }}',
+        contact: '{{ customer.phone_number }}'
+      },
+      theme: {
+        color: '#1F618D'
+      }
+    }
+    
+    var rzp1 = new Razorpay(options)
+    
+    document.getElementById('pay-btn').onclick = function (e) {
+      rzp1.open();
+      e.preventDefault();
+      return false;
+    }
+  </script>
 {% endblock %}

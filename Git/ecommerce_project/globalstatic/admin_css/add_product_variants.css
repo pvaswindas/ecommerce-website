@@ -1,0 +1,90 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+select,
+input[type="text"],
+input[type="file"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+
+/* Add styles for select dropdowns */
+.select-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .select-wrapper select {
+    width: calc(100% - 22px); /* Adjusted width to account for the dropdown arrow */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    -webkit-appearance: none; /* Remove default arrow on iOS Safari */
+    -moz-appearance: none; /* Remove default arrow on Firefox */
+    appearance: none; /* Remove default arrow */
+  }
+  
+  .select-wrapper::after {
+    content: '\25BC';
+    font-size: 20px;
+    color: #666;
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  
+  /* Style for selected option */
+  .select-wrapper select option {
+    padding: 10px;
+  }
+  
+  /* Style for hover effect */
+  .select-wrapper:hover::after {
+    color: #333;
+  }
+  

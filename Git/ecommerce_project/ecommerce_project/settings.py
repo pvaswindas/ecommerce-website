@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 
 
 
+
 RAZORPAY_KEY_ID = 'rzp_test_RG8cmNPoKDf1Xt'
 RAZORPAY_KEY_SECRET = 'tMgZ8DTvegWFLvGwFV4poONR'
 
@@ -52,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
     'user_app.middleware.RedirectAuthenticatedUserMiddleware',
+    # 'user_app.middleware.CustomExceptionHandlerMiddleware',
 ]
 
 ROOT_URLCONF = 'ecommerce_project.urls'

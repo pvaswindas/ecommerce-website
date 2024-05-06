@@ -101,17 +101,9 @@
       var rzp1 = new Razorpay(options)
       
       document.getElementById('pay-btn').onclick = function (e) {
-        rzp1.open()
-        e.preventDefault()
-      }
-      
-      options.handler = function (response) {
-        console.log(response)
-        var customerName = response.user.name
-        var customerEmail = response.user.email
-        var customerContact = response.user.contact
-      
-        alert('Payment Successful!\nCustomer Name: ' + customerName + '\nCustomer Email: ' + customerEmail + '\nCustomer Contact: ' + customerContact)
+        rzp1.open();
+        e.preventDefault();
+        return false;
       }
     </script>
   </body>

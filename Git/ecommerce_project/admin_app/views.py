@@ -1162,10 +1162,10 @@ def edit_product_size(request, p_id):
                     messages.error(
                         request, 'A same product variant already exists with this size.')
 
-                elif not 1 <= quantity <= 500:
+                elif not 0 <= quantity <= 500:
                     is_every_field_valid = False
                     messages.error(
-                        request, 'Quantity should be between 1 and 500.')
+                        request, 'Quantity should be between 0 and 500.')
 
                 if is_every_field_valid:
                     try:
@@ -1752,7 +1752,7 @@ def change_order_status(request, order_id):
 
         if order_item:
             order = order_item.order
-            order_products = OrderItem.objects.filter(order = order)
+            order_products = OrderItem.objects.filter(order = order,request_cancel = False, cancel_product = False, request_return = False, return_product = False)
                 
             order_item.order_status = order_status
             order_item.save()
@@ -2085,7 +2085,6 @@ def sales_report_page(request):
 
                 if current_year_and_month:
                     year, month = map(int, current_year_and_month.split('-'))
-
                     first_day_of_month = timezone.datetime(year, month, 1).replace(
                         hour=0, minute=0, second=0, microsecond=0)
                     last_day_of_month = timezone.datetime(
@@ -2218,10 +2217,11 @@ def sales_report_page(request):
             'discount_amount'))['total_discount'] if sales_data else 0
 
         if sales_data:
+            overall_order_amount = float(sales_data.aggregate(total_amount=Sum('each_price'))['total_amount'] or 0)
+            overall_discount = float(sales_data.aggregate(total_discount=Sum('discount_amount'))['total_discount'] or 0)
             request.session['overall_sales_count'] = overall_sales_count
             request.session['overall_order_amount'] = overall_order_amount
             request.session['overall_discount'] = overall_discount
-
         context = {
             'sales_data': sales_data,
             'is_active_sales': is_active_sales,
