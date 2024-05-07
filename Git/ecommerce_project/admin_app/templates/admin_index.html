@@ -27,7 +27,7 @@
     <div class="col-12 grid-margin transparent">
       <div class="row">
         <div class="col-12 col-sm-3 mb-4 stretch-card transparent">
-          <div class="card card-tale pb-2">
+          <div class="card card-tale pb-2 shadow">
             <div class="card-body">
               <p class="mb-4">Today’s Orders</p>
               <p class="fs-30 mb-2">{{ todays_order }}</p>
@@ -36,7 +36,7 @@
           </div>
         </div>
         <div class="col-12 col-sm-3 mb-4 stretch-card transparent">
-          <div class="card card-dark-blue">
+          <div class="card card-dark-blue shadow">
             <div class="card-body">
               <p class="mb-4">Total Orders</p>
               <p class="fs-30 mb-2">{{ total_orders }}</p>
@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="col-12 col-sm-3 mb-4 stretch-card transparent">
-          <div class="card card-light-blue pb-0">
+          <div class="card card-light-blue pb-0 shadow">
             <div class="card-body">
               <p class="mb-4">Total Number of Products</p>
               <p class="fs-30 mb-2">{{ total_products }}</p>
@@ -54,7 +54,7 @@
           </div>
         </div>
         <div class="col-12 col-sm-3 mb-4 stretch-card transparent">
-          <div class="card card-light-danger">
+          <div class="card card-light-danger shadow">
             <div class="card-body">
               <p class="mb-4">Number of Customers</p>
               <p class="fs-30 mb-2">{{ total_customers }}</p>
@@ -65,23 +65,41 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-12 col-lg-5">
-        <div class="card shadow p-2">
-            <form id="monthChartForm" action="{% url 'admin_dashboard' %}" method="get" class="d-flex justify-content-between  py-2 m-2">
-                <span>{{ year_month }}</span>
-                <select class="form-select bg-white border-0" name="selected_month" id="monthSelect"></select>
-            </form>
-            <div class="card-body">
-              {% if check_data %}
-                  <canvas id="productSalesBarChart" width="400" height="300"></canvas>
-              {% else %}
-                  <p>No data available for the selected month</p>
-              {% endif %}
-          </div>
+  <div class="row d-flex justify-content-around">
+    <div class="col-12 col-md-5">
+      <div class="card shadow p-2">
+        <form id="monthChartForm" action="{% url 'admin_dashboard' %}" method="get" class="d-flex justify-content-between py-2 m-2">
+          <span>{{ year_month }}</span>
+          <select class="form-select bg-white border-0" name="selected_month" id="monthSelect"></select>
+          {% comment %} <input type="hidden" name="selected_year" value="{{selected_year}}"> {% endcomment %}
+        </form>
+        <div class="card-body">
+          {% if month_check_data %}
+            <canvas id="productSalesBarChart" width="400" height="300"></canvas>
+          {% else %}
+            <p>No data available for the selected month</p>
+          {% endif %}
         </div>
+      </div>
+
     </div>
-</div>
+    <div class="col-12 col-md-5">
+      <div class="card shadow p-2">
+        <form id="yearChartForm" action="{% url 'admin_dashboard' %}" method="get" class="d-flex justify-content-between py-2 m-2">
+          <span>{{ year }}</span>
+          <select class="form-select bg-white border-0" name="selected_year" id="yearSelect"></select>
+          {% comment %} <input type="hidden" name="selected_month_year" value="{{selected_month_year}}"> {% endcomment %}
+        </form>
+        <div class="card-body">
+          {% if year_check_data %}
+            <canvas id="yearlySalesBarChart" width="400" height="300"></canvas>
+          {% else %}
+            <p>No data available for the selected year</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block custom_scripts %}
@@ -91,10 +109,10 @@
     var myChart = new Chart(ctx, {
       type: 'bar',
       data: {
-          labels: {{ labels | safe }},
+          labels: {{ month_labels | safe }},
           datasets: [{
-              label: 'Sales',
-              data: {{ data | safe }},
+              label: ' Sales',
+              data: {{ month_data | safe }},
               backgroundColor: [
                   'rgba(255, 99, 132, 0.6)',
                   'rgba(54, 162, 235, 0.6)',
@@ -136,45 +154,117 @@
       }
     });
   </script>
-
   <script>
     function populateMonthYearSelect() {
-        const selectElement = document.getElementById('monthSelect');
+        const selectMonth = document.getElementById('monthSelect');
         const currentYear = new Date().getFullYear();
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-        selectElement.innerHTML = '';
+        selectMonth.innerHTML = '';
 
         const placeholderOption = document.createElement('option');
         placeholderOption.text = "Select month";
         placeholderOption.disabled = true;
         placeholderOption.selected = true;
-        selectElement.appendChild(placeholderOption);
+        selectMonth.appendChild(placeholderOption);
 
         for (let i = 0; i < 12; i++) {
             const option = document.createElement('option');
             option.text = `${months[i]} ${currentYear}`;
-            selectElement.appendChild(option);
+            selectMonth.appendChild(option);
         }
     }
-
     window.onload = populateMonthYearSelect;
-</script>
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const monthChartForm = document.getElementById('monthChartForm')
+      const selectMonth = document.getElementById('monthSelect');
+
+      selectMonth.addEventListener('change', function(){
+        const selectedMonth = selectMonth.value;
+        if (selectedMonth !== ''){
+          monthChartForm.submit();
+        }
+      })
+      
+
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const yearChartForm = document.getElementById('yearChartForm')
+      const yearMonth = document.getElementById('yearSelect');
+
+      yearMonth.addEventListener('change', function(){
+        const selectedMonth = yearMonth.value;
+        if (selectedMonth !== ''){
+          yearChartForm.submit();
+        }
+      })
+    });
+  </script>
+
+  <script>
+    function populateYearSelect() {
+        const selectYear = document.getElementById('yearSelect');
+        const currentYear = new Date().getFullYear();
+
+        selectYear.innerHTML = '';
+
+        const placeholderOption = document.createElement('option');
+        placeholderOption.text = "Select year";
+        placeholderOption.disabled = true;
+        placeholderOption.selected = true;
+        selectYear.appendChild(placeholderOption);
+
+        for (let i = 0; i < 10; i++) {
+            const option = document.createElement('option');
+            option.value = currentYear - i;
+            option.text = currentYear - i;
+            selectYear.appendChild(option);
+        }
+    }
+    populateYearSelect();
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const yearlySalesData = JSON.parse("{{ yearly_sales_data|escapejs }}");
+        const months = Object.keys(yearlySalesData);
+        const sales = Object.values(yearlySalesData);
+
+        var ctx = document.getElementById('yearlySalesBarChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Yearly Sales',
+                    data: sales,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+  </script>
 
 
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const monthChartForm = document.getElementById('monthChartForm')
-    const selectMonth = document.getElementById('monthSelect');
 
-    selectMonth.addEventListener('change', function(){
-      const selectedMonth = selectMonth.value;
-      if (selectedMonth !== ''){
-        monthChartForm.submit();
-      }
-    })
-    
-
-  });
-</script>
 {% endblock %}

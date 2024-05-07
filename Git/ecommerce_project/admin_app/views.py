@@ -1,5 +1,6 @@
 import re
 import time
+import json
 import calendar
 from io import BytesIO
 import pytz  # type: ignore
@@ -209,40 +210,15 @@ def admin_check_login(request):
 
 
 # ADMIN DASHBOARD PAGE
+
+
 @never_cache
 def admin_dashboard(request):
     if request.user.is_superuser:
         context = {}
-        
-        current_date = datetime.now().date()
-        current_year = str(current_date.year)
-        current_year = str(current_date.year)
-        current_month = current_date.month
-        current_month_name = calendar.month_name[current_month]
-
-        current_month_year = current_month_name + ' ' + current_year
-        
-        first_day_of_month = current_date.replace(day=1)
-        last_day_of_month = (first_day_of_month.replace(month=first_day_of_month.month % 12 + 1, day=1) - timedelta(days=1))
-        
         selected_month_year = request.GET.get('selected_month')
+        selected_year = request.GET.get('selected_year')
         
-        if selected_month_year:
-            selected_month, selected_year = selected_month_year.split()
-            selected_month = datetime.strptime(selected_month, '%B').month
-            
-            filter_month_start = datetime(int(selected_year), selected_month, 1).date()
-            
-            last_day = calendar.monthrange(int(selected_year), selected_month)[1]
-            
-            filter_month_end = datetime(int(selected_year), selected_month, last_day).date()
-            year_month = selected_month_year
-            
-        else:
-            filter_month_start = first_day_of_month
-            filter_month_end = last_day_of_month
-            year_month = current_month_year
-            
         
         order_items = OrderItem.objects.filter(
             order_status='Delivered',
@@ -252,33 +228,30 @@ def admin_dashboard(request):
             request_return=False,
             delivery_date__isnull=False
         )
-        
-        sales_data = {}
-        
-        current_day = filter_month_start
-        while current_day <= filter_month_end:
-            order_items_day = order_items.filter(delivery_date=current_day)
+        if selected_year:
+            year = selected_year
+        else:
+            year = current_year
             
-            total_sales_day = order_items_day.aggregate(total_sales=Sum('each_price'))['total_sales']
-            
-            sales_data[current_day] = total_sales_day or 0
-            
-            current_day += timedelta(days=1)
-        
-        labels = [day.strftime("%b %d") for day in sales_data.keys()]
-        data = list(sales_data.values())
-        set_data = set(data)
-        check_data = False if set_data == {0} else True
-        
-        print(year_month)
-        print(selected_month_year)
+        month_labels, month_data, month_check_data, year_month = get_monthly_sales_data(order_items, selected_month_year)
+        yearly_sales_data = get_yearly_sales_data(order_items, selected_year)
+        values = yearly_sales_data.values()
+        integer_set_values = set(values)
+        year_check_data = False if integer_set_values == {0} else True
         context.update({
-            'labels': labels,
-            'data': data,
-            'check_data' : check_data,
+            'month_labels': month_labels,
+            'month_data': month_data,
+            'month_check_data' : month_check_data,
             'selected_month_year' : selected_month_year,
             'year_month' : year_month,
+            'year' : year,
+            'year_check_data' : year_check_data,
+            'selected_year' : selected_year,
         })
+        
+        
+        context['yearly_sales_data'] = json.dumps(yearly_sales_data)
+
         collect_data = get_data(request)
         context.update({**collect_data, "is_active_dashboard": is_active_dashboard})
 
@@ -286,6 +259,67 @@ def admin_dashboard(request):
     else:
         return redirect("admin_login_page")
 
+
+
+
+def get_monthly_sales_data(order_items, selected_month_year=None):
+    current_date = datetime.now().date()
+    current_year = str(current_date.year)
+    current_month = current_date.month
+    current_month_name = calendar.month_name[current_month]
+    current_month_year = current_month_name + ' ' + current_year
+    first_day_of_month = current_date.replace(day=1)
+    last_day_of_month = (first_day_of_month.replace(month=first_day_of_month.month % 12 + 1, day=1) - timedelta(days=1))
+    
+    if selected_month_year is not None:
+        selected_month, selected_year = selected_month_year.split()
+        selected_month = datetime.strptime(selected_month, '%B').month
+        filter_month_start = datetime(int(selected_year), selected_month, 1).date()
+        last_day = calendar.monthrange(int(selected_year), selected_month)[1]
+        filter_month_end = datetime(int(selected_year), selected_month, last_day).date()
+        year_month = selected_month_year 
+    else:
+        filter_month_start = first_day_of_month
+        filter_month_end = last_day_of_month
+        year_month = current_month_year
+        
+    monthly_sales_data = {}
+    current_day = filter_month_start
+    while current_day <= filter_month_end:
+        order_items_day = order_items.filter(delivery_date=current_day)
+        total_sales_day = order_items_day.aggregate(total_sales=Sum('each_price'))['total_sales']
+        monthly_sales_data[current_day] = total_sales_day or 0
+        current_day += timedelta(days=1)
+    month_labels = [day.strftime("%b %d") for day in monthly_sales_data.keys()]
+    month_data = list(monthly_sales_data.values())
+    set_data = set(month_data)
+    month_check_data = False if set_data == {0} else True
+    return month_labels, month_data, month_check_data, year_month
+
+
+
+
+def get_yearly_sales_data(order_items, selected_year=None):
+    current_date = datetime.now().date()
+    current_year = current_date.year
+    if selected_year is not None:
+        filter_year = int(selected_year)
+    else:
+        filter_year = current_year
+    yearly_sales_data = {}
+    
+    for month in range(1, 13):
+        order_items_monthly = order_items.filter(delivery_date__year=filter_year, delivery_date__month=month)
+        
+        total_sales_month = order_items_monthly.aggregate(total_sales=Sum('each_price'))['total_sales'] or 0
+        
+        yearly_sales_data[calendar.month_abbr[month]] = total_sales_month
+    
+    return yearly_sales_data
+
+
+    
+    
 
 
 
