@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0081_alter_productcolorimage_products_and_more'),
+        ("admin_app", "0081_alter_productcolorimage_products_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='orders',
-            name='order_status',
-            field=models.CharField(blank=True, default='Order Placed', max_length=100, null=True),
+            model_name="orders",
+            name="order_status",
+            field=models.CharField(
+                blank=True, default="Order Placed", max_length=100, null=True
+            ),
         ),
     ]

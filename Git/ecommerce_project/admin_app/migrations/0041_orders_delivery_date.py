@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0040_orderitem_request_return'),
+        ("admin_app", "0040_orderitem_request_return"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='orders',
-            name='delivery_date',
+            model_name="orders",
+            name="delivery_date",
             field=models.DateField(null=True),
         ),
     ]

@@ -7,23 +7,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0077_banner_orderitem_request_cancel'),
+        ("admin_app", "0077_banner_orderitem_request_cancel"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='orderitem',
-            name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='productsize', to='admin_app.productsize'),
+            model_name="orderitem",
+            name="product",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="productsize",
+                to="admin_app.productsize",
+            ),
         ),
         migrations.AlterField(
-            model_name='productcolorimage',
-            name='products',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='products', to='admin_app.products'),
+            model_name="productcolorimage",
+            name="products",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="products",
+                to="admin_app.products",
+            ),
         ),
         migrations.AlterField(
-            model_name='productsize',
-            name='product_color_image',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='product_color_image', to='admin_app.productcolorimage'),
+            model_name="productsize",
+            name="product_color_image",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="product_color_image",
+                to="admin_app.productcolorimage",
+            ),
         ),
     ]

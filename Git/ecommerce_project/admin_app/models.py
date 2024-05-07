@@ -35,9 +35,9 @@ class Products(models.Model):
     information = models.TextField()
     type = models.CharField(max_length=50)
     category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, related_name='products')
-    brand = models.ForeignKey(
-        Brand, on_delete=models.CASCADE, related_name='products')
+        Category, on_delete=models.CASCADE, related_name="products"
+    )
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="products")
     is_deleted = models.BooleanField(default=False)
     is_listed = models.BooleanField(default=True)
 
@@ -47,13 +47,14 @@ class Products(models.Model):
 
 class ProductColorImage(models.Model):
     products = models.ForeignKey(
-        Products, on_delete=models.CASCADE, related_name='product_color_image')
+        Products, on_delete=models.CASCADE, related_name="product_color_image"
+    )
     color = models.CharField(max_length=50)
     price = models.PositiveBigIntegerField()
-    main_image = models.FileField(upload_to=' product_all_images/')
-    side_image = models.FileField(upload_to=' product_all_images/')
-    top_image = models.FileField(upload_to=' product_all_images/')
-    back_image = models.FileField(upload_to=' product_all_images/')
+    main_image = models.FileField(upload_to=" product_all_images/")
+    side_image = models.FileField(upload_to=" product_all_images/")
+    top_image = models.FileField(upload_to=" product_all_images/")
+    back_image = models.FileField(upload_to=" product_all_images/")
     is_deleted = models.BooleanField(default=False)
     is_listed = models.BooleanField(default=True)
     in_stock = models.BooleanField(default=True)
@@ -65,7 +66,8 @@ class ProductColorImage(models.Model):
 
 class ProductSize(models.Model):
     product_color_image = models.ForeignKey(
-        ProductColorImage, on_delete=models.CASCADE, related_name='product_sizes')
+        ProductColorImage, on_delete=models.CASCADE, related_name="product_sizes"
+    )
     size = models.CharField(max_length=50)
     quantity = models.PositiveBigIntegerField()
     is_listed = models.BooleanField(default=True)
@@ -87,8 +89,8 @@ class ProductSize(models.Model):
 
 class ProductOffer(models.Model):
     product_color_image = models.ForeignKey(
-        ProductColorImage, on_delete=models.CASCADE,
-        related_name='productoffer')
+        ProductColorImage, on_delete=models.CASCADE, related_name="productoffer"
+    )
     discount_percentage = models.PositiveBigIntegerField()
     offer_price = models.PositiveBigIntegerField(blank=True, null=True)
     start_date = models.DateField(auto_now_add=True)
@@ -97,10 +99,9 @@ class ProductOffer(models.Model):
     def save(self, *args, **kwargs):
         if self.product_color_image and self.discount_percentage:
             discount_price = int(
-                round((self.product_color_image.price *
-                       self.discount_percentage) / 100))
-            self.offer_price = (
-                self.product_color_image.price - discount_price)
+                round((self.product_color_image.price * self.discount_percentage) / 100)
+            )
+            self.offer_price = self.product_color_image.price - discount_price
         super(ProductOffer, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -112,8 +113,9 @@ class ProductOffer(models.Model):
 
 
 class CategoryOffer(models.Model):
-    category = models.OneToOneField(Category, on_delete=models.CASCADE,
-                                    related_name='categoryoffer')
+    category = models.OneToOneField(
+        Category, on_delete=models.CASCADE, related_name="categoryoffer"
+    )
     discount_percentage = models.PositiveBigIntegerField()
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField()
@@ -127,8 +129,7 @@ class CategoryOffer(models.Model):
 
 
 class Coupon(models.Model):
-    coupon_code = models.CharField(
-        primary_key=True, unique=True, max_length=12)
+    coupon_code = models.CharField(primary_key=True, unique=True, max_length=12)
     name = models.CharField(max_length=100)
     discount_percentage = models.PositiveBigIntegerField()
     minimum_amount = models.PositiveBigIntegerField(blank=True, default=0)
@@ -146,7 +147,7 @@ class Coupon(models.Model):
         if not self.coupon_code:
             first_part = "COUPNCD"
             while True:
-                random_numbers = ''.join(random.choices(string.digits, k=5))
+                random_numbers = "".join(random.choices(string.digits, k=5))
                 coupon_code = f"{first_part}{random_numbers}"
                 if not Coupon.objects.filter(coupon_code=coupon_code).exists():
                     break
@@ -181,21 +182,19 @@ class Orders(models.Model):
     number_of_orders = models.PositiveBigIntegerField(default=1)
     subtotal = models.PositiveBigIntegerField(default=0)
     shipping_charge = models.PositiveBigIntegerField(default=0)
-    order_status = models.CharField(max_length=100, blank=True, null=True, default='Order Placed')
+    order_status = models.CharField(
+        max_length=100, blank=True, null=True, default="Order Placed"
+    )
     total_charge = models.PositiveBigIntegerField(default=0)
     razorpay_id = models.CharField(max_length=100, blank=True, null=True)
     paid = models.BooleanField(default=False)
     placed_at = models.DateTimeField(default=timezone.now)
     coupon_applied = models.BooleanField(default=False)
     coupon_name = models.CharField(blank=True, null=True)
-    coupon_discount_percent = models.PositiveBigIntegerField(
-        blank=True, null=True)
-    discount_price = models.PositiveBigIntegerField(blank=True, null=True,
-                                                    default=0)
-    coupon_minimum_amount = models.PositiveBigIntegerField(
-        blank=True, null=True)
-    coupon_maximum_amount = models.PositiveBigIntegerField(
-        blank=True, null=True)
+    coupon_discount_percent = models.PositiveBigIntegerField(blank=True, null=True)
+    discount_price = models.PositiveBigIntegerField(blank=True, null=True, default=0)
+    coupon_minimum_amount = models.PositiveBigIntegerField(blank=True, null=True)
+    coupon_maximum_amount = models.PositiveBigIntegerField(blank=True, null=True)
     delivery_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
@@ -208,11 +207,10 @@ class Orders(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.order_id:
-            first_part = 'OD'
+            first_part = "OD"
             while True:
-                random_letters = ''.join(
-                    random.choices(string.ascii_uppercase, k=4))
-                random_numbers = ''.join(random.choices(string.digits, k=6))
+                random_letters = "".join(random.choices(string.ascii_uppercase, k=4))
+                random_numbers = "".join(random.choices(string.digits, k=6))
                 order_id = f"{first_part}{random_letters}{random_numbers}"
                 if not Orders.objects.filter(order_id=order_id).exists():
                     break
@@ -221,12 +219,11 @@ class Orders(models.Model):
 
 
 class OrderItem(models.Model):
-    order_items_id = models.CharField(
-        primary_key=True, max_length=12, unique=True)
-    order = models.ForeignKey(
-        Orders, on_delete=models.CASCADE, related_name='order')
+    order_items_id = models.CharField(primary_key=True, max_length=12, unique=True)
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name="order")
     product = models.ForeignKey(
-        ProductSize, on_delete=models.PROTECT, related_name='orderitems')
+        ProductSize, on_delete=models.PROTECT, related_name="orderitems"
+    )
     quantity = models.PositiveBigIntegerField(default=1)
     order_status = models.CharField(max_length=100)
     each_price = models.PositiveBigIntegerField(default=0)
@@ -247,20 +244,18 @@ class OrderItem(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.order_items_id:
-            first_part = 'ODIN'
+            first_part = "ODIN"
             while True:
-                random_letters = ''.join(
-                    random.choices(string.ascii_uppercase, k=4))
-                random_numbers = ''.join(random.choices(string.digits, k=4))
+                random_letters = "".join(random.choices(string.ascii_uppercase, k=4))
+                random_numbers = "".join(random.choices(string.digits, k=4))
                 order_items_id = f"{first_part}{
                     random_letters}{random_numbers}"
-                if not OrderItem.objects.filter(
-                        order_items_id=order_items_id).exists():
+                if not OrderItem.objects.filter(order_items_id=order_items_id).exists():
                     break
             self.order_items_id = order_items_id
 
         if self.order_items_id:
-            if self.order_status == 'Delivered':
+            if self.order_status == "Delivered":
                 self.order.payment.success = True
                 self.order.payment.pending = False
                 self.order.payment.save()
@@ -284,9 +279,9 @@ class Wallet(models.Model):
 class WalletTransaction(models.Model):
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     order_item = models.ForeignKey(
-        OrderItem, on_delete=models.CASCADE, blank=True, null=True)
-    transaction_id = models.CharField(
-        primary_key=True, max_length=12, unique=True)
+        OrderItem, on_delete=models.CASCADE, blank=True, null=True
+    )
+    transaction_id = models.CharField(primary_key=True, max_length=12, unique=True)
     money_deposit = models.PositiveBigIntegerField(blank=True, default=0)
     money_withdrawn = models.PositiveBigIntegerField(blank=True, default=0)
     time_of_transaction = models.DateTimeField(auto_now_add=True)
@@ -304,12 +299,13 @@ class WalletTransaction(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.transaction_id:
-            first_part = 'TRNSCT'
+            first_part = "TRNSCT"
             while True:
-                random_numbers = ''.join(random.choices(string.digits, k=6))
+                random_numbers = "".join(random.choices(string.digits, k=6))
                 transaction_id = f"{first_part}{random_numbers}"
                 if not WalletTransaction.objects.filter(
-                        transaction_id=transaction_id).exists():
+                    transaction_id=transaction_id
+                ).exists():
                     break
             self.transaction_id = transaction_id
         super().save(*args, **kwargs)
@@ -375,18 +371,22 @@ class CartProducts(models.Model):
         try:
             p_offer = self.product.product_color_image.productoffer
             product_offer = p_offer.filter(end_date__gte=today).aggregate(
-                Max('offer_price'))['offer_price__max']
+                Max("offer_price")
+            )["offer_price__max"]
             color = self.product.product_color_image
             product_offer = ProductOffer.objects.filter(
-                product_color_image=color, end_date__gte=today).first()
+                product_color_image=color, end_date__gte=today
+            ).first()
             category = self.product.product_color_image.products.category
             category_offer = CategoryOffer.objects.filter(
-                category=category, end_date__gte=today).first()
+                category=category, end_date__gte=today
+            ).first()
 
             if product_offer and category_offer:
                 highest_discount = max(
                     product_offer.discount_percentage,
-                    category_offer.discount_percentage)
+                    category_offer.discount_percentage,
+                )
             elif product_offer:
                 highest_discount = product_offer.discount_percentage
             elif category_offer:
@@ -395,9 +395,9 @@ class CartProducts(models.Model):
                 highest_discount = 0
 
             if highest_discount > 0:
-                discount_amount = round((
-                    highest_discount * self.product.product_color_image.price)
-                    / 100)
+                discount_amount = round(
+                    (highest_discount * self.product.product_color_image.price) / 100
+                )
                 price = self.product.product_color_image.price
                 highest_offer_price = price - discount_amount
             else:

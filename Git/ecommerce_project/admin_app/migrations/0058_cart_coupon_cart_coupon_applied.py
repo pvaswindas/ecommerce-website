@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0057_rename_coupon_coupon_coupon_code_and_more'),
+        ("admin_app", "0057_rename_coupon_coupon_coupon_code_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cart',
-            name='coupon',
+            model_name="cart",
+            name="coupon",
             field=models.CharField(blank=True),
         ),
         migrations.AddField(
-            model_name='cart',
-            name='coupon_applied',
+            model_name="cart",
+            name="coupon_applied",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -7,13 +7,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0017_orderitem_quantity'),
+        ("admin_app", "0017_orderitem_quantity"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='wishlist',
-            name='products',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.productcolorimage'),
+            model_name="wishlist",
+            name="products",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="admin_app.productcolorimage",
+            ),
         ),
     ]

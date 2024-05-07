@@ -16,27 +16,83 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Customer',
+            name="Customer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('phone_number', models.CharField(max_length=10, validators=[django.core.validators.RegexValidator(message='Phone number must have 10 digits.', regex='^\\d{10}$')])),
-                ('gender', models.IntegerField(choices=[(1, 'Male'), (2, 'Female'), (3, 'Other')], default=3)),
-                ('dob', models.DateField(null=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "phone_number",
+                    models.CharField(
+                        max_length=10,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="Phone number must have 10 digits.",
+                                regex="^\\d{10}$",
+                            )
+                        ],
+                    ),
+                ),
+                (
+                    "gender",
+                    models.IntegerField(
+                        choices=[(1, "Male"), (2, "Female"), (3, "Other")], default=3
+                    ),
+                ),
+                ("dob", models.DateField(null=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Address',
+            name="Address",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(default='', max_length=100)),
-                ('phone_number', models.CharField(default='', max_length=10, validators=[django.core.validators.RegexValidator(message='Phone number must have 10 digits.', regex='^\\d{10}$')])),
-                ('country', models.CharField(max_length=50)),
-                ('state', models.CharField(max_length=50)),
-                ('city', models.CharField(max_length=50)),
-                ('street_address', models.CharField(max_length=50)),
-                ('pin_code', models.CharField(max_length=50)),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='user_app.customer')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(default="", max_length=100)),
+                (
+                    "phone_number",
+                    models.CharField(
+                        default="",
+                        max_length=10,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                message="Phone number must have 10 digits.",
+                                regex="^\\d{10}$",
+                            )
+                        ],
+                    ),
+                ),
+                ("country", models.CharField(max_length=50)),
+                ("state", models.CharField(max_length=50)),
+                ("city", models.CharField(max_length=50)),
+                ("street_address", models.CharField(max_length=50)),
+                ("pin_code", models.CharField(max_length=50)),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="user_app.customer",
+                    ),
+                ),
             ],
         ),
     ]

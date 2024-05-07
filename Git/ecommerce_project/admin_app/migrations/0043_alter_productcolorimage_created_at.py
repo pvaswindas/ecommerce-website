@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0042_productcolorimage_created_at'),
+        ("admin_app", "0042_productcolorimage_created_at"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='productcolorimage',
-            name='created_at',
+            model_name="productcolorimage",
+            name="created_at",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
     ]

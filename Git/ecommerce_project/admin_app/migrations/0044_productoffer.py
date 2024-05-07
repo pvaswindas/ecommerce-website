@@ -8,18 +8,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0043_alter_productcolorimage_created_at'),
+        ("admin_app", "0043_alter_productcolorimage_created_at"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProductOffer',
+            name="ProductOffer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('discount_percentage', models.DecimalField(decimal_places=2, max_digits=5)),
-                ('start_date', models.DateField(default=django.utils.timezone.now)),
-                ('end_date', models.DateField()),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.products')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "discount_percentage",
+                    models.DecimalField(decimal_places=2, max_digits=5),
+                ),
+                ("start_date", models.DateField(default=django.utils.timezone.now)),
+                ("end_date", models.DateField()),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_app.products",
+                    ),
+                ),
             ],
         ),
     ]

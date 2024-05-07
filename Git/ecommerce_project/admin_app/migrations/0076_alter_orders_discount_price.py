@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0075_remove_orderitem_total_price'),
+        ("admin_app", "0075_remove_orderitem_total_price"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='orders',
-            name='discount_price',
+            model_name="orders",
+            name="discount_price",
             field=models.PositiveBigIntegerField(blank=True, default=0, null=True),
         ),
     ]

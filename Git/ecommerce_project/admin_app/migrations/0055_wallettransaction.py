@@ -7,18 +7,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0054_alter_wallet_balance'),
+        ("admin_app", "0054_alter_wallet_balance"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='WalletTransaction',
+            name="WalletTransaction",
             fields=[
-                ('transaction_id', models.CharField(max_length=12, primary_key=True, serialize=False, unique=True)),
-                ('money_deposit', models.PositiveBigIntegerField(blank=True)),
-                ('money_withdrawn', models.PositiveBigIntegerField(blank=True)),
-                ('time_of_transaction', models.DateTimeField(auto_now_add=True)),
-                ('wallet', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.wallet')),
+                (
+                    "transaction_id",
+                    models.CharField(
+                        max_length=12, primary_key=True, serialize=False, unique=True
+                    ),
+                ),
+                ("money_deposit", models.PositiveBigIntegerField(blank=True)),
+                ("money_withdrawn", models.PositiveBigIntegerField(blank=True)),
+                ("time_of_transaction", models.DateTimeField(auto_now_add=True)),
+                (
+                    "wallet",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_app.wallet",
+                    ),
+                ),
             ],
         ),
     ]

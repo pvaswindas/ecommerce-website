@@ -6,33 +6,22 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
-
-
-
-
-
 @receiver(post_save, sender=Customer)
 def create_cart(sender, instance, created, **kwargs):
     if created:
         Cart.objects.create(customer=instance)
 
 
-
-
 @receiver(post_save, sender=Customer)
 def create_wishlist(sender, instance, created, **kwargs):
     if created:
         Wishlist.objects.create(customer=instance)
-        
-        
 
 
 @receiver(post_save, sender=User)
 def create_wallet(sender, instance, created, **kwargs):
     if created:
         Wallet.objects.create(user=instance)
-    
-
 
 
 @receiver(post_save, sender=Category)
@@ -41,10 +30,16 @@ def update_products_on_category_change(sender, instance, **kwargs):
     products.update(is_listed=instance.is_listed, is_deleted=instance.is_deleted)
     for product in products:
         product_color_images = ProductColorImage.objects.filter(products=product)
-        product_color_images.update(is_listed=instance.is_listed, is_deleted=instance.is_deleted)
+        product_color_images.update(
+            is_listed=instance.is_listed, is_deleted=instance.is_deleted
+        )
         for product_color_image in product_color_images:
-            product_sizes = ProductSize.objects.filter(product_color_image=product_color_image)
-            product_sizes.update(is_listed=instance.is_listed, is_deleted=instance.is_deleted)
+            product_sizes = ProductSize.objects.filter(
+                product_color_image=product_color_image
+            )
+            product_sizes.update(
+                is_listed=instance.is_listed, is_deleted=instance.is_deleted
+            )
 
 
 @receiver(post_save, sender=Brand)
@@ -53,10 +48,16 @@ def update_products_on_brand_change(sender, instance, **kwargs):
     products.update(is_listed=instance.is_listed, is_deleted=instance.is_deleted)
     for product in products:
         product_color_images = ProductColorImage.objects.filter(products=product)
-        product_color_images.update(is_listed=instance.is_listed, is_deleted=instance.is_deleted)
+        product_color_images.update(
+            is_listed=instance.is_listed, is_deleted=instance.is_deleted
+        )
         for product_color_image in product_color_images:
-            product_sizes = ProductSize.objects.filter(product_color_image=product_color_image)
-            product_sizes.update(is_listed=instance.is_listed, is_deleted=instance.is_deleted)
+            product_sizes = ProductSize.objects.filter(
+                product_color_image=product_color_image
+            )
+            product_sizes.update(
+                is_listed=instance.is_listed, is_deleted=instance.is_deleted
+            )
 
 
 @receiver(post_save, sender=ProductColorImage)
@@ -65,24 +66,31 @@ def update_product_size_on_color_image_change(sender, instance, **kwargs):
     product_sizes.update(is_listed=instance.is_listed, is_deleted=instance.is_deleted)
 
 
-
 @receiver(post_save, sender=ProductSize)
 def update_cart_in_stock_on_product_size_quantity_change(sender, instance, **kwargs):
-    cart_products = CartProducts.objects.filter(product = instance)
-    cart_products.update(in_stock= instance.in_stock)
-    
-    
+    cart_products = CartProducts.objects.filter(product=instance)
+    cart_products.update(in_stock=instance.in_stock)
+
 
 @receiver(post_save, sender=ProductSize)
-def update_product_color_in_stock_on_product_size_quantity_change(sender, instance, **kwargs):
+def update_product_color_in_stock_on_product_size_quantity_change(
+    sender, instance, **kwargs
+):
     product_color_image = instance.product_color_image
-    total_sizes = ProductSize.objects.filter(product_color_image=product_color_image).count()
-    out_of_stock_sizes = ProductSize.objects.filter(product_color_image=product_color_image, in_stock=False).count()
+    total_sizes = ProductSize.objects.filter(
+        product_color_image=product_color_image
+    ).count()
+    out_of_stock_sizes = ProductSize.objects.filter(
+        product_color_image=product_color_image, in_stock=False
+    ).count()
     if out_of_stock_sizes == total_sizes:
-        ProductColorImage.objects.filter(pk=product_color_image.pk).update(in_stock=False)
+        ProductColorImage.objects.filter(pk=product_color_image.pk).update(
+            in_stock=False
+        )
     else:
-        ProductColorImage.objects.filter(pk=product_color_image.pk).update(in_stock=True)
-
+        ProductColorImage.objects.filter(pk=product_color_image.pk).update(
+            in_stock=True
+        )
 
 
 @receiver(post_save, sender=CartProducts)
@@ -101,12 +109,9 @@ def update_cart_coupon_status(sender, instance, **kwargs):
 def delete_expired_product_offers(sender, instance, **kwargs):
     if instance.end_date < timezone.now().date():
         instance.delete()
-        
-        
+
+
 @receiver(post_save, sender=Coupon)
 def delete_expired_coupon(sender, instance, **kwargs):
     if instance.end_date < timezone.now().date():
         instance.delete()
-        
-        
-        

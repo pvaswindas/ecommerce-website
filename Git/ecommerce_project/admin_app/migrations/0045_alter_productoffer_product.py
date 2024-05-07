@@ -7,13 +7,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0044_productoffer'),
+        ("admin_app", "0044_productoffer"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='productoffer',
-            name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.productcolorimage'),
+            model_name="productoffer",
+            name="product",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="admin_app.productcolorimage",
+            ),
         ),
     ]

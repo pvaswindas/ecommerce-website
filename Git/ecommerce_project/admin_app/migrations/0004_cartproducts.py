@@ -7,16 +7,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0003_remove_cart_in_stock_remove_cart_products'),
+        ("admin_app", "0003_remove_cart_in_stock_remove_cart_products"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CartProducts',
+            name="CartProducts",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('cart', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.cart')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.productcolorimage')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "cart",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="admin_app.cart"
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_app.productcolorimage",
+                    ),
+                ),
             ],
         ),
     ]

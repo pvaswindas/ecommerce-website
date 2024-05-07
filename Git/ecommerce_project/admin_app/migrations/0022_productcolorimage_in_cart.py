@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0021_productcolorimage_in_wishlist'),
+        ("admin_app", "0021_productcolorimage_in_wishlist"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='productcolorimage',
-            name='in_cart',
+            model_name="productcolorimage",
+            name="in_cart",
             field=models.BooleanField(default=False),
         ),
     ]

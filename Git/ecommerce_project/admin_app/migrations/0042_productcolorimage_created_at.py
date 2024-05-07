@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0041_orders_delivery_date'),
+        ("admin_app", "0041_orders_delivery_date"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='productcolorimage',
-            name='created_at',
-            field=models.DateTimeField(default=datetime.datetime(2024, 4, 9, 4, 36, 0, 764707, tzinfo=datetime.timezone.utc)),
+            model_name="productcolorimage",
+            name="created_at",
+            field=models.DateTimeField(
+                default=datetime.datetime(
+                    2024, 4, 9, 4, 36, 0, 764707, tzinfo=datetime.timezone.utc
+                )
+            ),
         ),
     ]

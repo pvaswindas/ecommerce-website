@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0023_remove_productcolorimage_in_cart_and_more'),
+        ("admin_app", "0023_remove_productcolorimage_in_cart_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='orders',
-            name='paid',
+            model_name="orders",
+            name="paid",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='orders',
-            name='razorpay_id',
+            model_name="orders",
+            name="razorpay_id",
             field=models.CharField(blank=True, max_length=100),
         ),
     ]

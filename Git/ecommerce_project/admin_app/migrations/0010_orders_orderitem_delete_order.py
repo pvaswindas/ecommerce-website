@@ -7,32 +7,78 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0009_alter_productsize_quantity'),
-        ('user_app', '0001_initial'),
+        ("admin_app", "0009_alter_productsize_quantity"),
+        ("user_app", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Orders',
+            name="Orders",
             fields=[
-                ('order_id', models.CharField(max_length=12, primary_key=True, serialize=False, unique=True)),
-                ('order_status', models.CharField(max_length=100)),
-                ('address', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='user_app.address')),
-                ('coupon', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='admin_app.coupon')),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='user_app.customer')),
-                ('payment', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='admin_app.payment')),
+                (
+                    "order_id",
+                    models.CharField(
+                        max_length=12, primary_key=True, serialize=False, unique=True
+                    ),
+                ),
+                ("order_status", models.CharField(max_length=100)),
+                (
+                    "address",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="user_app.address",
+                    ),
+                ),
+                (
+                    "coupon",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="admin_app.coupon",
+                    ),
+                ),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="user_app.customer",
+                    ),
+                ),
+                (
+                    "payment",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="admin_app.payment",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='OrderItem',
+            name="OrderItem",
             fields=[
-                ('order_items_id', models.CharField(max_length=12, primary_key=True, serialize=False, unique=True)),
-                ('order_status', models.CharField(max_length=100)),
-                ('product', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='admin_app.productsize')),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='admin_app.orders')),
+                (
+                    "order_items_id",
+                    models.CharField(
+                        max_length=12, primary_key=True, serialize=False, unique=True
+                    ),
+                ),
+                ("order_status", models.CharField(max_length=100)),
+                (
+                    "product",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="admin_app.productsize",
+                    ),
+                ),
+                (
+                    "order",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="admin_app.orders",
+                    ),
+                ),
             ],
         ),
         migrations.DeleteModel(
-            name='Order',
+            name="Order",
         ),
     ]

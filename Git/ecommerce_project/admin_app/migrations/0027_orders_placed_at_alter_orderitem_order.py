@@ -8,18 +8,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0026_delete_banner_delete_coupon'),
+        ("admin_app", "0026_delete_banner_delete_coupon"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='orders',
-            name='placed_at',
+            model_name="orders",
+            name="placed_at",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AlterField(
-            model_name='orderitem',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='order', to='admin_app.orders'),
+            model_name="orderitem",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="order",
+                to="admin_app.orders",
+            ),
         ),
     ]

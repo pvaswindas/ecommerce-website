@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0013_alter_orders_address'),
+        ("admin_app", "0013_alter_orders_address"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='orders',
-            name='payment',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='admin_app.payment'),
+            model_name="orders",
+            name="payment",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="admin_app.payment"
+            ),
         ),
     ]

@@ -6,14 +6,14 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0025_payment_failed_payment_pending_payment_success'),
+        ("admin_app", "0025_payment_failed_payment_pending_payment_success"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='Banner',
+            name="Banner",
         ),
         migrations.DeleteModel(
-            name='Coupon',
+            name="Coupon",
         ),
     ]

@@ -7,24 +7,44 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0018_alter_wishlist_products'),
+        ("admin_app", "0018_alter_wishlist_products"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='wishlist',
-            name='in_stock',
+            model_name="wishlist",
+            name="in_stock",
         ),
         migrations.RemoveField(
-            model_name='wishlist',
-            name='products',
+            model_name="wishlist",
+            name="products",
         ),
         migrations.CreateModel(
-            name='WishlistItem',
+            name="WishlistItem",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('products', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.productcolorimage')),
-                ('wishlist', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.wishlist')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "products",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_app.productcolorimage",
+                    ),
+                ),
+                (
+                    "wishlist",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_app.wishlist",
+                    ),
+                ),
             ],
         ),
     ]

@@ -16,7 +16,7 @@
         <div class="col-12 col-xl-4">
           <div class="justify-content-end d-flex">
             <div class="dropdown flex-md-grow-1 flex-xl-grow-0">
-               <span> {{ today }} </span>
+              <span>{{ today }}</span>
             </div>
           </div>
         </div>
@@ -30,8 +30,8 @@
           <div class="card card-tale pb-2">
             <div class="card-body">
               <p class="mb-4">Today’s Orders</p>
-              <p class="fs-30 mb-2"> {{ todays_order }} </p>
-              <p> {{ todays_order_vs_order_in_five_days }}% (5 days)</p>
+              <p class="fs-30 mb-2">{{ todays_order }}</p>
+              <p>{{ todays_order_vs_order_in_five_days }}% (5 days)</p>
             </div>
           </div>
         </div>
@@ -39,7 +39,7 @@
           <div class="card card-dark-blue">
             <div class="card-body">
               <p class="mb-4">Total Orders</p>
-              <p class="fs-30 mb-2"> {{ total_orders }} </p>
+              <p class="fs-30 mb-2">{{ total_orders }}</p>
               <p>{{ increase_of_order_in_five_days }}% (5 days)</p>
             </div>
           </div>
@@ -48,7 +48,7 @@
           <div class="card card-light-blue pb-0">
             <div class="card-body">
               <p class="mb-4">Total Number of Products</p>
-              <p class="fs-30 mb-2"> {{ total_products }} </p>
+              <p class="fs-30 mb-2">{{ total_products }}</p>
               <p>{{ increase_of_products_in_five_days }}% (5 days)</p>
             </div>
           </div>
@@ -57,7 +57,7 @@
           <div class="card card-light-danger">
             <div class="card-body">
               <p class="mb-4">Number of Customers</p>
-              <p class="fs-30 mb-2"> {{ total_customers }} </p>
+              <p class="fs-30 mb-2">{{ total_customers }}</p>
               <p>{{ increase_of_customer_in_five_days }}% (5 days)</p>
             </div>
           </div>
@@ -65,4 +65,116 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-12 col-lg-5">
+        <div class="card shadow p-2">
+            <form id="monthChartForm" action="{% url 'admin_dashboard' %}" method="get" class="d-flex justify-content-between  py-2 m-2">
+                <span>{{ year_month }}</span>
+                <select class="form-select bg-white border-0" name="selected_month" id="monthSelect"></select>
+            </form>
+            <div class="card-body">
+              {% if check_data %}
+                  <canvas id="productSalesBarChart" width="400" height="300"></canvas>
+              {% else %}
+                  <p>No data available for the selected month</p>
+              {% endif %}
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    var ctx = document.getElementById('productSalesBarChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: {{ labels | safe }},
+          datasets: [{
+              label: 'Sales',
+              data: {{ data | safe }},
+              backgroundColor: [
+                  'rgba(255, 99, 132, 0.6)',
+                  'rgba(54, 162, 235, 0.6)',
+                  'rgba(255, 206, 86, 0.6)',
+              ],
+              hoverBackgroundColor: [
+                  'rgba(255, 99, 132, 0.8)',
+                  'rgba(54, 162, 235, 0.8)',
+                  'rgba(255, 206, 86, 0.8)',
+              ],
+              borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+              ],
+              
+          }]
+      },
+      options: {
+          responsive: true,
+          plugins: {
+              legend: {
+                  display: false
+              }
+          },
+          scales: {
+              x: {
+                  ticks: {
+                      display: false
+                  },
+                  grid: {
+                      display: false
+                  }
+              },
+              y: {
+                  beginAtZero: true
+              }
+          }
+      }
+    });
+  </script>
+
+  <script>
+    function populateMonthYearSelect() {
+        const selectElement = document.getElementById('monthSelect');
+        const currentYear = new Date().getFullYear();
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        selectElement.innerHTML = '';
+
+        const placeholderOption = document.createElement('option');
+        placeholderOption.text = "Select month";
+        placeholderOption.disabled = true;
+        placeholderOption.selected = true;
+        selectElement.appendChild(placeholderOption);
+
+        for (let i = 0; i < 12; i++) {
+            const option = document.createElement('option');
+            option.text = `${months[i]} ${currentYear}`;
+            selectElement.appendChild(option);
+        }
+    }
+
+    window.onload = populateMonthYearSelect;
+</script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const monthChartForm = document.getElementById('monthChartForm')
+    const selectMonth = document.getElementById('monthSelect');
+
+    selectMonth.addEventListener('change', function(){
+      const selectedMonth = selectMonth.value;
+      if (selectedMonth !== ''){
+        monthChartForm.submit();
+      }
+    })
+    
+
+  });
+</script>
 {% endblock %}

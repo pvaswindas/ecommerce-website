@@ -7,20 +7,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0055_wallettransaction'),
+        ("admin_app", "0055_wallettransaction"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Coupon',
+            name="Coupon",
             fields=[
-                ('coupon', models.CharField(max_length=12, primary_key=True, serialize=False, unique=True)),
-                ('name', models.CharField(max_length=100)),
-                ('discount_percentage', models.PositiveBigIntegerField()),
-                ('coupon_price', models.PositiveBigIntegerField(blank=True)),
-                ('start_date', models.DateField(auto_now_add=True)),
-                ('end_date', models.DateField()),
-                ('product_color_image', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='admin_app.productcolorimage')),
+                (
+                    "coupon",
+                    models.CharField(
+                        max_length=12, primary_key=True, serialize=False, unique=True
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("discount_percentage", models.PositiveBigIntegerField()),
+                ("coupon_price", models.PositiveBigIntegerField(blank=True)),
+                ("start_date", models.DateField(auto_now_add=True)),
+                ("end_date", models.DateField()),
+                (
+                    "product_color_image",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_app.productcolorimage",
+                    ),
+                ),
             ],
         ),
     ]

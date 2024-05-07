@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0065_alter_orderitem_delivery_date'),
+        ("admin_app", "0065_alter_orderitem_delivery_date"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='wallettransaction',
-            name='money_deposit',
+            model_name="wallettransaction",
+            name="money_deposit",
             field=models.PositiveBigIntegerField(blank=True, default=0),
         ),
         migrations.AlterField(
-            model_name='wallettransaction',
-            name='money_withdrawn',
+            model_name="wallettransaction",
+            name="money_withdrawn",
             field=models.PositiveBigIntegerField(blank=True, default=0),
         ),
     ]

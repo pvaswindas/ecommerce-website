@@ -7,18 +7,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0072_coupon'),
+        ("admin_app", "0072_coupon"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CategoryOffer',
+            name="CategoryOffer",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('discount_percentage', models.PositiveBigIntegerField()),
-                ('start_date', models.DateField(auto_now_add=True)),
-                ('end_date', models.DateField()),
-                ('category', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='admin_app.category')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("discount_percentage", models.PositiveBigIntegerField()),
+                ("start_date", models.DateField(auto_now_add=True)),
+                ("end_date", models.DateField()),
+                (
+                    "category",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="admin_app.category",
+                    ),
+                ),
             ],
         ),
     ]

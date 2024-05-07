@@ -7,19 +7,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0001_initial'),
-        ('user_app', '0001_initial'),
+        ("admin_app", "0001_initial"),
+        ("user_app", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cart',
-            name='customer',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='user_app.customer'),
+            model_name="cart",
+            name="customer",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="user_app.customer"
+            ),
         ),
         migrations.AlterField(
-            model_name='wishlist',
-            name='customer',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='user_app.customer'),
+            model_name="wishlist",
+            name="customer",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE, to="user_app.customer"
+            ),
         ),
     ]

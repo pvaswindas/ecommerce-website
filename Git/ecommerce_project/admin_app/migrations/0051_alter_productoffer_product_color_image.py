@@ -7,13 +7,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0050_alter_productoffer_discount_percentage_and_more'),
+        ("admin_app", "0050_alter_productoffer_discount_percentage_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='productoffer',
-            name='product_color_image',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='productoffer', to='admin_app.productcolorimage'),
+            model_name="productoffer",
+            name="product_color_image",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="productoffer",
+                to="admin_app.productcolorimage",
+            ),
         ),
     ]

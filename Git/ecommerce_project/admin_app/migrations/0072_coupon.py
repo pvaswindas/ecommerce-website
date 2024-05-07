@@ -6,20 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0071_delete_coupon'),
+        ("admin_app", "0071_delete_coupon"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Coupon',
+            name="Coupon",
             fields=[
-                ('coupon_code', models.CharField(max_length=12, primary_key=True, serialize=False, unique=True)),
-                ('name', models.CharField(max_length=100)),
-                ('discount_percentage', models.PositiveBigIntegerField()),
-                ('minimum_amount', models.PositiveBigIntegerField(blank=True, default=0)),
-                ('maximum_amount', models.PositiveBigIntegerField(blank=True)),
-                ('start_date', models.DateField(auto_now_add=True)),
-                ('end_date', models.DateField()),
+                (
+                    "coupon_code",
+                    models.CharField(
+                        max_length=12, primary_key=True, serialize=False, unique=True
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("discount_percentage", models.PositiveBigIntegerField()),
+                (
+                    "minimum_amount",
+                    models.PositiveBigIntegerField(blank=True, default=0),
+                ),
+                ("maximum_amount", models.PositiveBigIntegerField(blank=True)),
+                ("start_date", models.DateField(auto_now_add=True)),
+                ("end_date", models.DateField()),
             ],
         ),
     ]

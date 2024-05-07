@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0007_productcolorimage_in_stock'),
+        ("admin_app", "0007_productcolorimage_in_stock"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cartproducts',
-            name='in_stock',
+            model_name="cartproducts",
+            name="in_stock",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='productsize',
-            name='in_stock',
+            model_name="productsize",
+            name="in_stock",
             field=models.BooleanField(default=True),
         ),
     ]

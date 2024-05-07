@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admin_app', '0060_alter_coupon_coupon_code'),
+        ("admin_app", "0060_alter_coupon_coupon_code"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='coupon',
-            name='coupon_code',
-            field=models.CharField(max_length=100, primary_key=True, serialize=False, unique=True),
+            model_name="coupon",
+            name="coupon_code",
+            field=models.CharField(
+                max_length=100, primary_key=True, serialize=False, unique=True
+            ),
         ),
     ]
