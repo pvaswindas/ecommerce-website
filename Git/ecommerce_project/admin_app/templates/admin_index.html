@@ -4,6 +4,7 @@
 
 {% block custom_css %}
   <link rel="shortcut icon" href="{% static 'images/Sneakerheads.png' %}" />
+  <link rel="stylesheet" href="{% static 'admin_css/index.css' %}" />
 {% endblock %}
 
 {% block content %}
@@ -66,12 +67,12 @@
     </div>
   </div>
   <div class="row d-flex justify-content-around">
-    <div class="col-12 col-md-5">
+    <div class="col-12 col-md-5 my-2">
       <div class="card shadow p-2">
         <form id="monthChartForm" action="{% url 'admin_dashboard' %}" method="get" class="d-flex justify-content-between py-2 m-2">
           <span>{{ year_month }}</span>
           <select class="form-select bg-white border-0" name="selected_month" id="monthSelect"></select>
-          {% comment %} <input type="hidden" name="selected_year" value="{{selected_year}}"> {% endcomment %}
+          {% comment %} <input type="hidden" name="selected_year" value="{{ selected_year }}" /> {% endcomment %}
         </form>
         <div class="card-body">
           {% if month_check_data %}
@@ -81,14 +82,13 @@
           {% endif %}
         </div>
       </div>
-
     </div>
-    <div class="col-12 col-md-5">
+    <div class="col-12 col-md-5 my-2">
       <div class="card shadow p-2">
         <form id="yearChartForm" action="{% url 'admin_dashboard' %}" method="get" class="d-flex justify-content-between py-2 m-2">
           <span>{{ year }}</span>
           <select class="form-select bg-white border-0" name="selected_year" id="yearSelect"></select>
-          {% comment %} <input type="hidden" name="selected_month_year" value="{{selected_month_year}}"> {% endcomment %}
+          {% comment %} <input type="hidden" name="selected_month_year" value="{{ selected_month_year }}" /> {% endcomment %}
         </form>
         <div class="card-body">
           {% if year_check_data %}
@@ -98,6 +98,33 @@
           {% endif %}
         </div>
       </div>
+    </div>
+  </div>
+  <div class="row d-flex justify-content-around my-5 p-5">
+    <div class="col-6">
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th scope="col">No</th>
+              <th scope="col">Top 10 Products</th>
+              <th scope="col">Number of Orders</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in top_selling_products %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ product.products.name }}</td>
+                <td>{{ product.num_orders }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-6">
+
     </div>
   </div>
 {% endblock %}
@@ -264,7 +291,4 @@
         });
     });
   </script>
-
-
-
 {% endblock %}

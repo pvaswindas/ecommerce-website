@@ -218,7 +218,17 @@ def admin_dashboard(request):
         context = {}
         selected_month_year = request.GET.get('selected_month')
         selected_year = request.GET.get('selected_year')
-        
+        ordered_items = OrderItem.objects.filter(order_status="Delivered")
+        best_selling_products = (
+            ProductColorImage.objects.filter(
+                is_listed=True,
+                is_deleted=False,
+                product_sizes__orderitems__in=ordered_items,
+            )
+            .annotate(num_orders=Count("product_sizes__orderitems"))
+            .order_by("-num_orders")
+        )
+        top_selling_products = best_selling_products.distinct()[:10]
         
         order_items = OrderItem.objects.filter(
             order_status='Delivered',
@@ -247,6 +257,7 @@ def admin_dashboard(request):
             'year' : year,
             'year_check_data' : year_check_data,
             'selected_year' : selected_year,
+            'top_selling_products' : top_selling_products,
         })
         
         
