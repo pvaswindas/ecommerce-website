@@ -1,11 +1,71 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Payment Failed</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            animation: slideInDown 0.5s ease forwards;
+        }
+        .card-header {
+            background-color: #dc3545;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .card-body {
+            text-align: center;
+        }
+        .btn-primary {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+        @keyframes slideInDown {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+    <link rel="icon" href="{% static 'user/images/sneakerheads_logo/sh_round_red.png' %}" />
+    
 </head>
 <body>
-    <h1>Failed</h1>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Payment Failed</div>
+                    <div class="card-body">
+                        <p>Unfortunately, your payment was not successful.</p>
+                        <p>Please try again later or contact support if you continue to experience issues.</p>
+                        <a href="{% url 'order_items_page' order_id %}" class="btn btn-primary btn-lg">Retry Payment</a>
+                        <a href="/" class="btn btn-primary btn-lg">Go Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

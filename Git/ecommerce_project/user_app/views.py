@@ -750,6 +750,8 @@ def shop_page_view(request):
         product_color_list = product_color_list.order_by("price")
     elif sortby == "high_to_low":
         product_color_list = product_color_list.order_by("-price")
+        
+    product_color_list.order_by('id')
 
     paginator = Paginator(product_color_list, 12)
 
@@ -2464,9 +2466,8 @@ def razorpay_payment(request, user_id):
         }
         try:
             result = razorpay_client.utility.verify_payment_signature(params_dict)
-
-            if result is not None:
-                with transaction.atomic():
+            with transaction.atomic():
+                if result is not None:
                     payment.paid_at = timezone.now()
                     payment.pending = False
                     payment.success = True
@@ -2521,7 +2522,8 @@ def razorpay_payment(request, user_id):
                     cart_items.delete()
 
                     time.sleep(2)
-
+                    user = order.customer.user
+                    authenticate(user)
                     return redirect("order_placed_view", order_id=order.order_id)
         except Exception:
             payment.failed = True
@@ -2569,7 +2571,9 @@ def razorpay_payment(request, user_id):
             cart_items.delete()
 
             time.sleep(1)
-            return render(request, "paymentfail.html")
+            user = order.customer.user
+            authenticate(user)
+            return redirect('payment_failed', order.order_id)
 
         else:
             pass
@@ -2598,34 +2602,29 @@ def razorpay_repayment_payment(request, order_id):
 
         try:
             result = razorpay_client.utility.verify_payment_signature(params_dict)
-            print(result)
-
-            if result is not None:
-                print("Inside")
-                payment.paid_at = timezone.now()
-                payment.pending = False
-                payment.success = True
-                payment.save()
-                print("After payment")
-                total = total_charge * 100
-                razorpay_client.payment.capture(payment_id, total)
-                print(razorpay_client)
-                order.order_status = "Order Placed"
-                order.paid = True
-                order.razorpay_id = razorpay_order_id
-                order.placed_at = timezone.now()
-                order.save()
-                print(order)
-                for item in order_items:
-                    item.order_status = "Order Placed"
-                    item.save()
-                print(order_items)
-                time.sleep(1)
-                return redirect("order_placed_view", order_id=order.order_id)
-            else:
-                return render(request, "paymentfail.html")
+            with transaction.atomic():
+                if result is not None:
+                    payment.paid_at = timezone.now()
+                    payment.pending = False
+                    payment.success = True
+                    payment.save()
+                    total = total_charge * 100
+                    razorpay_client.payment.capture(payment_id, total)
+                    order.order_status = "Order Placed"
+                    order.paid = True
+                    order.razorpay_id = razorpay_order_id
+                    order.placed_at = timezone.now()
+                    order.save()
+                    for item in order_items:
+                        item.order_status = "Order Placed"
+                        item.save()
+                    user = order.customer.user
+                    authenticate(user)
+                    return redirect("order_placed_view", order_id=order.order_id)
         except Exception:
-            return redirect("user_dashboard")
+            user = order.customer.user
+            authenticate(user)
+            return redirect('payment_failed', order.order_id)
     else:
         return redirect("user_dashboard")
 
@@ -2637,3 +2636,21 @@ def order_placed_view(request, order_id):
         return render(request, "order_placed.html", {"order": order})
     else:
         return redirect("index_page")
+
+
+@never_cache
+def payment_failed(request, order_id):
+    if request.user.is_authenticated:
+        user = request.user
+        order = Orders.objects.get(order_id = order_id)
+        if order.customer.user == user:
+            context = {
+                'order' : order,
+                'order_id' : order_id,
+            }
+            return render(request, "paymentfail.html", context)
+        else:
+            return redirect('user_dashboard')
+    else:
+        return redirect(index_page)
+    

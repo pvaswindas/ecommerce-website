@@ -143,6 +143,8 @@ urlpatterns = [
         razorpay_repayment_payment,
         name="razorpay_repayment_payment",
     ),
+    
+    path('sneakerheads/user/payment_failed/<str:order_id>/', payment_failed, name='payment_failed')
 ]
 
 
