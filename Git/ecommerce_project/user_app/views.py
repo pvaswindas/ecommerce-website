@@ -654,11 +654,10 @@ def verify_email(request):
 @never_cache
 @clear_old_messages
 def logout(request):
-    if request.method == "POST":
+    if request.user.is_authenticated:
         auth.logout(request)
         messages.info(request, "Login again!")
         return redirect(sign_in)
-
     else:
         return redirect("sign_in_page")
 
@@ -2662,4 +2661,35 @@ def payment_failed(request, order_id):
             return redirect('user_dashboard')
     else:
         return redirect(index_page)
-    
+
+
+
+
+
+@never_cache
+@clear_old_messages
+def review_product_page(request, product_color_id):
+    if request.user.is_authenticated:
+        try:
+            product_color = ProductColorImage.objects.get(pk = product_color_id)
+            user = request.user
+            customer = Customer.objects.get(user = user)
+            user_orders = Orders.objects.filter(customer = customer)
+            
+            valid_product = False
+            for order in user_orders:
+                if OrderItem.objects.filter(order=order, product__product_color_image=product_color).exists():
+                    valid_product = True
+                    break
+            if valid_product:
+                context = {
+                    'product_color' : product_color
+                }
+                return render(request, 'review_product.html', context)
+            else:
+                return redirect('user_dashboard')
+        except ProductColorImage.DoesNotExist:
+            return redirect('user_dashboard')
+    else:
+        return redirect('sign_in_page')
+        

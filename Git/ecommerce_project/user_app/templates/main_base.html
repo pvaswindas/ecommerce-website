@@ -88,7 +88,7 @@
   {% block page_wrapper %}
     <div class="page-wrapper">
       {% block navbar %}
-        <header class="header header-8">
+        <header class="header header-8 shadow border">
           <div class="header-top">
             <div class="container">
               <div class="header-right">
@@ -126,10 +126,7 @@
                                   <a class="text-dark fw-medium" href="{% url 'wallet_page_view' user.id %}">Wallet</a>
                                 </li>
                                 <li>
-                                  <form action="{% url 'logout' %}" method="post">
-                                    {% csrf_token %}
-                                    <button class="border-0 bg-white text-dark fw-medium" type="submit">LOGOUT</button>
-                                  </form>
+                                  <a href="{% url 'logout' %}"><button class="border-0 bg-white text-dark fw-medium" type="button">LOGOUT</button></a>
                                 </li>
                               </ul>
                             </div>

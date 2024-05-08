@@ -144,7 +144,10 @@ urlpatterns = [
         name="razorpay_repayment_payment",
     ),
     
-    path('sneakerheads/user/payment_failed/<str:order_id>/', payment_failed, name='payment_failed')
+    path('sneakerheads/user/payment_failed/<str:order_id>/', payment_failed, name='payment_failed'),
+    
+    path('sneakerheads/user/review-product/<int:product_color_id>/',
+         review_product_page, name='review_product_page'),
 ]
 
 

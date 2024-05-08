@@ -9,7 +9,7 @@
   <div class="container-fluid p-5 main-container">
     <div class="container-fluid">
       <div class="row bg-white shadow mt-4 mb-4">
-        <div class="col-12 col-md-4 p-5">
+        <div class="col-12 col-md-3 p-5">
           <h5>Delivery Address</h5>
           <p>
             <strong>Name:</strong> {{ order.customer.user.first_name }} {{ customer.user.last_name }}
@@ -27,7 +27,7 @@
             <strong>Pincode:</strong> {{ order.address.pin_code }}
           </p>
         </div>
-        <div class="col-12 col-md-4 p-5">
+        <div class="col-12 col-md-3 p-5">
           <h5>Order ({{ order.number_of_orders }})</h5>
           <p>{{ order.order_id }}</p>
           {% if order.total_charge > 0 %}
@@ -72,7 +72,7 @@
         </div>
 
         {% if not cancelled and order.order_status == 'Delivered' and not can_return_order %}
-          <div class="col-12 col-md-4 p-5">
+          <div class="col-12 col-md-3 p-5">
             <h5>Download Invoice</h5>
             <div class="row d-flex align-items-center py-4">
               <div class="col-auto">
@@ -108,6 +108,10 @@
                 <th>Quantity</th>
                 <th>Price</th>
                 <th>Status</th>
+                {% if not cancelled and order.order_status == 'Delivered' and not can_return_order  %}
+                 <th>More Actions</th> 
+                {% endif %}
+                  
               </tr>
             </thead>
 
@@ -134,6 +138,14 @@
                       <strong class="badge bg-danger">{{ item.order_status }}</strong>
                     {% endif %}
                   </td>
+                  
+                  {% if not cancelled and order.order_status == 'Delivered' and not can_return_order  %}
+                  <td>
+                    <i class="bi bi-star-fill px-1" style="color: #007FFF;"></i>
+                    <a href="{% url 'review_product_page' item.product.product_color_image.id %}" style="color: #007FFF;">Rate and Review Product</a>
+                  </td>
+                  {% endif %}
+                    
                 </tr>
                 {% empty %}
                 <tr>
