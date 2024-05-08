@@ -43,13 +43,13 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from reportlab.lib import colors  # type: ignore
 from reportlab.lib.units import inch  # type: ignore
+from reportlab.lib.enums import TA_RIGHT # type: ignore
 from reportlab.platypus import TableStyle  # type: ignore
 from reportlab.lib.pagesizes import letter  # type: ignore
 from reportlab.lib.styles import ParagraphStyle  # type: ignore
 from reportlab.platypus import Paragraph, Spacer  # type: ignore
 from reportlab.lib.styles import getSampleStyleSheet  # type: ignore
 from reportlab.platypus import SimpleDocTemplate, Table  # type: ignore
-import os
 
 today = datetime.now().date()
 
@@ -1636,97 +1636,100 @@ def generate_invoice(request, order_id):
     if request.user.is_authenticated:
         try:
             order = Orders.objects.get(order_id=order_id)
-            order_items = OrderItem.objects.filter(order=order)
-
+            order_items = OrderItem.objects.filter(
+                order=order,request_cancel=False, request_return=False)
             buffer = BytesIO()
-
             doc = SimpleDocTemplate(buffer, pagesize=letter)
-
+            
             styles = getSampleStyleSheet()
-            centered_style = ParagraphStyle(
-                name="Centered", parent=styles["Heading1"], alignment=1
-            )
-
+            
+            for style_name, style in styles.byName.items():
+                style.fontSize = 9
+            
             today_date = datetime.now().strftime("%Y-%m-%d")
-
             content = []
 
-            content.append(Paragraph("<b>Invoice</b>", centered_style))
+            heading_style = ParagraphStyle(name="Invoice", parent=styles["Heading1"], alignment=1, fontSize=14)
+            content.append(Paragraph("<b>Invoice</b>", heading_style))
             content.append(Spacer(1, 0.5 * inch))
 
             max_width = 40
-
             address_content = f"<b>Shipping Address :</b> {order.address}"
-
-            wrapped_address = textwrap.fill(address_content, width=max_width)
-
-            address_paragraphs = [
-                Paragraph(line, styles["Normal"])
-                for line in wrapped_address.split("\n")
-            ]
+            wrapped_address = textwrap.fill(address_content, width=max_width, subsequent_indent=" " * 20)
+            address_paragraphs = [Paragraph(line, styles["Normal"]) for line in wrapped_address.split("\n")]
             content.extend(address_paragraphs)
-            content.append(Spacer(1, 0.5 * inch))
+            content.append(Spacer(1, 0.2 * inch))
+
+            gst = 'GSTINMDHGYR'
+            order_id = order.order_id
+            gst_style = ParagraphStyle(name="GST", parent=styles["Normal"], alignment=TA_RIGHT)
+            content.append(Paragraph(f"<b>GST:</b> {gst}", gst_style))
+            content.append(Paragraph(f"<b>Order ID:</b> {order_id}", styles["Normal"]))
+            content.append(Spacer(1, 0.2 * inch))
 
             data = [["Product", "Quantity", "Total Price", "Delivery Date"]]
             for item in order_items:
                 formatted_date = item.delivery_date.strftime("%a, %d %b %Y")
-                data.append(
-                    [
-                        item.product.product_color_image.products.name,
-                        item.quantity,
-                        item.each_price,
-                        formatted_date,
-                    ]
-                )
+                item_name = f"{item.product.product_color_image.products.name} ({item.product.product_color_image.color})"
+                data.append([
+                    item_name,
+                    item.quantity,
+                    item.each_price,
+                    formatted_date,
+                ])
 
-            table = Table(data, repeatRows=1)
-            table.setStyle(
-                TableStyle(
-                    [
-                        ("BACKGROUND", (0, 0), (-1, 0), colors.white),
-                        ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
-                        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                        ("TOPPADDING", (0, 0), (-1, 0), 12),
-                        ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
-                        ("BACKGROUND", (0, 1), (-1, -1), colors.white),
-                        ("GRID", (0, 0), (-1, -1), 1, colors.black),
-                    ]
-                )
+            column_widths = [240, 50, 70, 100]
+            table_data_style = ParagraphStyle(
+                name='TableData',
+                fontSize=9,
             )
 
+            table = Table(data, colWidths=column_widths, repeatRows=1)
+            table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.white),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.black),
+                ("ALIGN", (0, 0), (-1, -1), "LEFT"),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("TOPPADDING", (0, 0), (-1, 0), 12),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                ("BACKGROUND", (0, 1), (-1, -2), colors.white),
+                ("GRID", (0, 0), (-1, -2), 1, colors.black),
+                ("GRID", (0, -1), (-1, -1), 0, colors.black),
+            ]))
+
             content.append(table)
-
             content.append(Spacer(1, 0.5 * inch))
+            total_charge = order.total_charge
+            if order.discount_price is not None and order.discount_price > 0:
+                price_before_discount = order.total_charge + order.discount_price
+                discount_amount = order.discount_price
+            else:
+                price_before_discount = order.total_charge
+                discount_amount = 0
+            total_price_style = ParagraphStyle(name="TotalPrice", parent=styles["Normal"], alignment=TA_RIGHT, fontSize=8)
+            content.append(Paragraph(f"<b>Gross Price:</b> {price_before_discount}.00", total_price_style))
+            content.append(Paragraph(f"<b>Discount Price:</b> {discount_amount}.00", total_price_style))
+            content.append(Spacer(1, 0.2 * inch))
+            content.append(Paragraph(f"<b>Total Price:</b> {total_charge}.00", total_price_style))
+            content.append(Spacer(1, 0.2 * inch))
 
-            total_charge = f"<b>Total Charge:</b> {
-                order.total_charge}"
-
-            content.append(Paragraph(total_charge, styles["Normal"]))
-            content.append(Spacer(1, 0.5 * inch))
-
-            company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {
-                today_date}"
+            company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {today_date}"
             content.append(Paragraph(company_details, styles["Normal"]))
-            content.append(Spacer(1, 0.5 * inch))
 
             doc.build(content)
 
-            current_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
             file_name = f"Invoice{order.order_id}.pdf"
 
             response = HttpResponse(buffer.getvalue(), content_type="application/pdf")
-            response["Content-Disposition"] = (
-                f'attachment; filename="{
-                file_name}"'
-            )
-
+            response["Content-Disposition"] = f'attachment; filename="{file_name}"'
             return response
 
         except Orders.DoesNotExist:
             return redirect("sign_in_page")
     else:
         return redirect("user_dashboard")
+
+
 
 
 @never_cache
@@ -2625,6 +2628,7 @@ def razorpay_repayment_payment(request, order_id):
                         item.save()
                     user = order.customer.user
                     authenticate(user)
+                    send_order_confirmation_email(order)
                     return redirect("order_placed_view", order_id=order.order_id)
         except Exception:
             user = order.customer.user
