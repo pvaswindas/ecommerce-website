@@ -221,7 +221,6 @@ def admin_dashboard(request):
         ordered_items = OrderItem.objects.filter(order_status="Delivered")
         best_selling_products = (
             ProductColorImage.objects.filter(
-                is_listed=True,
                 is_deleted=False,
                 product_sizes__orderitems__in=ordered_items,
             )
@@ -230,6 +229,13 @@ def admin_dashboard(request):
         )
         top_selling_products = best_selling_products.distinct()[:10]
         
+        top_selling_brands = best_selling_products.values('products__brand__name').annotate(
+            total_orders=Count('id')
+        ).order_by('-total_orders').distinct()[:5]
+        
+        top_selling_types = best_selling_products.values('products__type').annotate(
+            total_orders=Count('id')
+        ).order_by('-total_orders').distinct()[:5]
         order_items = OrderItem.objects.filter(
             order_status='Delivered',
             request_cancel=False,
@@ -242,7 +248,6 @@ def admin_dashboard(request):
             year = selected_year
         else:
             year = current_year
-            
         month_labels, month_data, month_check_data, year_month = get_monthly_sales_data(order_items, selected_month_year)
         yearly_sales_data = get_yearly_sales_data(order_items, selected_year)
         values = yearly_sales_data.values()
@@ -258,6 +263,8 @@ def admin_dashboard(request):
             'year_check_data' : year_check_data,
             'selected_year' : selected_year,
             'top_selling_products' : top_selling_products,
+            'top_selling_brands' : top_selling_brands,
+            'top_selling_types' : top_selling_types,
         })
         
         
@@ -1134,6 +1141,7 @@ def edit_product_update(request, p_id):
                             product.description = description
                             product.information = information
                             product.category = category
+                            product.type = type_str
                             product.brand = brand
                             product.save()
                             messages.success(request, "Product Updated successfully!")

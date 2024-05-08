@@ -100,8 +100,8 @@
       </div>
     </div>
   </div>
-  <div class="row d-flex justify-content-around my-5 p-5">
-    <div class="col-6">
+  <div class="row d-flex justify-content-around mt-5 pt-5 px-5">
+    <div class="col-12 col-md-6 my-1">
       <div class="table-responsive">
         <table class="custom-table">
           <thead>
@@ -123,8 +123,53 @@
         </table>
       </div>
     </div>
-    <div class="col-6">
-
+    <div class="col-12 col-md-6 align-content-between my-1">
+      <div class="d-flex flex-column justify-content-between align-content-between">
+        <div class="table-responsive mb-3">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th scope="col">No</th>
+                <th scope="col">Top 5 Brands</th>
+                <th scope="col">Number of Orders</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for brand in top_selling_brands %}
+                {% if forloop.counter <= 5 %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ brand.products__brand__name }}</td>
+                    <td>{{ brand.total_orders }}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="table-responsive mt-2">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th scope="col">No</th>
+                <th scope="col">Top 5 Categories</th>
+                <th scope="col">Number of Orders</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for types in top_selling_types %}
+                {% if forloop.counter <= 5 %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ types.products__type }}</td>
+                    <td>{{ types.total_orders }}</td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}
