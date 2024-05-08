@@ -42,8 +42,8 @@
     <div class="order-status-form">
       {% if not order_item.cancel_product %}
         {% if not order_item.request_cancel %}
-          {% if not order_item.order_status == 'Delivered' %}
-            {% if not order_item.order_status == 'Returned' %}
+          {% if not order_item.request_return %}
+            {% if not order_item.order_status == 'Delivered' %}
               <h2>Change Order Status</h2>
               <form action="{% url 'change_order_status' order_item.order_items_id %}" method="post">
                 {% csrf_token %}
@@ -56,17 +56,19 @@
                 <button type="submit" class="status-button">Change Status</button>
               </form>
             {% else %}
-              <span class="bg-warning text-black py-1 px-2 rounded rounded-1"><strong>Order Returned and Refund completed</strong></span>
+            
+            {% if order.order_status == 'Delivered' %}
+              <span class="bg-success text-black py-1 px-2 rounded rounded-1"><strong>Order Delivered</strong></span>
+            {% endif %}
+              
             {% endif %}
           {% else %}
-            {% if order_item.request_return %}
-              {% if not order_item.return_product %}
-                <a href="{% url 'return_product' order_item.order_items_id %}">
-                  <button class="btn btn-warning rounded rounded-1">Accept Return</button>
-                </a>
-              {% endif %}
+            {% if not order_item.return_product %}
+              <a href="{% url 'return_product' order_item.order_items_id %}">
+                <button class="btn btn-warning rounded rounded-1">Accept Return</button>
+              </a>
             {% else %}
-              <p><strong>Order Status :</strong> Delivered</p>
+            <span class="bg-warning text-black py-1 px-2 rounded rounded-1"><strong>Order Returned & Refund Processed</strong></span>
             {% endif %}
           {% endif %}
         {% else %}

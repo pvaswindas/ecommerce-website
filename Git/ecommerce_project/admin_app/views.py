@@ -2450,6 +2450,7 @@ def cancel_product(request, order_items_id):
 
                                 wallet_transaction = WalletTransaction.objects.create(
                                     wallet=wallet,
+                                    order = order,
                                     order_item=order_item,
                                     money_deposit=refund_money,
                                 )
@@ -2457,7 +2458,6 @@ def cancel_product(request, order_items_id):
 
                                 order_item.each_price = refund_money
                                 order_item.save()
-
                                 order.total_charge = sum_of_all_other
                                 order.coupon_applied = False
                                 order.coupon_name = None
@@ -2503,10 +2503,21 @@ def cancel_product(request, order_items_id):
                     order.total_charge -= order_item.each_price
                     if order.total_charge < 0:
                         order.total_charge = 0
+                    
                     order.save()
                 order_item.cancel_product = True
                 order_item.order_status = "Cancelled"
                 order_item.save()
+                order_status = 'Cancelled'
+                order_products = OrderItem.objects.filter(order = order)
+                count = sum(
+                        1 for item in order_products if item.order_status == order_status
+                )
+                status = True if count == order.number_of_orders else None
+
+                if status == True:
+                    order.order_status = order_status
+                order.save()
                 time.sleep(1)
                 return redirect("order_detailed_view", order_items_id)
         except:
@@ -2556,6 +2567,7 @@ def return_product(request, order_items_id):
 
                             wallet_transaction = WalletTransaction.objects.create(
                                 wallet=wallet,
+                                order = order,
                                 order_item=order_item,
                                 money_deposit=refund_money,
                             )
@@ -2623,7 +2635,16 @@ def return_product(request, order_items_id):
                 order_item.return_product = True
                 order_item.order_status = "Returned"
                 order_item.save()
+                order_status = 'Returned'
+                order_products = OrderItem.objects.filter(order = order)
+                count = sum(
+                        1 for item in order_products if item.order_status == order_status
+                )
+                status = True if count == order.number_of_orders else None
 
+                if status == True:
+                    order.order_status = order_status
+                order.save()
                 time.sleep(2)
 
                 return redirect("order_detailed_view", order_items_id)

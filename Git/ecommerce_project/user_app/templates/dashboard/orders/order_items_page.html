@@ -39,7 +39,11 @@
           {% endif %}
 
           {% if not cancelled and can_return_order %}
-            {{ order.order_status }}
+            
+            {% if not order.order_status == 'Returned' %}
+              {{ order.order_status }}
+            {% endif %}
+              
 
             {% if order.order_status == 'Delivered' %}
               <small>On {{ order.delivery_date }}</small>

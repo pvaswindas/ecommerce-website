@@ -1549,7 +1549,10 @@ def order_items_page(request, order_id):
                 reverse("razorpay_repayment_payment", kwargs={"order_id": order_id})
             )
             currency = "INR"
-            amount_in_paise = int(total_charge) * 100
+            if total_charge > 0:
+                amount_in_paise = int(total_charge) * 100
+            else:
+                amount_in_paise = 1 * 100
             razorpay_order = razorpay_client.order.create(
                 dict(amount=amount_in_paise, currency=currency, payment_capture="0")
             )
@@ -2368,25 +2371,27 @@ def place_order(request):
                                 )
                                 product_size.quantity -= item.quantity
                                 product_size.save()
-
-                                if payment_method == "Wallet":
-                                    order.paid = True
-                                    order.save()
-                                    payment.paid_at = timezone.now()
-                                    payment.pending = False
-                                    payment.success = True
-                                    payment.save()
-                                    wallet_transaction = (
-                                        WalletTransaction.objects.create(
-                                            wallet=wallet,
-                                            order_item=order_item,
-                                            money_withdrawn=price_of_each,
-                                        )
+                                
+                            if payment_method == "Wallet":
+                                order.paid = True
+                                order.save()
+                                payment.paid_at = timezone.now()
+                                payment.pending = False
+                                payment.success = True
+                                payment.save()
+                                wallet_transaction = (
+                                    WalletTransaction.objects.create(
+                                        wallet=wallet,
+                                        order=order,
+                                        money_withdrawn=total_charge,
                                     )
-                                    wallet.balance -= price_of_each
-                                    wallet.save()
-                                    wallet_transaction.save()
-
+                                )
+                                wallet_balance = wallet.balance
+                                total_charge = int(total_charge)
+                                wallet_balance = int(wallet_balance)
+                                wallet.balance = wallet_balance - total_charge
+                                wallet.save()
+                                wallet_transaction.save()
                             send_order_confirmation_email(order)
                             cart_items.delete()
 
@@ -2520,8 +2525,8 @@ def razorpay_payment(request, user_id):
 
                     send_order_confirmation_email(order)
                     cart_items.delete()
-
-                    time.sleep(2)
+                    if payment_method == 'Cash On Delivery':
+                        time.sleep(2)
                     user = order.customer.user
                     authenticate(user)
                     return redirect("order_placed_view", order_id=order.order_id)

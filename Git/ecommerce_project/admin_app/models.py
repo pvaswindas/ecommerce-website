@@ -278,8 +278,13 @@ class Wallet(models.Model):
 
 class WalletTransaction(models.Model):
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        Orders, on_delete=models.CASCADE, blank=True,
+        null=True, related_name="wallet_transaction"
+    )
     order_item = models.ForeignKey(
-        OrderItem, on_delete=models.CASCADE, blank=True, null=True
+        OrderItem, on_delete=models.CASCADE, blank=True,
+        null=True, related_name='wallet_transaction'
     )
     transaction_id = models.CharField(primary_key=True, max_length=12, unique=True)
     money_deposit = models.PositiveBigIntegerField(blank=True, default=0)
@@ -292,10 +297,11 @@ class WalletTransaction(models.Model):
         elif self.money_withdrawn:
             money = "-{}".format(self.money_withdrawn)
         id = self.transaction_id
-        item = self.order_item
+        order = self.order
+        order_items = self.order_item
         name = f"{self.wallet.user.first_name} {self.wallet.user.last_name}"
         time = self.time_of_transaction
-        return f"{id} | {item} - {name} : {time} |"
+        return f"{id} | {order} | {order_items} - {name} | {money}"
 
     def save(self, *args, **kwargs):
         if not self.transaction_id:

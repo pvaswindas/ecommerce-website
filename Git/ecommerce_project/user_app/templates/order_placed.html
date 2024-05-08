@@ -7,50 +7,53 @@
 {% endblock %}
 
 {% block page_content %}
-  <div class="order-placed-container">
-    <div class="order-placed-header">
-      <h1>Your Order Has Been Successfully Placed!</h1>
-      <p>Thank you for shopping with us.</p>
-    </div>
-    <div class="order-details">
-      <h2>Order Details</h2>
-      <table class="order-summary-table">
-        <tr>
-          <th>Order ID:</th>
-          <td>{{ order.order_id }}</td>
-        </tr>
-        <tr>
-          <th>Payment Status:</th>
-          <td>
-            {% if order.payment.method_name == 'Razorpay' %}
-              {% if order.paid == True %}
-                Paid
+  <div class="container">
+    <div class="order-placed-container">
+      <div class="order-placed-header">
+        <h1>Your Order Has Been Successfully Placed!</h1>
+        <p>Thank you for shopping with us.</p>
+      </div>
+      <div class="order-details">
+        <h2>Order Details</h2>
+        <table class="order-summary-table">
+          <tr>
+            <th>Order ID:</th>
+            <td>{{ order.order_id }}</td>
+          </tr>
+          <tr>
+            <th>Payment Status:</th>
+            <td>
+              {% if order.payment.method_name == 'Razorpay' %}
+                {% if order.paid == True %}
+                  Paid
+                {% endif %}
+              {% else %}
+                Cash On Delivery
               {% endif %}
-            {% else %}
-              Cash On Delivery
-            {% endif %}
-          </td>
-        </tr>
-        <tr>
-          <th>Total Items:</th>
-          <td>{{ order.number_of_orders }}</td>
-        </tr>
-        <tr>
-          <th>Subtotal:</th>
-          <td>₹{{ order.subtotal }}</td>
-        </tr>
-        <tr>
-          <th>Shipping Charge:</th>
-          <td>₹{{ order.shipping_charge }}</td>
-        </tr>
-        <tr>
-          <th>Total Charge:</th>
-          <td>₹{{ order.total_charge }}</td>
-        </tr>
-      </table>
-    </div>
-    <div class="continue-shopping">
-      <a href="{% url 'shop_page_view' %}" class="btn btn-primary">Continue Shopping</a>
+            </td>
+          </tr>
+          <tr>
+            <th>Total Items:</th>
+            <td>{{ order.number_of_orders }}</td>
+          </tr>
+          <tr>
+            <th>Subtotal:</th>
+            <td>₹{{ order.subtotal }}</td>
+          </tr>
+          <tr>
+            <th>Shipping Charge:</th>
+            <td>₹{{ order.shipping_charge }}</td>
+          </tr>
+          <tr>
+            <th>Total Charge:</th>
+            <td>₹{{ order.total_charge }}</td>
+          </tr>
+        </table>
+      </div>
+      <div class="row d-flex justify-content-between px-3">
+          <a href="{% url 'shop_page_view' %}" class="btn btn-outline-success w-50">Continue Shopping</a>
+          <a href="{% url 'order_items_page' order.order_id %}" class="btn btn-outline-success w-50">Order Details</a>
+      </div>
     </div>
   </div>
 {% endblock %}
