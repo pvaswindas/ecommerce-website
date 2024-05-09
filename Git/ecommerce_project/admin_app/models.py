@@ -318,15 +318,15 @@ class WalletTransaction(models.Model):
 
 
 class Review(models.Model):
-    products = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product_color = models.ForeignKey(ProductColorImage, on_delete=models.CASCADE, default='')
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    rating = models.BigIntegerField()
-    review_text = models.TextField()
-    review_date = models.DateField()
-    verified_purchase = models.BooleanField(default=False)
+    rating = models.PositiveBigIntegerField(default=1)
+    review_text = models.TextField(default='')
+    review_date = models.DateField(auto_now_add=True)
+    title = models.CharField(default='')
 
     def __str__(self):
-        return self.rating
+        return f"{self.product_color.products.name} {self.product_color.color} - {self.rating}"
 
 
 class Wishlist(models.Model):

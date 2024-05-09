@@ -37,7 +37,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.hashers import check_password
 from admin_app.models import Category, Brand, ProductColorImage, ProductSize
 from admin_app.models import ProductOffer, CategoryOffer, Coupon, Payment
-from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction
+from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction, Review
 from admin_app.models import Wishlist, WishlistItem, Cart, CartProducts
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -70,6 +70,9 @@ def clear_old_messages(view_func):
         return response
 
     return only_new_messages
+
+alphabets_pattern = re.compile(r"^[a-zA-Z\s]+$")
+description_pattern = re.compile(r"^[\w\s',.\-\(\)]*$")
 
 
 def clean_string(input_string):
@@ -802,7 +805,17 @@ def product_single_view_page(request, product_name, pdt_id):
     context = {}
     product_color = ProductColorImage.objects.get(pk=pdt_id)
     today = datetime.now().date()
-
+    reviews = Review.objects.filter(product_color=product_color)
+    avg_rating = reviews.aggregate(avg_rating=Avg('rating'))['avg_rating']
+    rounded_rating = round(avg_rating) if avg_rating else 0
+    no_rating = 5 - rounded_rating
+    review_count = reviews.count()
+    rating_list = []
+    for i in range(rounded_rating):
+        rating_list.append(i)
+    no_rating_list = []
+    for i in range(no_rating):
+        no_rating_list.append(i)
     try:
         try:
             product_offer = ProductOffer.objects.get(
@@ -837,6 +850,12 @@ def product_single_view_page(request, product_name, pdt_id):
         context.update(
             {
                 "product_offer": product_offer,
+                'reviews' : reviews,
+                'avg_rating' : avg_rating,
+                'rating_list' : rating_list,
+                'no_rating_list' : no_rating_list,
+                'rounded_rating' : rounded_rating,
+                'review_count' : review_count,
                 "category_offer": category_offer,
                 "highest_discount": highest_discount,
                 "highest_offer_price": highest_offer_price,
@@ -2675,7 +2694,7 @@ def review_product_page(request, product_color_id):
             user = request.user
             customer = Customer.objects.get(user = user)
             user_orders = Orders.objects.filter(customer = customer)
-            
+            rating_form = [1,2,3,4,5]
             valid_product = False
             for order in user_orders:
                 if OrderItem.objects.filter(order=order, product__product_color_image=product_color).exists():
@@ -2683,6 +2702,7 @@ def review_product_page(request, product_color_id):
                     break
             if valid_product:
                 context = {
+                    'rating_form' : rating_form,
                     'product_color' : product_color
                 }
                 return render(request, 'review_product.html', context)
@@ -2692,4 +2712,60 @@ def review_product_page(request, product_color_id):
             return redirect('user_dashboard')
     else:
         return redirect('sign_in_page')
-        
+    
+
+
+
+@never_cache
+@clear_old_messages
+def rate_and_review(request, product_color_id):
+    if request.user.is_authenticated:
+        try:
+            product_color = ProductColorImage.objects.get(pk = product_color_id)
+            user = request.user
+            customer = Customer.objects.get(user = user)
+            user_orders = Orders.objects.filter(customer = customer)
+            valid_product = False
+            is_all_valid = True
+            for order in user_orders:
+                if OrderItem.objects.filter(order=order, product__product_color_image=product_color).exists():
+                    valid_product = True
+                    break
+            if valid_product:
+                if request.method == 'POST':
+                    rating = request.POST.get('rating')
+                    description = request.POST.get('description')
+                    title = request.POST.get('title')
+                    try:
+                        description_pattern.match(description)
+                        description_pattern.match(title)
+                        cleaned_title = clean_string(title)
+                        cleaned_description = clean_string(description)
+                        if not 5<= len(cleaned_description) <= 300:
+                            is_all_valid = False
+                        if not 3<= len(cleaned_title) <= 100:
+                            is_all_valid = False
+                    except ValueError:
+                        is_all_valid = False
+                    if is_all_valid:
+                        review = Review.objects.create(
+                            product_color = product_color,
+                            customer=customer,
+                            rating=rating,
+                            review_text=description,
+                            title=title,
+                        )
+                        review.save()
+                        print('Reached After')
+                        messages.success(request, 'Rating have been updated')
+                        return redirect(user_dashboard)
+                    else:
+                        return redirect('review_product_page', product_color_id)
+                else:
+                    return redirect('user_dashboard')
+            else:
+                return redirect('user_dashboard')
+        except Exception:
+            return redirect(user_dashboard)
+    else:
+        return redirect('sign_in_page')

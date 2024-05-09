@@ -47,12 +47,19 @@
           <div class="col-md-6">
             <div class="product-details">
               <h1 class="product-title">{{ product_color.products.name }}</h1>
-              <div class="ratings-container">
-                <div class="ratings">
-                  <div class="ratings-val" style="width: 80%;"></div>
+              {% if review_count > 0 %}
+                <div class="ratings-container">
+                  <div class="rating">
+                    {% for i in rating_list %}
+                      <i class="bi bi-star-fill text-warning"></i>
+                    {% endfor %}
+                    {% for i in no_rating_list %}
+                      <i class="bi bi-star-fill text-light"></i>
+                    {% endfor %}
+                  </div>
+                    <a class="ratings-text" href="#product-review-link" id="review-link">( {{rounded_rating}} Reviews )</a>
                 </div>
-                <a class="ratings-text" href="#product-review-link" id="review-link">( 2 Reviews )</a>
-              </div>
+              {% endif %}
               <div class="product-price">
                 {% if product_offer or category_offer %}
                     <span class="text-success">₹ {{ highest_offer_price }}.00</span>
@@ -137,9 +144,12 @@
           <li class="nav-item">
             <a class="nav-link" id="product-shipping-link" data-toggle="tab" href="#product-shipping-tab" role="tab" aria-controls="product-shipping-tab" aria-selected="false">Shipping & Returns</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" id="product-review-link" data-toggle="tab" href="#product-review-tab" role="tab" aria-controls="product-review-tab" aria-selected="false">Reviews</a>
-          </li>
+          
+          {% if reviews %}
+            <li class="nav-item">
+              <a class="nav-link" id="product-review-link" data-toggle="tab" href="#product-review-tab" role="tab" aria-controls="product-review-tab" aria-selected="false">Reviews</a>
+            </li>
+          {% endif %}
         </ul>
         <div class="tab-content">
           <div class="tab-pane fade show active" id="product-desc-tab" role="tabpanel" aria-labelledby="product-desc-link">
@@ -164,9 +174,36 @@
               </p>
             </div>
           </div>
-          <div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
-            {% include 'shop_page/reviews_product.html' %}
-          </div>
+          
+          {% if reviews %}
+            <div class="tab-pane fade" id="product-review-tab" role="tabpanel" aria-labelledby="product-review-link">
+              <div class="reviews">
+                <h3>Reviews</h3>
+                {% for review in reviews %}
+                  <div class="review">
+                    <div class="row no-gutters">
+                      <div class="col-auto">
+                        <h4><a href="#">{{ review.customer.user.first_name }}.</a></h4>
+                        <div class="ratings-container">
+                          <div class="ratings">
+                            <div class="ratings-val" style="width: 80%;"></div>
+                          </div>
+                        </div>
+                        <span class="review-date">{{ review.review_date }}</span>
+                      </div>
+                      <div class="col">
+                        <h4>{{ review.title }}</h4>
+              
+                        <div class="review-content">
+                          <p>{{ review.review_text }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>            
+            </div>
+          {% endif %}
         </div>
       </div>
 
@@ -174,30 +211,6 @@
     </div>
   </div>
 
-  {% comment %} <div class="sticky-bar">
-    <div class="container">
-      <div class="row">
-        <div class="col-6">
-          <figure class="product-media">
-            <a href="{% url 'product_single_view_page' product_color.products.name product_color.id %}"><img src="{{ product_color.main_image.url }}" alt="Product image" /></a>
-          </figure>
-          <h4 class="product-title"><a href="product.html">{{ product_color.products.name }}</a></h4>
-        </div>
-
-        <div class="col-6 justify-content-end">
-          <div class="product-price">₹ {{ product_color.price }}.00</div>
-          <div class="product-details-quantity">
-            <input type="number" id="sticky-cart-qty" class="form-control" value="1" min="1" max="10" step="1" data-decimals="0" required />
-          </div>
-
-          <div class="product-details-action">
-            <a href="#" class="btn-product btn-cart"><span>add to cart</span></a>
-            <a href="#" class="btn-product btn-wishlist" title="Wishlist"><span>Add to Wishlist</span></a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> {% endcomment %}
 {% endblock %}
 
 {% block custom_scripts %}
@@ -206,24 +219,16 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Select the color selector
       var colorSelector = document.querySelector('.product-nav-thumbs')
-      // Select the main product image
       var mainImage = document.getElementById('product-zoom')
-      // Select all items in the product image gallery
       var galleryItems = document.querySelectorAll('.product-gallery-item')
     
-      // Add event listener to the color selector
       colorSelector.addEventListener('click', function (event) {
-        // Prevent default link behavior
         event.preventDefault()
     
-        // Check if clicked element is a color selector
         if (event.target.tagName === 'IMG') {
-          // Update main product image src
           mainImage.src = event.target.src
     
-          // Update product image gallery src
           galleryItems.forEach(function (item) {
             item.querySelector('img').src = event.target.src
           })

@@ -148,6 +148,9 @@ urlpatterns = [
     
     path('sneakerheads/user/review-product/<int:product_color_id>/',
          review_product_page, name='review_product_page'),
+    
+    path('sneakerheads/user/rate-and-review/<int:product_color_id>/',
+         rate_and_review, name='rate_and_review'),
 ]
 
 

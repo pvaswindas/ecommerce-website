@@ -1,43 +1,55 @@
 {% extends 'main_base.html' %}
 {% load static %}
+{% block extra1_css %}
+  <link rel="stylesheet" href="{% static 'user/css/review_product.css' %}" />
+{% endblock %}
 
+{% block extra_css %}
+{% endblock %}
 {% block page_content %}
-<div class="container-fluid bg-light px-0 min-vh-100 py-5">
+  <div class="container-fluid bg-light px-0 min-vh-100 py-5">
     <div class="row d-flex bg-white justify-content-around mx-5 shadow p-3">
-        <div class="col-md-8 align-content-center">
-            <h1>Review Product</h1>
-        </div>
-        <div class="col-md-4 d-flex text-center align-content-center justify-content-center">
-            <h4 class="align-content-center">{{ product_color.products.name }} ({{ product_color.color }})</h4>
-            <img class="img-fluid w-25" src="{{ product_color.main_image.url }}" alt="productimage">
-        </div>
+      <div class="col-md-8 align-content-center px-4">
+        <h2>Review Product</h2>
+      </div>
+      <div class="col-md-4 d-flex text-center align-content-center justify-content-center">
+        <h5 class="align-content-center">{{ product_color.products.name }} ({{ product_color.color }})</h5>
+        <img class="img-fluid w-25" src="{{ product_color.main_image.url }}" alt="productimage" />
+      </div>
     </div>
     <div class="row d-flex justify-content-between mx-5">
-        <div class="col-12 bg-white shadow border p-5 mt-4">
+      <div class="col-12 bg-white shadow border p-5 mt-4">
+        <form action="{% url 'rate_and_review' product_color.id %}" method="post" id="ratingForm">
+            {% csrf_token %}
             <div class="container-fluid border py-5">
-                <h3 class="mb-4">Rate this prouduct</h3>
-                <input type="checkbox" class="d-none" name="very_bad">
-                <label for="very_bad"><i class="bi bi-star-fill fs-3 mx-1"></i></label>
-                
-                <input type="checkbox" class="d-none" name="bad">
-                <label for="bad"><i class="bi bi-star-fill fs-3 mx-1"></i></label>
-
-                <input type="checkbox" class="d-none" name="good">
-                <label for="good"><i class="bi bi-star-fill fs-3 mx-1"></i></label>
-
-                <input type="checkbox" class="d-none" name="very_good">
-                <label for="very_good"><i class="bi bi-star-fill fs-3 mx-1"></i></label>
-
-                <input type="checkbox" class="d-none" name="excellent">
-                <label for="excellent"><i class="bi bi-star-fill fs-3 mx-1"></i></label>
+                <h3 class="mb-4">Rate this product</h3>
+                <label for="vol">Rate between 2 - 5:</label>
+                <input type="range" id="vol" name="rating" min="1" max="5" required step="1">
             </div>
             <div class="container-fluid border my-5 py-5">
                 <h3 class="mb-4">Review this product</h3>
-                <textarea class="w-100 py-5 mb-4 border" name="description" id="description"></textarea>
+                <textarea class="w-100 p-5 mb-4 border fs-3" name="description" id="description" required></textarea>
                 <label class="fs-3 fw-medium text-black" for="title">Title</label>
-                <input class="w-100 py-2 mt-0 border border-0 fs-3" type="text" placeholder="Review title..." name="title">
+                <input class="w-100 py-2 mt-0 border border-0 fs-3" type="text" required placeholder="Review title..." name="title" />
             </div>
-        </div>
+            <button class="btn btn-warning float-end" type="submit">Submit</button>
+        </form>
+      </div>
     </div>
-</div>
+  </div>
+{% endblock %}
+
+{% block custom_scripts %}
+  <script>
+    function toggleStarClass(checkbox) {
+      var starIcon = checkbox.nextElementSibling.querySelector('.bi-star-fill');
+      if (checkbox.checked) {
+        starIcon.classList.add('star');
+        starIcon.classList.remove('unstar');
+      } else {
+        starIcon.classList.remove('star');
+        starIcon.classList.add('unstar');
+      }
+    }
+  </script>
 {% endblock %}

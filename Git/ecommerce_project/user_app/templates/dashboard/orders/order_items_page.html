@@ -139,7 +139,7 @@
                     {% endif %}
                   </td>
                   
-                  {% if not cancelled and order.order_status == 'Delivered' and not can_return_order  %}
+                  {% if cancelled or order.order_status == 'Delivered' or can_return_order  %}
                   <td>
                     <i class="bi bi-star-fill px-1" style="color: #007FFF;"></i>
                     <a href="{% url 'review_product_page' item.product.product_color_image.id %}" style="color: #007FFF;">Rate and Review Product</a>
