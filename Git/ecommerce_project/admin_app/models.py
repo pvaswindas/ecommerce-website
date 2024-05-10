@@ -414,5 +414,3 @@ class CartProducts(models.Model):
             return self.quantity * self.product.product_color_image.price
 
 
-class Banner(models.Model):
-    pass

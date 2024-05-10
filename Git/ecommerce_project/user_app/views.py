@@ -43,7 +43,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from reportlab.lib import colors  # type: ignore
 from reportlab.lib.units import inch  # type: ignore
-from reportlab.lib.enums import TA_RIGHT # type: ignore
+from reportlab.lib.enums import TA_RIGHT  # type: ignore
 from reportlab.platypus import TableStyle  # type: ignore
 from reportlab.lib.pagesizes import letter  # type: ignore
 from reportlab.lib.styles import ParagraphStyle  # type: ignore
@@ -71,6 +71,7 @@ def clear_old_messages(view_func):
 
     return only_new_messages
 
+
 alphabets_pattern = re.compile(r"^[a-zA-Z\s]+$")
 description_pattern = re.compile(r"^[\w\s',.\-\(\)]*$")
 
@@ -89,9 +90,11 @@ def get_cart_wishlist_address_order_data(request):
         cart = Cart.objects.get(customer=customer)
         cart_items = CartProducts.objects.filter(cart=cart)
         wishlist = Wishlist.objects.get(customer=customer)
-        wishlist_item_count = WishlistItem.objects.filter(wishlist=wishlist).count()
+        wishlist_item_count = WishlistItem.objects.filter(
+            wishlist=wishlist).count()
         addresses = Address.objects.filter(customer=customer).order_by("name")
-        orders = Orders.objects.filter(customer=customer).order_by("-placed_at")
+        orders = Orders.objects.filter(
+            customer=customer).order_by("-placed_at")
         order_items = OrderItem.objects.filter(order__customer=customer).order_by(
             "-order__placed_at"
         )
@@ -208,7 +211,8 @@ def index_page(request):
         women_products_count = all_products.filter(
             products__category__name="WOMEN"
         ).count()
-        men_products_count = all_products.filter(products__category__name="MEN").count()
+        men_products_count = all_products.filter(
+            products__category__name="MEN").count()
         kids_products_count = all_products.filter(
             products__category__name="KIDS"
         ).count()
@@ -244,7 +248,8 @@ def index_page(request):
                 "men_top_selling_products": men_top_selling_products,
             }
         )
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
         context.update(cart_wishlist_address_order_data)
         return render(request, "index.html", context)
     return render(request, "index.html")
@@ -344,7 +349,8 @@ def register_function(request):
 
             elif len(password) < 8:
                 is_every_field_valid = False
-                messages.error(request, "Password must be at least 8 characters long.")
+                messages.error(
+                    request, "Password must be at least 8 characters long.")
 
             elif " " in password:
                 is_every_field_valid = False
@@ -422,7 +428,8 @@ def otp_verification_page(request):
 
         if otp and otp_created_at_str:
 
-            otp_created_at = datetime.strptime(otp_created_at_str, "%Y-%m-%d %H:%M:%S")
+            otp_created_at = datetime.strptime(
+                otp_created_at_str, "%Y-%m-%d %H:%M:%S")
             otp_created_at = timezone.make_aware(
                 otp_created_at, timezone.get_current_timezone()
             )
@@ -482,11 +489,13 @@ def otp_verification_page(request):
                         )
                         return redirect("sign_in_page")
                     else:
-                        messages.error(request, "User data not found in session")
+                        messages.error(
+                            request, "User data not found in session")
                 else:
                     messages.error(request, "Invalid OTP. Please try again.")
             else:
-                messages.error(request, "OTP has expired. Please request a new one.")
+                messages.error(
+                    request, "OTP has expired. Please request a new one.")
     else:
         return redirect("verify_otp")
 
@@ -577,7 +586,8 @@ def reset_password_change(request, user_id):
 
         is_valid_password = True
         if len(password) < 8:
-            messages.error(request, "Password must be at least 8 characters long.")
+            messages.error(
+                request, "Password must be at least 8 characters long.")
             is_valid_password = False
         elif " " in password:
             messages.error(request, "Password cannot contain spaces.")
@@ -683,7 +693,8 @@ def shop_page_view(request):
         {"min": 10000, "max": 15000},
     ]
     if request.user.is_authenticated:
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
         context.update(cart_wishlist_address_order_data)
 
     sortby = request.GET.get("sortby", "default")
@@ -752,7 +763,7 @@ def shop_page_view(request):
         product_color_list = product_color_list.order_by("price")
     elif sortby == "high_to_low":
         product_color_list = product_color_list.order_by("-price")
-        
+
     product_color_list = product_color_list.order_by('pk')
 
     paginator = Paginator(product_color_list, 12)
@@ -841,7 +852,8 @@ def product_single_view_page(request, product_name, pdt_id):
             highest_discount = category_offer.discount_percentage
 
         if category_offer or product_offer:
-            discount_amount = round((highest_discount * product_color.price) / 100)
+            discount_amount = round(
+                (highest_discount * product_color.price) / 100)
             highest_offer_price = product_color.price - discount_amount
         else:
             highest_discount = None
@@ -850,22 +862,23 @@ def product_single_view_page(request, product_name, pdt_id):
         context.update(
             {
                 "product_offer": product_offer,
-                'reviews' : reviews,
-                'avg_rating' : avg_rating,
-                'rating_list' : rating_list,
-                'no_rating_list' : no_rating_list,
-                'rounded_rating' : rounded_rating,
-                'review_count' : review_count,
+                'reviews': reviews,
+                'avg_rating': avg_rating,
+                'rating_list': rating_list,
+                'no_rating_list': no_rating_list,
+                'rounded_rating': rounded_rating,
+                'review_count': review_count,
                 "category_offer": category_offer,
                 "highest_discount": highest_discount,
                 "highest_offer_price": highest_offer_price,
             }
         )
     except ObjectDoesNotExist:
-        pass
+        return redirect('shop_page_view')
 
     if request.user.is_authenticated:
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
         context.update(cart_wishlist_address_order_data)
         user = request.user
         customer = Customer.objects.get(user=user)
@@ -885,7 +898,8 @@ def product_single_view_page(request, product_name, pdt_id):
         )
 
     last_five_products = ProductColorImage.objects.order_by("-id")[:5]
-    product_sizes = ProductSize.objects.filter(product_color_image=product_color)
+    product_sizes = ProductSize.objects.filter(
+        product_color_image=product_color)
 
     context.update(
         {
@@ -911,7 +925,8 @@ def wishlist_view(request):
         cart_items = CartProducts.objects.filter(cart=cart)
         wishlist = Wishlist.objects.get(customer=customer)
         wishlist_items = WishlistItem.objects.filter(wishlist=wishlist)
-        wishlist_item_count = WishlistItem.objects.filter(wishlist=wishlist).count()
+        wishlist_item_count = WishlistItem.objects.filter(
+            wishlist=wishlist).count()
 
         context = {
             "cart": cart,
@@ -921,6 +936,8 @@ def wishlist_view(request):
             "wishlist_item_count": wishlist_item_count,
         }
         return render(request, "wishlist.html", context)
+    else:
+        return redirect('sign_in_page')
 
 
 @never_cache
@@ -1022,7 +1039,8 @@ def remove_in_wishlist(request, product_color_id):
 def user_dashboard(request):
     if request.user.is_authenticated:
         context = {}
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
         context.update(cart_wishlist_address_order_data)
         return render(request, "dashboard.html", context)
     else:
@@ -1094,9 +1112,9 @@ def user_details_edit(request):
                 user.save()
                 customer.save()
                 messages.success(request, "Profile updated successfully.")
-                return redirect(reverse("user_dashboard", kwargs={"user_id": user_id}))
+                return redirect('user_dashboard')
             else:
-                return redirect(reverse("user_dashboard", kwargs={"user_id": user_id}))
+                return redirect('user_dashboard')
         else:
             messages.error(request, "User details not found.")
             return redirect(index_page)
@@ -1122,13 +1140,15 @@ def referrals_page_view(request):
             sign_up_url + f"?ref={referral_code}"
         )
 
-        referral_usage = Customer.objects.filter(used_referral_code=referral_code)
+        referral_usage = Customer.objects.filter(
+            used_referral_code=referral_code)
 
         referral_count = referral_usage.count() if referral_usage else 0
 
         total_earnings = 250 * referral_count if referral_count else 0
 
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
         context.update(cart_wishlist_address_order_data)
         context.update(
             {
@@ -1490,7 +1510,8 @@ def add_new_address(request, customer_id):
                 else:
                     return redirect("user_dashboard", user_id=user_id)
             else:
-                messages.error(request, "Please fill all the fields to add the address")
+                messages.error(
+                    request, "Please fill all the fields to add the address")
                 return redirect("user_dashboard", user_id=user_id)
     else:
         return redirect(index_page)
@@ -1535,7 +1556,8 @@ def user_change_password(request, user_id):
                     user.set_password(new_password)
                     user.save()
 
-                    user = authenticate(username=user.username, password=new_password)
+                    user = authenticate(
+                        username=user.username, password=new_password)
                     if user is not None:
                         auth.login(request, user)
 
@@ -1564,7 +1586,8 @@ def order_items_page(request, order_id):
             user = customer.user
             total_charge = order.total_charge
             callback_url = request.build_absolute_uri(
-                reverse("razorpay_repayment_payment", kwargs={"order_id": order_id})
+                reverse("razorpay_repayment_payment",
+                        kwargs={"order_id": order_id})
             )
             currency = "INR"
             if total_charge > 0:
@@ -1572,7 +1595,8 @@ def order_items_page(request, order_id):
             else:
                 amount_in_paise = 1 * 100
             razorpay_order = razorpay_client.order.create(
-                dict(amount=amount_in_paise, currency=currency, payment_capture="0")
+                dict(amount=amount_in_paise,
+                     currency=currency, payment_capture="0")
             )
             razorpay_order_id = razorpay_order["id"]
 
@@ -1620,7 +1644,8 @@ def order_items_page(request, order_id):
                 can_return_order = False
 
             current_time = timezone.now()
-            ten_minutes_after_order_placed = order.placed_at + timedelta(minutes=10)
+            ten_minutes_after_order_placed = order.placed_at + \
+                timedelta(minutes=10)
 
             if current_time <= ten_minutes_after_order_placed:
                 can_repay = True
@@ -1655,40 +1680,46 @@ def generate_invoice(request, order_id):
         try:
             order = Orders.objects.get(order_id=order_id)
             order_items = OrderItem.objects.filter(
-                order=order,request_cancel=False, request_return=False)
+                order=order, request_cancel=False, request_return=False)
             buffer = BytesIO()
             doc = SimpleDocTemplate(buffer, pagesize=letter)
-            
+
             styles = getSampleStyleSheet()
-            
+
             for style_name, style in styles.byName.items():
                 style.fontSize = 9
-            
+
             today_date = datetime.now().strftime("%Y-%m-%d")
             content = []
 
-            heading_style = ParagraphStyle(name="Invoice", parent=styles["Heading1"], alignment=1, fontSize=14)
+            heading_style = ParagraphStyle(
+                name="Invoice", parent=styles["Heading1"], alignment=1, fontSize=14)
             content.append(Paragraph("<b>Invoice</b>", heading_style))
             content.append(Spacer(1, 0.5 * inch))
 
             max_width = 40
             address_content = f"<b>Shipping Address :</b> {order.address}"
-            wrapped_address = textwrap.fill(address_content, width=max_width, subsequent_indent=" " * 20)
-            address_paragraphs = [Paragraph(line, styles["Normal"]) for line in wrapped_address.split("\n")]
+            wrapped_address = textwrap.fill(
+                address_content, width=max_width, subsequent_indent=" " * 20)
+            address_paragraphs = [
+                Paragraph(line, styles["Normal"]) for line in wrapped_address.split("\n")]
             content.extend(address_paragraphs)
             content.append(Spacer(1, 0.2 * inch))
 
             gst = 'GSTINMDHGYR'
             order_id = order.order_id
-            gst_style = ParagraphStyle(name="GST", parent=styles["Normal"], alignment=TA_RIGHT)
+            gst_style = ParagraphStyle(
+                name="GST", parent=styles["Normal"], alignment=TA_RIGHT)
             content.append(Paragraph(f"<b>GST:</b> {gst}", gst_style))
-            content.append(Paragraph(f"<b>Order ID:</b> {order_id}", styles["Normal"]))
+            content.append(
+                Paragraph(f"<b>Order ID:</b> {order_id}", styles["Normal"]))
             content.append(Spacer(1, 0.2 * inch))
 
             data = [["Product", "Quantity", "Total Price", "Delivery Date"]]
             for item in order_items:
                 formatted_date = item.delivery_date.strftime("%a, %d %b %Y")
-                item_name = f"{item.product.product_color_image.products.name} ({item.product.product_color_image.color})"
+                item_name = f"{item.product.product_color_image.products.name} ({
+                    item.product.product_color_image.color})"
                 data.append([
                     item_name,
                     item.quantity,
@@ -1724,30 +1755,35 @@ def generate_invoice(request, order_id):
             else:
                 price_before_discount = order.total_charge
                 discount_amount = 0
-            total_price_style = ParagraphStyle(name="TotalPrice", parent=styles["Normal"], alignment=TA_RIGHT, fontSize=8)
-            content.append(Paragraph(f"<b>Gross Price:</b> {price_before_discount}.00", total_price_style))
-            content.append(Paragraph(f"<b>Discount Price:</b> {discount_amount}.00", total_price_style))
+            total_price_style = ParagraphStyle(
+                name="TotalPrice", parent=styles["Normal"], alignment=TA_RIGHT, fontSize=8)
+            content.append(Paragraph(
+                f"<b>Gross Price:</b> {price_before_discount}.00", total_price_style))
+            content.append(
+                Paragraph(f"<b>Discount Price:</b> {discount_amount}.00", total_price_style))
             content.append(Spacer(1, 0.2 * inch))
-            content.append(Paragraph(f"<b>Total Price:</b> {total_charge}.00", total_price_style))
+            content.append(
+                Paragraph(f"<b>Total Price:</b> {total_charge}.00", total_price_style))
             content.append(Spacer(1, 0.2 * inch))
 
-            company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {today_date}"
+            company_details = f"<b>SneakerHeads</b><br/>Email: sneakerheadsweb@email.com<br/>Date: {
+                today_date}"
             content.append(Paragraph(company_details, styles["Normal"]))
 
             doc.build(content)
 
             file_name = f"Invoice{order.order_id}.pdf"
 
-            response = HttpResponse(buffer.getvalue(), content_type="application/pdf")
-            response["Content-Disposition"] = f'attachment; filename="{file_name}"'
+            response = HttpResponse(
+                buffer.getvalue(), content_type="application/pdf")
+            response["Content-Disposition"] = f'attachment; filename="{
+                file_name}"'
             return response
 
         except Orders.DoesNotExist:
             return redirect("sign_in_page")
     else:
         return redirect("user_dashboard")
-
-
 
 
 @never_cache
@@ -1863,7 +1899,8 @@ def sent_return_request(request, order_items_id):
 def cart_view_page(request, user_id):
     if request.user.is_authenticated:
         context = {}
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
 
         context["today"] = datetime.now().date()
 
@@ -1889,14 +1926,13 @@ def add_to_cart(request, product_id):
                 ).get(pk=size)
 
                 cart = Cart.objects.get(customer=customer)
-
                 cart_product = CartProducts.objects.create(
                     cart=cart,
                     product=product_size,
                 )
                 cart_product.save()
                 return redirect("cart_view_page", user_id=user_id)
-        except Exception as e:
+        except Exception:
             return redirect(index_page)
     else:
         return redirect(sign_in)
@@ -2007,7 +2043,8 @@ def update_quantity(request):
                 try:
                     new_quantity = int(new_quantity)
                 except ValueError:
-                    messages.error(request, "Add the cart quantity using the buttons")
+                    messages.error(
+                        request, "Add the cart quantity using the buttons")
                     return redirect("cart_view_page")
                 try:
                     if cart_item.product.quantity >= new_quantity:
@@ -2117,7 +2154,8 @@ def checkout_page(request):
                 customer=customer, coupon_applied=True, order__cancel_product=False
             )
 
-            used_coupons = orders_with_coupon.values_list("coupon_name", flat=True)
+            used_coupons = orders_with_coupon.values_list(
+                "coupon_name", flat=True)
 
             available_coupons = Coupon.objects.filter(
                 Q(minimum_amount__lte=total_price)
@@ -2171,7 +2209,8 @@ def calculate_discounted_total_charge(cart_items, coupon):
     cart_total = cart_total_price
 
     if coupon:
-        discount_amount = round((cart_total * coupon.discount_percentage) / 100)
+        discount_amount = round(
+            (cart_total * coupon.discount_percentage) / 100)
         total_charge_discounted = cart_total - discount_amount
     else:
         total_charge_discounted = cart_total
@@ -2205,7 +2244,8 @@ def apply_coupon(request):
 def send_order_confirmation_email(order):
     subject = "Order Confirmation"
 
-    html_message = render_to_string("order_confirmation_email.html", {"order": order})
+    html_message = render_to_string(
+        "order_confirmation_email.html", {"order": order})
 
     plain_message = strip_tags(html_message)
 
@@ -2270,12 +2310,14 @@ def place_order(request):
                         maximum_amount = None
                         discount_amount = None
                         if cart.coupon_applied:
-                            coupon = Coupon.objects.get(coupon_code=cart.coupon)
+                            coupon = Coupon.objects.get(
+                                coupon_code=cart.coupon)
                             discount_price = int(cart_total) - int(
                                 total_charge_discounted
                             )
                             total_charge_discounted, discount_amount = (
-                                calculate_total_charge_discounted(cart_items, cart)
+                                calculate_total_charge_discounted(
+                                    cart_items, cart)
                             )
                             if_coupon_applied = True
                             coupon_name = cart.coupon
@@ -2303,7 +2345,8 @@ def place_order(request):
                                 callback_params = {
                                     "address_id": address_id,
                                 }
-                                callback_query_string = urlencode(callback_params)
+                                callback_query_string = urlencode(
+                                    callback_params)
                                 callback_url = (
                                     request.build_absolute_uri(
                                         reverse(
@@ -2348,7 +2391,8 @@ def place_order(request):
                                     "Razorpay Order Creation Failed: " + str(e)
                                 )
                         else:
-                            payment = Payment.objects.create(method_name=payment_method)
+                            payment = Payment.objects.create(
+                                method_name=payment_method)
 
                             order = Orders.objects.create(
                                 customer=customer,
@@ -2392,7 +2436,7 @@ def place_order(request):
                                 )
                                 product_size.quantity -= item.quantity
                                 product_size.save()
-                                
+
                             if payment_method == "Wallet":
                                 order.paid = True
                                 order.save()
@@ -2491,7 +2535,8 @@ def razorpay_payment(request, user_id):
             "razorpay_signature": signature,
         }
         try:
-            result = razorpay_client.utility.verify_payment_signature(params_dict)
+            result = razorpay_client.utility.verify_payment_signature(
+                params_dict)
             with transaction.atomic():
                 if result is not None:
                     payment.paid_at = timezone.now()
@@ -2540,7 +2585,8 @@ def razorpay_payment(request, user_id):
                         order_item.save()
 
                         product_size_id = item.product.id
-                        product_size = ProductSize.objects.get(pk=product_size_id)
+                        product_size = ProductSize.objects.get(
+                            pk=product_size_id)
                         product_size.quantity -= item.quantity
                         product_size.save()
 
@@ -2627,7 +2673,8 @@ def razorpay_repayment_payment(request, order_id):
         total_charge = order.total_charge
 
         try:
-            result = razorpay_client.utility.verify_payment_signature(params_dict)
+            result = razorpay_client.utility.verify_payment_signature(
+                params_dict)
             with transaction.atomic():
                 if result is not None:
                     payment.paid_at = timezone.now()
@@ -2669,11 +2716,11 @@ def order_placed_view(request, order_id):
 def payment_failed(request, order_id):
     if request.user.is_authenticated:
         user = request.user
-        order = Orders.objects.get(order_id = order_id)
+        order = Orders.objects.get(order_id=order_id)
         if order.customer.user == user:
             context = {
-                'order' : order,
-                'order_id' : order_id,
+                'order': order,
+                'order_id': order_id,
             }
             return render(request, "paymentfail.html", context)
         else:
@@ -2682,19 +2729,16 @@ def payment_failed(request, order_id):
         return redirect(index_page)
 
 
-
-
-
 @never_cache
 @clear_old_messages
 def review_product_page(request, product_color_id):
     if request.user.is_authenticated:
         try:
-            product_color = ProductColorImage.objects.get(pk = product_color_id)
+            product_color = ProductColorImage.objects.get(pk=product_color_id)
             user = request.user
-            customer = Customer.objects.get(user = user)
-            user_orders = Orders.objects.filter(customer = customer)
-            rating_form = [1,2,3,4,5]
+            customer = Customer.objects.get(user=user)
+            user_orders = Orders.objects.filter(customer=customer)
+            rating_form = [1, 2, 3, 4, 5]
             valid_product = False
             for order in user_orders:
                 if OrderItem.objects.filter(order=order, product__product_color_image=product_color).exists():
@@ -2702,8 +2746,8 @@ def review_product_page(request, product_color_id):
                     break
             if valid_product:
                 context = {
-                    'rating_form' : rating_form,
-                    'product_color' : product_color
+                    'rating_form': rating_form,
+                    'product_color': product_color
                 }
                 return render(request, 'review_product.html', context)
             else:
@@ -2712,8 +2756,6 @@ def review_product_page(request, product_color_id):
             return redirect('user_dashboard')
     else:
         return redirect('sign_in_page')
-    
-
 
 
 @never_cache
@@ -2721,10 +2763,10 @@ def review_product_page(request, product_color_id):
 def rate_and_review(request, product_color_id):
     if request.user.is_authenticated:
         try:
-            product_color = ProductColorImage.objects.get(pk = product_color_id)
+            product_color = ProductColorImage.objects.get(pk=product_color_id)
             user = request.user
-            customer = Customer.objects.get(user = user)
-            user_orders = Orders.objects.filter(customer = customer)
+            customer = Customer.objects.get(user=user)
+            user_orders = Orders.objects.filter(customer=customer)
             valid_product = False
             is_all_valid = True
             for order in user_orders:
@@ -2741,22 +2783,21 @@ def rate_and_review(request, product_color_id):
                         description_pattern.match(title)
                         cleaned_title = clean_string(title)
                         cleaned_description = clean_string(description)
-                        if not 5<= len(cleaned_description) <= 300:
+                        if not 5 <= len(cleaned_description) <= 300:
                             is_all_valid = False
-                        if not 3<= len(cleaned_title) <= 100:
+                        if not 3 <= len(cleaned_title) <= 100:
                             is_all_valid = False
                     except ValueError:
                         is_all_valid = False
                     if is_all_valid:
                         review = Review.objects.create(
-                            product_color = product_color,
+                            product_color=product_color,
                             customer=customer,
                             rating=rating,
                             review_text=description,
                             title=title,
                         )
                         review.save()
-                        print('Reached After')
                         messages.success(request, 'Rating have been updated')
                         return redirect(user_dashboard)
                     else:
@@ -2769,20 +2810,21 @@ def rate_and_review(request, product_color_id):
             return redirect(user_dashboard)
     else:
         return redirect('sign_in_page')
-    
-    
-    
+
+
 @never_cache
 @clear_old_messages
 def mens_page(request):
     context = {}
     if request.user.is_authenticated:
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
         context.update(cart_wishlist_address_order_data)
     sortby = request.GET.get("sortby", "default")
-    
+
     product_color_list = ProductColorImage.objects.filter(
-        is_deleted=False, is_listed=True, products__category__name__iexact='Men'
+        is_deleted=False, is_listed=True,
+        products__category__name__iexact='Men'
     )
     product_color_list = product_color_list.order_by('pk')
     if sortby == "a_z":
@@ -2792,7 +2834,7 @@ def mens_page(request):
     elif sortby == "low_to_high":
         product_color_list = product_color_list.order_by("price")
     elif sortby == "high_to_low":
-        product_color_list = product_color_list.order_by("-price")    
+        product_color_list = product_color_list.order_by("-price")
     paginator = Paginator(product_color_list, 12)
     page_number = request.GET.get("page")
     try:
@@ -2813,15 +2855,13 @@ def mens_page(request):
     return render(request, 'mens.html', context)
 
 
-
-
-
 @never_cache
 @clear_old_messages
 def women_page(request):
     context = {}
     if request.user.is_authenticated:
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
         context.update(cart_wishlist_address_order_data)
     sortby = request.GET.get("sortby", "default")
     product_color_list = ProductColorImage.objects.filter(
@@ -2845,7 +2885,7 @@ def women_page(request):
         product_color_list = paginator.page(1)
     except EmptyPage:
         product_color_list = paginator.page(paginator.num_pages)
-    
+
     latest_products = ProductColorImage.objects.filter(
         is_deleted=False, is_listed=True,
         products__category__name__iexact='Women'
@@ -2858,15 +2898,13 @@ def women_page(request):
     return render(request, 'women.html', context)
 
 
-
-
-
 @never_cache
 @clear_old_messages
 def kids_page(request):
     context = {}
     if request.user.is_authenticated:
-        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
         context.update(cart_wishlist_address_order_data)
     sortby = request.GET.get("sortby", "default")
     product_color_list = ProductColorImage.objects.filter(
@@ -2900,3 +2938,85 @@ def kids_page(request):
         'sortby': sortby,
     })
     return render(request, 'kids.html', context)
+
+
+@never_cache
+@clear_old_messages
+def sneakers_and_athletic_page(request):
+    context = {}
+    if request.user.is_authenticated:
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(
+            request)
+        context.update(cart_wishlist_address_order_data)
+
+    sortby = request.GET.get("sortby", "default")
+
+    product_color_list = ProductColorImage.objects.filter(
+        is_deleted=False,
+        is_listed=True,
+    ).filter(
+        Q(products__type__icontains='sneaker') | Q(
+            products__type__icontains='athletic')
+    )
+    women_running_shoe = request.GET.get("women_running_shoe")
+    running_shoes = request.GET.get('running_shoes')
+    boots = request.GET.get('boots')
+    if women_running_shoe:
+        product_color_list = ProductColorImage.objects.filter(
+            is_listed=True,
+            is_deleted=False,
+        ).filter(
+            Q(products__category__name__iexact='Women') &
+            Q(products__type__icontains='sneaker')
+        )
+    elif running_shoes:
+        product_color_list = ProductColorImage.objects.filter(
+            is_listed=True,
+            is_deleted=False,
+            products__type__icontains='Running'
+        )
+    elif boots:
+        product_color_list = ProductColorImage.objects.filter(
+            is_listed=True,
+            is_deleted=False,
+            products__type__icontains='Boots'
+        )   
+        
+    product_color_list = product_color_list.order_by('pk')
+
+    if sortby == "a_z":
+        product_color_list = product_color_list.order_by("products__name")
+    elif sortby == "new_arrival":
+        product_color_list = product_color_list.order_by("-created_at")
+    elif sortby == "low_to_high":
+        product_color_list = product_color_list.order_by("price")
+    elif sortby == "high_to_low":
+        product_color_list = product_color_list.order_by("-price")
+
+    paginator = Paginator(product_color_list, 12)
+
+    page_number = request.GET.get("page")
+    try:
+        product_color_list = paginator.page(page_number)
+    except PageNotAnInteger:
+        product_color_list = paginator.page(1)
+    except EmptyPage:
+        product_color_list = paginator.page(paginator.num_pages)
+
+    latest_products = ProductColorImage.objects.filter(
+        is_deleted=False,
+        is_listed=True,
+    ).filter(
+        Q(products__type__icontains='sneaker') | Q(
+            products__type__icontains='athletic')
+    ).order_by("-created_at")[:4]
+
+    context.update({
+        'product_color_list': product_color_list,
+        'latest_products': latest_products,
+        'sortby': sortby,
+        'women_running_shoe' : women_running_shoe,
+        'running_shoes' : running_shoes,
+    })
+
+    return render(request, 'sneakers_athletic_shoes.html', context)
