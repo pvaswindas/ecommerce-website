@@ -1,0 +1,121 @@
+{% extends 'main_base.html' %}
+{% load static %}
+{% block extra_css %}
+
+{% endblock %}
+
+{% block page_header %}
+  <div class="page-header container-fluid d-flex justify-content-center align-items-center min-vh-100 img-fluid" style="background-image: url('{% static 'user/images/page_header/womens_logo.jpg' %}')">
+    <div class="container text-center">
+      <h1 class="page-title text-white fw-medium">Women's Sneakers<span class="font-monospace text-black">Welcome to our collection of women's shoes</span></h1>
+    </div>
+  </div>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <nav aria-label="breadcrumb" class="breadcrumb-nav border-0 mb-0">
+    <div class="container">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{% url 'index_page' %}">Home</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Women</li>
+      </ol>
+    </div>
+  </nav>
+{% endblock %}
+
+{% block page_content %}
+  <div class="container-fluid">
+    {% if product_color_list %}
+    <div class="toolbox-right">
+        <div class="toolbox-sort">
+            <form id="sortForm" action="{% url 'women_page' %}" method="get">
+                {% csrf_token %}
+                <label for="sortby">Sort by:</label>
+                <div class="select-custom">
+                    <select name="sortby" id="sortby" class="form-control">
+                        <option value="default" {% if sortby == 'default' %}selected{% endif %}>Default</option>
+                        <option value="a_z" {% if sortby == 'a_z' %}selected{% endif %}>A - Z</option>
+                        <option value="new_arrival" {% if sortby == 'new_arrival' %}selected{% endif %}>New Arrivals</option>
+                        <option value="low_to_high" {% if sortby == 'low_to_high' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="high_to_low" {% if sortby == 'high_to_low' %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+      </div>        
+      <div class="products mb-3 px-5">
+        <div class="row px-5">
+          {% for product_color in product_color_list %}
+            <div class="col-6 col-md-3 col-lg-3 col-xl-3 my-5 animate__animated animate__rotateIn">
+              <div class="product product-7 text-center">
+                <figure class="product-media">
+                  {% if not product_color.in_stock %}
+                    <span class="product-label bg-danger text-white">Out Of Stock</span>
+                  {% elif product_color in latest_products %}
+                    <span class="product-label label-new">New</span>
+                  {% endif %}
+
+                  <a href="{% url 'product_single_view_page' product_color.products.name product_color.id %}"><img src="{{ product_color.main_image.url }}" alt="Product image" class="product-image" id="mainImage{{ product_color.id }}" /></a>
+                </figure>
+
+                <div class="product-body">
+                  <div class="product-cat"></div>
+                  <h3 class="product-title"><a href="{% url 'product_single_view_page' product_color.products.name product_color.id %}">{{ product_color.products.name }}</a></h3>
+                  <div class="product-price">₹ {{ product_color.price }}.00</div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if product_color_list.has_other_pages %}
+        <ul class="pagination justify-content-center">
+          {% if product_color_list.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if request.GET.urlencode %}{{ request.GET.urlencode|slice:'1:' }}{% endif %}">&laquo;</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ product_color_list.previous_page_number }}{% if request.GET.urlencode %}{{ request.GET.urlencode|slice:'1:' }}{% endif %}">{{ product_color_list.previous_page_number }}</a>
+            </li>
+          {% endif %}
+
+          <li class="page-item active">
+            <a class="page-link" href="?page={{ product_color_list.number }}{% if request.GET.urlencode %}{{ request.GET.urlencode|slice:'1:' }}{% endif %}">{{ product_color_list.number }}</a>
+          </li>
+
+          {% if product_color_list.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ product_color_list.next_page_number }}{% if request.GET.urlencode %}{{ request.GET.urlencode|slice:'1:' }}{% endif %}">{{ product_color_list.next_page_number }}</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ product_color_list.paginator.num_pages }}{% if request.GET.urlencode %}{{ request.GET.urlencode|slice:'1:' }}{% endif %}">&raquo;</a>
+            </li>
+          {% endif %}
+        </ul>
+      {% endif %}
+    {% else %}
+      <div class="no-products-message text-center">No products available</div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+
+{% block custom_js %}
+  <script src="{% static 'user/assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/jquery.hoverIntent.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/jquery.waypoints.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/owl.carousel.min.js' %}"></script>
+  <script src="{% static 'user/assets/js/jquery.magnific-popup.min.js' %}"></script>
+  
+  <script>
+    $(document).ready(function() {
+        $('#sortby').change(function() {
+            $('#sortForm').submit();
+        });
+    });
+  </script>
+{% endblock %}

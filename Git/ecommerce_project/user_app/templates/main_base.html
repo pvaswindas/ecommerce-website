@@ -163,17 +163,17 @@
                     {% endblock %}
                     {% block nav_women_active %}
                       <li>
-                        <a href="">Women</a>
+                        <a href="{% url 'women_page' %}">Women</a>
                       </li>
                     {% endblock %}
                     {% block nav_men_active %}
                       <li>
-                        <a href="#">Men</a>
+                        <a href="{% url 'mens_page' %}">Men</a>
                       </li>
                     {% endblock %}
                     {% block nav_kids_active %}
                       <li>
-                        <a href="">Kids</a>
+                        <a href="{% url 'kids_page' %}">Kids</a>
                       </li>
                     {% endblock %}
                   </ul>

@@ -753,7 +753,7 @@ def shop_page_view(request):
     elif sortby == "high_to_low":
         product_color_list = product_color_list.order_by("-price")
         
-    product_color_list.order_by('id')
+    product_color_list = product_color_list.order_by('pk')
 
     paginator = Paginator(product_color_list, 12)
 
@@ -2769,3 +2769,134 @@ def rate_and_review(request, product_color_id):
             return redirect(user_dashboard)
     else:
         return redirect('sign_in_page')
+    
+    
+    
+@never_cache
+@clear_old_messages
+def mens_page(request):
+    context = {}
+    if request.user.is_authenticated:
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        context.update(cart_wishlist_address_order_data)
+    sortby = request.GET.get("sortby", "default")
+    
+    product_color_list = ProductColorImage.objects.filter(
+        is_deleted=False, is_listed=True, products__category__name__iexact='Men'
+    )
+    product_color_list = product_color_list.order_by('pk')
+    if sortby == "a_z":
+        product_color_list = product_color_list.order_by("products__name")
+    elif sortby == "new_arrival":
+        product_color_list = product_color_list.order_by("-created_at")
+    elif sortby == "low_to_high":
+        product_color_list = product_color_list.order_by("price")
+    elif sortby == "high_to_low":
+        product_color_list = product_color_list.order_by("-price")    
+    paginator = Paginator(product_color_list, 12)
+    page_number = request.GET.get("page")
+    try:
+        product_color_list = paginator.page(page_number)
+    except PageNotAnInteger:
+        product_color_list = paginator.page(1)
+    except EmptyPage:
+        product_color_list = paginator.page(paginator.num_pages)
+    latest_products = ProductColorImage.objects.filter(
+        is_deleted=False, is_listed=True,
+        products__category__name__iexact='Men'
+    ).order_by("-created_at")[:4]
+    context.update({
+        'product_color_list': product_color_list,
+        'latest_products': latest_products,
+        'sortby': sortby,
+    })
+    return render(request, 'mens.html', context)
+
+
+
+
+
+@never_cache
+@clear_old_messages
+def women_page(request):
+    context = {}
+    if request.user.is_authenticated:
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        context.update(cart_wishlist_address_order_data)
+    sortby = request.GET.get("sortby", "default")
+    product_color_list = ProductColorImage.objects.filter(
+        is_deleted=False, is_listed=True,
+        products__category__name__iexact='Women'
+    )
+    product_color_list = product_color_list.order_by('pk')
+    if sortby == "a_z":
+        product_color_list = product_color_list.order_by("products__name")
+    elif sortby == "new_arrival":
+        product_color_list = product_color_list.order_by("-created_at")
+    elif sortby == "low_to_high":
+        product_color_list = product_color_list.order_by("price")
+    elif sortby == "high_to_low":
+        product_color_list = product_color_list.order_by("-price")
+    paginator = Paginator(product_color_list, 12)
+    page_number = request.GET.get("page")
+    try:
+        product_color_list = paginator.page(page_number)
+    except PageNotAnInteger:
+        product_color_list = paginator.page(1)
+    except EmptyPage:
+        product_color_list = paginator.page(paginator.num_pages)
+    
+    latest_products = ProductColorImage.objects.filter(
+        is_deleted=False, is_listed=True,
+        products__category__name__iexact='Women'
+    ).order_by("-created_at")[:4]
+    context.update({
+        'product_color_list': product_color_list,
+        'latest_products': latest_products,
+        'sortby': sortby,
+    })
+    return render(request, 'women.html', context)
+
+
+
+
+
+@never_cache
+@clear_old_messages
+def kids_page(request):
+    context = {}
+    if request.user.is_authenticated:
+        cart_wishlist_address_order_data = get_cart_wishlist_address_order_data(request)
+        context.update(cart_wishlist_address_order_data)
+    sortby = request.GET.get("sortby", "default")
+    product_color_list = ProductColorImage.objects.filter(
+        is_deleted=False, is_listed=True,
+        products__category__name__iexact='Kids'
+    )
+    product_color_list = product_color_list.order_by('pk')
+    if sortby == "a_z":
+        product_color_list = product_color_list.order_by("products__name")
+    elif sortby == "new_arrival":
+        product_color_list = product_color_list.order_by("-created_at")
+    elif sortby == "low_to_high":
+        product_color_list = product_color_list.order_by("price")
+    elif sortby == "high_to_low":
+        product_color_list = product_color_list.order_by("-price")
+    paginator = Paginator(product_color_list, 12)
+    page_number = request.GET.get("page")
+    try:
+        product_color_list = paginator.page(page_number)
+    except PageNotAnInteger:
+        product_color_list = paginator.page(1)
+    except EmptyPage:
+        product_color_list = paginator.page(paginator.num_pages)
+    latest_products = ProductColorImage.objects.filter(
+        is_deleted=False, is_listed=True,
+        products__category__name__iexact='Kids'
+    ).order_by("-created_at")[:4]
+    context.update({
+        'product_color_list': product_color_list,
+        'latest_products': latest_products,
+        'sortby': sortby,
+    })
+    return render(request, 'kids.html', context)

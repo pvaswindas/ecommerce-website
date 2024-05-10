@@ -70,36 +70,36 @@
     <div class="row justify-content-center">
       <div class="col-sm-6 col-md-4">
         <div class="banner banner-cat">
-          <a href="#"><img src="{% static 'user/assets/images/demos/demo-10/banners/banner-5.jpg' %}" alt="Banner" /></a>
+          <a href="{% url 'women_page' %}"><img src="{% static 'user/images/categories/women_category.jpg' %}" alt="Banner" /></a>
 
           <div class="banner-content banner-content-overlay text-center">
             <h3 class="banner-title font-weight-normal">Women's</h3>
             <h4 class="banner-subtitle">{{women_products_count}} Products</h4>
-            <a href="" class="banner-link">SHOP NOW</a>
+            <a href="{% url 'women_page' %}" class="banner-link">SHOP NOW</a>
           </div>
         </div>
       </div>
 
       <div class="col-sm-6 col-md-4">
         <div class="banner banner-cat">
-          <a href="#"><img src="{% static 'user/assets/images/demos/demo-10/banners/banner-6.jpg' %}" alt="Banner" /></a>
+          <a href="{% url 'mens_page' %}"><img src="{% static 'user/images/categories/men_category.jpg' %}" alt="Banner" /></a>
 
           <div class="banner-content banner-content-overlay text-center">
             <h3 class="banner-title font-weight-normal">Men's</h3>
             <h4 class="banner-subtitle">{{men_products_count}} Products</h4>
-            <a href="" class="banner-link">SHOP NOW</a>
+            <a href="{% url 'mens_page' %}" class="banner-link">SHOP NOW</a>
           </div>
         </div>
       </div>
 
       <div class="col-sm-6 col-md-4">
         <div class="banner banner-cat">
-          <a href="#"><img src="{% static 'user/assets/images/demos/demo-10/banners/banner-7.jpg' %}" alt="Banner" /></a>
+          <a href="{% url 'kids_page' %}"><img src="{% static 'user/images/categories/kid_category.jpg' %}" alt="Banner" /></a>
 
           <div class="banner-content banner-content-overlay text-center">
             <h3 class="banner-title font-weight-normal">Kid's</h3>
             <h4 class="banner-subtitle">{{kids_products_count}} Products</h4>
-            <a href="" class="banner-link">SHOP NOW</a>
+            <a href="{% url 'kids_page' %}" class="banner-link">SHOP NOW</a>
           </div>
         </div>
       </div>
