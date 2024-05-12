@@ -23,9 +23,11 @@
                         </select>
                         
                         {% if women_running_shoe %}
-                          <input type="hidden" name="women_running_shoe" value="1">
+                            <input type="hidden" name="women_running_shoe" value="1">
                         {% elif running_shoes %}
-                          <input type="hidden" name="running_shoes" value="1">
+                            <input type="hidden" name="running_shoes" value="1">
+                        {% elif boots %}
+                            <input type="hidden" name="boots" value="1">
                         {% endif %}
                     </div>
                 </form>

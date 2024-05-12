@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete, pre_delete, pre_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from admin_app.models import *
 from django.utils import timezone
@@ -69,7 +69,7 @@ def update_product_size_on_color_image_change(sender, instance, **kwargs):
 @receiver(post_save, sender=ProductSize)
 def update_cart_in_stock_on_product_size_quantity_change(sender, instance, **kwargs):
     cart_products = CartProducts.objects.filter(product=instance)
-    cart_products.update(in_stock=instance.in_stock)
+    cart_products.update(in_stock=instance.quantity > 0)
 
 
 @receiver(post_save, sender=ProductSize)

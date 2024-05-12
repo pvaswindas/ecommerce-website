@@ -414,3 +414,18 @@ class CartProducts(models.Model):
             return self.quantity * self.product.product_color_image.price
 
 
+
+
+
+class Banner(models.Model):
+    banner_name=models.CharField(max_length=200)
+    product_color_image=models.ForeignKey(ProductColorImage, on_delete=models.CASCADE)
+    title=models.CharField(max_length=200)
+    subtitle=models.CharField(max_length=200)
+    price_text=models.CharField(max_length=200)
+    
+    def __str__(self):
+        name=self.banner_name
+        p_name=self.product_color_image.products.name
+        color=self.product_color_image.color
+        return f"{name} {p_name} ({color})"

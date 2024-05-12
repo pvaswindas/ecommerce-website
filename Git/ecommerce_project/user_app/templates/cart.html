@@ -50,7 +50,6 @@
                 </thead>
                 <tbody>
                   {% for item in cart_items %}
-                    {% if item.in_stock %}
                       <tr>
                         <td class="product-col">
                           <div class="product">
@@ -62,21 +61,33 @@
                         </td>
                         <td class="total-col">{{ item.product.size }}</td>
                         <td class="price-col">₹{{ item.total_price }}.00</td>
-                        <td class="quantity-col">
-                          <div class="cart-product-quantity">
-                            {% if item.product.quantity > 10 %}
-                              <input type="number" id="quantity-{{ item.id }}"  class="form-control" value="{{ item.quantity }}" min="1" max="10" step="1" data-decimals="0" required />
-                            {% else %}
-                              <input type="number" id="quantity-{{ item.id }}"  class="form-control" value="{{ item.quantity }}" min="1" max="{{ item.product.quantity }}" step="1" data-decimals="0" required />
-                            {% endif %}
-                          </div>
-                        </td>
-                        <td class="total-col" id="total-price-{{ item.id }}">₹{{ item.total_price }}.00</td>
+                        {% if item.in_stock %}
+                          <td class="quantity-col">
+                            <div class="cart-product-quantity">
+                              {% if item.product.quantity > 10 %}
+                                <input type="number" id="quantity-{{ item.id }}"  class="form-control" value="{{ item.quantity }}" min="1" max="10" step="1" data-decimals="0" required />
+                              {% else %}
+                                <input type="number" id="quantity-{{ item.id }}"  class="form-control" value="{{ item.quantity }}" min="1" max="{{ item.product.quantity }}" step="1" data-decimals="0" required />
+                              {% endif %}
+                            </div>
+                          </td>
+                          <td class="total-col" id="total-price-{{ item.id }}">₹{{ item.total_price }}.00</td>
+                        {% else %}
+                          <td class="quantity-col">
+                            <div class="cart-product-quantity">
+                              {% if item.product.quantity > 10 %}
+                                <input type="number" disabled id="quantity-{{ item.id }}"  class="form-control" value="{{ item.quantity }}" min="1" max="10" step="1" data-decimals="0" required />
+                              {% else %}
+                                <input type="number" disabled id="quantity-{{ item.id }}"  class="form-control" value="{{ item.quantity }}" min="1" max="{{ item.product.quantity }}" step="1" data-decimals="0" required />
+                              {% endif %}
+                            </div>
+                          </td>
+                          <td class="total-col" disabled>Not in stock</td>
+                        {% endif %}
                         <td class="remove-col">
                           <a href="{% url 'remove_from_cart' item.id %}"><button class="btn-remove"><i class="icon-close"></i></button></a>
                         </td>
                       </tr>
-                    {% endif %}
                   {% endfor %}
                 </tbody>
               </table>
@@ -91,46 +102,58 @@
             {% endif %}
           </div>
           {% if cart_items %}
-            <aside class="col-lg-3">
-              <div class="summary summary-cart">
-                <h3 class="summary-title">Cart Total</h3>
-                <div class="summary-content">
-                  <table class="table table-summary">
-                    <tbody>
-                      <tr class="summary-subtotal">
-                        <td>Subtotal:</td>
-                        <td>₹.00</td>
-                      </tr>
-                      <tr class="summary-shipping">
-                        <td>Shipping:</td>
-                        <td>&nbsp;</td>
-                      </tr>
-                      <tr class="summary-shipping-row">
-                        <td>Free Shipping:</td>
-                        <td>₹0.00</td>
-                      </tr>
+            
+            {% if all_item_valid %}
+              <aside class="col-lg-3">
+                <div class="summary summary-cart">
+                  <h3 class="summary-title">Cart Total</h3>
+                  <div class="summary-content">
+                    <table class="table table-summary">
+                      <tbody>
+                        <tr class="summary-subtotal">
+                          <td>Subtotal:</td>
+                          <td>₹.00</td>
+                        </tr>
+                        <tr class="summary-shipping">
+                          <td>Shipping:</td>
+                          <td>&nbsp;</td>
+                        </tr>
+                        <tr class="summary-shipping-row">
+                          <td>Free Shipping:</td>
+                          <td>₹0.00</td>
+                        </tr>
 
-                      <tr class="summary-total">
-                        <td colspan="2" style="padding: 0;">
-                          <hr style="border-top: 1px solid #000; margin: 0;" />
-                        </td>
-                      </tr>
+                        <tr class="summary-total">
+                          <td colspan="2" style="padding: 0;">
+                            <hr style="border-top: 1px solid #000; margin: 0;" />
+                          </td>
+                        </tr>
 
-                      <tr class="summary-total">
-                        <td>Total:</td>
-                        <td>₹.00</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div class="checkout-btn">
-                    <a href="{% url 'checkout_page' %}"><button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</button></a>
+                        <tr class="summary-total">
+                          <td>Total:</td>
+                          <td>₹.00</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="checkout-btn">
+                      <a href="{% url 'checkout_page' %}"><button type="submit" class="btn btn-outline-primary-2 btn-order btn-block">PROCEED TO CHECKOUT</button></a>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="continue-shopping-btn">
-                <a href="{% url 'shop_page_view' %}" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
-              </div>
-            </aside>
+                <div class="continue-shopping-btn">
+                  <a href="{% url 'shop_page_view' %}" class="btn btn-outline-dark-2 btn-block mb-3"><span>CONTINUE SHOPPING</span><i class="icon-refresh"></i></a>
+                </div>
+              </aside>
+            {% else %}
+              <aside class="col-lg-3 text-center">
+                <div class="alert alert-secondary rounded rounded-2 py-5" role="alert">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  <h4 class="alert-heading">Oops! Some items are out of stock.</h4>
+                  <p>Please remove out-of-stock items to continue shopping.</p>
+                  <a href="{% url 'remove_out_of_stock_items' user.id %}"><button aria-disabled="true" class="btn btn-warning mt-3">Remove Out-of-Stock Items</button></a>
+                </div>
+              </aside>
+            {% endif %}
           {% endif %}
         </div>
       </div>

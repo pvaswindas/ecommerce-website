@@ -156,7 +156,10 @@ urlpatterns = [
     path('sneakerheads/user/mens/', mens_page, name='mens_page'),
     path('sneakerheads/user/women/', women_page, name='women_page'),
     path('sneakerheads/user/kids/', kids_page, name='kids_page'),
-    path('sneakerheads/user/sneaker-athletic-shoes/', sneakers_and_athletic_page, name='sneakers_and_athletic_page'),
+    path('sneakerheads/user/shoe-collections/', sneakers_and_athletic_page, name='sneakers_and_athletic_page'),
+    
+    path('sneakerheads/user/cart/remove-out-of-stock-items/<int:user_id>/',
+         remove_out_of_stock_items, name='remove_out_of_stock_items'),
     
 ]
 

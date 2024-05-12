@@ -45,7 +45,7 @@
                   {% if addresses %}
                     {% for addr in addresses %}
                       <div class="address-item">
-                        <input type="radio" id="address-{{ addr.id }}" name="delivery_address" value="{{ addr.id }}" class="custom-radio-input"/>
+                        <input type="radio" id="address-{{ addr.id }}" {% if not all_item_valid %}disabled{% endif %} name="delivery_address" value="{{ addr.id }}" class="custom-radio-input"/>
                         <label for="address-{{ addr.id }}" class="custom-radio-label">
                           <span class="address-name">{{ addr.name }} : {{ addr.phone_number }}</span><br />
                           <span class="address-details">
@@ -74,18 +74,18 @@
                     </div>
                     {% endif %}
                     <div class="payment-method-item">
-                        <input type="radio" id="payment_method_razorpay" class="payment-method" name="payment_method" value="Razorpay" />
+                        <input type="radio" id="payment_method_razorpay" {% if not all_item_valid %}disabled{% endif %} class="payment-method" name="payment_method" value="Razorpay" />
                         <label for="payment_method_razorpay" class="payment-method-label" style="max-width: 200px;">
                             <img style="max-width: 70px;" src="{% static 'user/images/payment_logo/razorpay.png' %}" alt="Razorpay" class="payment-method-image" />
                         </label>
                     </div>
                     {% if wallet_balance >= total_charge %}
-                    <div class="payment-method-item">
-                        <input type="radio" id="payment_method_wallet" class="payment-method" name="payment_method" value="Wallet" />
-                        <label for="payment_method_wallet" aria-disabled="true" class="payment-method-label" style="max-width: 200px;">
-                            <img style="max-width: 70px;" src="{% static 'user/images/payment_logo/wallet.png' %}" alt="Wallet" class="payment-method-image" />
-                        </label>
-                    </div>
+                      <div class="payment-method-item">
+                          <input type="radio" id="payment_method_wallet" {% if not all_item_valid %}disabled{% endif %}  class="payment-method" name="payment_method" value="Wallet" />
+                          <label for="payment_method_wallet" aria-disabled="true" class="payment-method-label" style="max-width: 200px;">
+                              <img style="max-width: 70px;" src="{% static 'user/images/payment_logo/wallet.png' %}" alt="Wallet" class="payment-method-image" />
+                          </label>
+                      </div>
                     {% else %}
                     <div class="payment-method-item">
                         <label for="payment_method_wallet" class="payment-method-label" style="max-width: 100px;">
@@ -144,69 +144,72 @@
             </div>
           </div>
 
-          <aside class="col-lg-3">
-            <div class="summary bg-light">
-              <h3 class="summary-title">Your Order</h3>
+          
+          {% if all_item_valid %}
+            <aside class="col-lg-3">
+              <div class="summary bg-light">
+                <h3 class="summary-title">Your Order</h3>
 
-              <table class="table table-summary  bg-light">
-                <thead>
-                  <tr>
-                    <th class="bg-light">Product</th>
-                    <th class="bg-light">Total</th>
-                  </tr>
-                </thead>
+                <table class="table table-summary  bg-light">
+                  <thead>
+                    <tr>
+                      <th class="bg-light">Product</th>
+                      <th class="bg-light">Total</th>
+                    </tr>
+                  </thead>
 
-                <tbody>
-                  {% for item in cart_items %}
-                    <tr class="bg-light">
+                  <tbody>
+                    {% for item in cart_items %}
+                      <tr class="bg-light">
+                        <td class="bg-light">
+                          <a href="#">{{ item.product.product_color_image.products.name }} × {{ item.quantity }}</a>
+                        </td>
+                        <td class="bg-light">₹{{ item.total_price }}.00</td>
+                      </tr>
+                    {% endfor %}
+
+                    {% if cart.coupon_applied %}
+                      <tr class="summary-subtotal bg-light">
+                        <td class="bg-light">Discount:</td>
+                        <td class="bg-light">₹ {{ discount_amount }} .00</td>
+                      </tr>
+                    {% endif %}
+
+                    <tr class="summary-subtotal">
+                      <td class="bg-light">Subtotal:</td>
                       <td class="bg-light">
-                        <a href="#">{{ item.product.product_color_image.products.name }} × {{ item.quantity }}</a>
+                        ₹{% if cart.coupon_applied %}
+                          {{ total_charge_discounted }}
+                        {% else %}
+                          {{ subtotal }}
+                        {% endif %}.00
                       </td>
-                      <td class="bg-light">₹{{ item.total_price }}.00</td>
                     </tr>
-                  {% endfor %}
-
-                  {% if cart.coupon_applied %}
-                    <tr class="summary-subtotal bg-light">
-                      <td class="bg-light">Discount:</td>
-                      <td class="bg-light">₹ {{ discount_amount }} .00</td>
+                    <tr>
+                      <td class="bg-light">Shipping:</td>
+                      <td class="bg-light">
+                        ₹{% if cart.coupon_applied %}
+                          {{ charge_for_shipping }}
+                        {% else %}
+                          {{ shipping_charge }}
+                        {% endif %}.00
+                      </td>
                     </tr>
-                  {% endif %}
-
-                  <tr class="summary-subtotal">
-                    <td class="bg-light">Subtotal:</td>
-                    <td class="bg-light">
-                      ₹{% if cart.coupon_applied %}
-                        {{ total_charge_discounted }}
-                      {% else %}
-                        {{ subtotal }}
-                      {% endif %}.00
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="bg-light">Shipping:</td>
-                    <td class="bg-light">
-                      ₹{% if cart.coupon_applied %}
-                        {{ charge_for_shipping }}
-                      {% else %}
-                        {{ shipping_charge }}
-                      {% endif %}.00
-                    </td>
-                  </tr>
-                  <tr class="summary-total">
-                    <td class="bg-light">Total:</td>
-                    <td class="bg-light">
-                      ₹{% if cart.coupon_applied %}
-                        {{ total_charge_discounted }}
-                      {% else %}
-                        {{ total_charge }}
-                      {% endif %}.00
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </aside>
+                    <tr class="summary-total">
+                      <td class="bg-light">Total:</td>
+                      <td class="bg-light">
+                        ₹{% if cart.coupon_applied %}
+                          {{ total_charge_discounted }}
+                        {% else %}
+                          {{ total_charge }}
+                        {% endif %}.00
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </aside>
+          {% endif %}
         </div>
       </div>
     </div>

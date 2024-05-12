@@ -89,6 +89,11 @@ def get_cart_wishlist_address_order_data(request):
         customer = Customer.objects.get(user=user)
         cart = Cart.objects.get(customer=customer)
         cart_items = CartProducts.objects.filter(cart=cart)
+        all_item_valid = True
+        for item in cart_items:
+            if not item.product.is_listed or item.product.is_deleted or item.product.quantity<=0:
+                all_item_valid = False
+                item.in_stock = False
         wishlist = Wishlist.objects.get(customer=customer)
         wishlist_item_count = WishlistItem.objects.filter(
             wishlist=wishlist).count()
@@ -104,6 +109,7 @@ def get_cart_wishlist_address_order_data(request):
                 "customer": customer,
                 "cart": cart,
                 "cart_items": cart_items,
+                'all_item_valid' : all_item_valid,
                 "wishlist": wishlist,
                 "wishlist_item_count": wishlist_item_count,
                 "addresses": addresses,
@@ -1757,6 +1763,7 @@ def generate_invoice(request, order_id):
                 discount_amount = 0
             total_price_style = ParagraphStyle(
                 name="TotalPrice", parent=styles["Normal"], alignment=TA_RIGHT, fontSize=8)
+            
             content.append(Paragraph(
                 f"<b>Gross Price:</b> {price_before_discount}.00", total_price_style))
             content.append(
@@ -1903,7 +1910,6 @@ def cart_view_page(request, user_id):
             request)
 
         context["today"] = datetime.now().date()
-
         context.update(cart_wishlist_address_order_data)
 
         return render(request, "cart.html", context)
@@ -1951,6 +1957,26 @@ def remove_from_cart(request, cart_item_id):
             return redirect(index_page)
     else:
         return redirect(sign_in)
+    
+    
+@never_cache
+def remove_out_of_stock_items(request, user_id):
+    if request.user.is_authenticated:
+        try:
+            user = request.user
+            customer = Customer.objects.get(user = user)
+            current_user_id = user.id
+            if current_user_id == user_id:
+                cart = Cart.objects.get(customer = customer)
+                cart_items = CartProducts.objects.filter(cart = cart, in_stock = False)
+                cart_items.delete()
+                return redirect('cart_view_page', user_id)
+            else:
+                return redirect('user_dashboard')
+        except Exception:
+            return redirect('user_dashboard')
+    else:
+        return redirect('sign_in_page')
 
 
 @never_cache
@@ -2121,7 +2147,12 @@ def checkout_page(request):
         wallet_balance = wallet.balance
         customer = Customer.objects.get(user=user)
         cart = Cart.objects.get(customer=customer)
-        cart_items = CartProducts.objects.filter(cart=cart, in_stock=True)
+        cart_items = CartProducts.objects.filter(cart=cart)
+        all_item_valid = True
+        for item in cart_items:
+            if not item.product.is_listed or item.product.is_deleted or item.product.quantity<=0:
+                all_item_valid = False
+                return redirect('cart_view_page', user.id)
         total_charge_discounted = 0
         discount_amount = 0
         if cart_items:
@@ -2167,6 +2198,7 @@ def checkout_page(request):
                 {
                     "coupon": coupon,
                     "wallet": wallet,
+                    'all_item_valid' : all_item_valid,
                     "wallet_balance": wallet_balance,
                     "available_coupons": available_coupons,
                     "discount_amount": discount_amount,
@@ -2278,8 +2310,11 @@ def place_order(request):
                     user = request.user
                     customer = Customer.objects.get(user=user)
                     wallet = Wallet.objects.get(user=user)
-                    cart = Cart.objects.get(customer=customer)
-                    cart_items = CartProducts.objects.filter(cart=cart)
+                    cart=Cart.objects.get(customer=customer)
+                    cart_items=CartProducts.objects.filter(cart=cart)
+                    for item in cart_items:
+                        if not item.product.is_listed or item.product.is_deleted or item.product.quantity<=0:
+                            return redirect('cart_view_page', user.id)
                     if cart_items:
                         total_charge_discounted = request.POST.get(
                             "total_charge_discounted"
@@ -2491,6 +2526,9 @@ def razorpay_payment(request, user_id):
 
         cart = Cart.objects.get(customer=customer)
         cart_items = CartProducts.objects.filter(cart=cart)
+        for item in cart_items:
+            if not item.product.is_listed or item.product.is_deleted or item.product.quantity<=0:
+                return redirect('cart_view_page', user.id)
 
         address_id = request.GET.get("address_id")
         address = Address.objects.get(pk=address_id)
@@ -3017,6 +3055,7 @@ def sneakers_and_athletic_page(request):
         'sortby': sortby,
         'women_running_shoe' : women_running_shoe,
         'running_shoes' : running_shoes,
+        'boots' : boots,
     })
 
     return render(request, 'sneakers_athletic_shoes.html', context)
