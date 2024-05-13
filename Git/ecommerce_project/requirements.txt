@@ -29,7 +29,6 @@ pandas==2.2.2
 pathspec==0.12.1
 pillow==10.2.0
 platformdirs==4.2.1
-psycopg2==2.9.9
 pycparser==2.21
 pydyf==0.10.0
 pyHanko==0.24.0
