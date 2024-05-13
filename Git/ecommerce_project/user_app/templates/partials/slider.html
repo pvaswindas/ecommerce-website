@@ -2,7 +2,7 @@
 <div class="container mt-2">
     <div class="intro-slider-container slider-container-ratio mb-2">
         <div class="intro-slider owl-carousel owl-simple owl-light owl-nav-inside" data-toggle="owl" data-owl-options='{"nav": false}'>
-            {% if valid_banners and valid_banners_count >= 3 %}
+            {% comment %} {% if valid_banners and valid_banners_count >= 3 %}
                 {% for banner in valid_banners %}
                     <div class="intro-slide">
                         <figure class="slide-image">
@@ -24,7 +24,7 @@
                         </div>
                     </div>
                 {% endfor %}
-            {% else %}
+            {% else %} {% endcomment %}
                 <div class="intro-slide">
                     <figure class="slide-image">
                         <picture>
@@ -83,7 +83,7 @@
                         </div>
                     </form>
                 </div>
-            {% endif %}
+            {% comment %} {% endif %} {% endcomment %}
         </div>
         <span class="slider-loader"></span>
     </div>
