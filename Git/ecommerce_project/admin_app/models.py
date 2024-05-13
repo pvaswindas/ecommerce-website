@@ -61,7 +61,7 @@ class ProductColorImage(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"{self.color} - {self.products.name}"
+        return f"{self.products.name} - {self.color}"
 
 
 class ProductSize(models.Model):
@@ -418,14 +418,13 @@ class CartProducts(models.Model):
 
 
 class Banner(models.Model):
-    banner_name=models.CharField(max_length=200)
-    product_color_image=models.ForeignKey(ProductColorImage, on_delete=models.CASCADE)
-    title=models.CharField(max_length=200)
-    subtitle=models.CharField(max_length=200)
-    price_text=models.CharField(max_length=200)
+    banner_name = models.CharField(max_length=200)
+    banner_image = models.ImageField(upload_to="banner_images/", default='')
+    product_color_image = models.ForeignKey(ProductColorImage, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length=200)
+    price_text = models.CharField(max_length=200)
+    is_listed = models.BooleanField(default=True)
     
     def __str__(self):
-        name=self.banner_name
-        p_name=self.product_color_image.products.name
-        color=self.product_color_image.color
-        return f"{name} {p_name} ({color})"
+        return f"{self.banner_name} - {self.title}"

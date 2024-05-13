@@ -219,6 +219,14 @@ urlpatterns = [
         views.search_user,
         name="search_user",
     ),
+    path(
+        "sneakerheads/admin/customer/to-admin/<int:user_id>/",
+        views.promote_to_admin,
+        name='promote_to_admin'
+    ),
+    
+    
+    
     path("sneakerheads/admin/orders/", views.orders_view_page, name="orders_view_page"),
     path(
         "sneakerheads/admin/orders/detailed-view/<str:order_id>/",
@@ -337,6 +345,11 @@ urlpatterns = [
         "sneakerheads/admin/banner/add-banner-page/",
         views.banner_add_page_view,
         name="banner_add_page_view",
+    ),
+    path(
+        'sneakerheads/admin/banner/edit-banner/<int:banner_id>/',
+        views.edit_banner_page,
+        name='edit_banner_page'
     ),
 ]
 

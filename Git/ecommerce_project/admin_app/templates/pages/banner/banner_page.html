@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block custom_css %}
-
+  <link rel="stylesheet" href="{% static 'admin_css/orders.css' %}" />
 {% endblock %}
 
 {% block content %}
@@ -32,11 +32,42 @@
     <table>
       <thead>
         <tr>
-
+          <th class="product-column">Product</th>
+          <th class="discount-column">Banner Title</th>
+          <th class="start-column">Banner Subtitel</th>
+          <th class="price-column">Banner Price Text</th>
+          <th class="end-column">End Date</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
-        
+        {% for banner in banners %}
+          <tr>
+            <td>
+              {% if banner.product_color_image.productoffer %}
+                  {% if banner.product_offer.end_date < today %}
+                      <div class="expired-offer">
+                          <p class="mb-1 text-danger">{{ banner.product_color_image.products.name }} ({{ banner.product_color_image.color }})</p>
+                          <span class="badge text-white bg-danger">Banner Expired</span>
+                      </div>
+                  {% else %}
+                      <div class="active-offer">
+                          <a href="{% url 'edit_banner_page' banner.id %}">
+                            {{ banner.product_color_image.products.name }} ({{ banner.product_color_image.color }})
+                          </a>
+                      </div>
+                  {% endif %}
+              {% endif %}
+            </td>          
+            <td>{{ banner.title }}</td>
+            <td>{{ banner.subtitle }}</td>
+            <td>{{ banner.price_text }}</td>
+            <td>{{ banner.product_offer.end_date }}</td>
+            <td>
+              <a href=""><button class="btn btn-dark rounded rounded-1">Delete</button></a>
+            </td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>

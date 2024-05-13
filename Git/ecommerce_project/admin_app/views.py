@@ -4,6 +4,7 @@ import json
 import calendar
 from io import BytesIO
 import pytz  # type: ignore
+from .forms import BannerForm
 from django.db.models import Q
 from django.contrib import auth
 from django.db.models import Sum
@@ -28,7 +29,7 @@ from django.views.decorators.cache import never_cache
 
 from django.db.models import F, ExpressionWrapper, DecimalField, Case, When
 from django.db.models import Value, Subquery, Count, OuterRef, IntegerField
-from admin_app.models import ProductOffer, CategoryOffer, Coupon
+from admin_app.models import ProductOffer, CategoryOffer, Coupon, Banner
 from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction
 from admin_app.models import Category, Brand
 from admin_app.models import Products, ProductColorImage, ProductSize
@@ -390,8 +391,6 @@ def admin_customers(request):
 
 
 # BLOCK CUSTOMER FUNCTION
-
-
 @never_cache
 def block_user(request, user_id):
     if request.user.is_superuser:
@@ -407,8 +406,6 @@ def block_user(request, user_id):
 
 
 # UNBLOCK CUSTOMER FUNCTION
-
-
 @never_cache
 def unblock_user(request, user_id):
     if request.user.is_superuser:
@@ -424,8 +421,6 @@ def unblock_user(request, user_id):
 
 
 # SEARCH CUSTOMER FUNCTION
-
-
 @never_cache
 def search_user(request):
     if request.user.is_superuser:
@@ -443,6 +438,17 @@ def search_user(request):
         )
     else:
         return redirect("admin_login_page")
+    
+@never_cache
+def promote_to_admin(request, user_id):
+    if request.user.is_superuser:
+        user = User.objects.get(id=user_id)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+        return redirect('admin_customers')
+    else:
+        return redirect('admin_login_page')
 
 
 # ---------------------------------------------------------------- CC_ADMIN CATEGORIES PAGE FUNCTIONS STARTING FROM HERE ----------------------------------------------------------------
@@ -3975,19 +3981,63 @@ def delete_coupon(request, coupon_id):
 @clear_old_messages
 def banner_view_page(request):
     if request.user.is_superuser:
+        banners = Banner.objects.all()
+        for banner in banners:
+            product_offer = ProductOffer.objects.get(product_color_image = banner.product_color_image)
+            banner.product_offer = product_offer
         context = {
             "is_active_banner": is_active_banner,
+            "banners" : banners,
+            "today": today,
         }
         return render(request, "pages/banner/banner_page.html", context)
     else:
         return redirect("admin_login_page")
 
 
+
+
 @never_cache
 @clear_old_messages
 def banner_add_page_view(request):
     if request.user.is_superuser:
-        context = {"is_active_banner": is_active_banner}
+        if request.method == 'POST':
+            form = BannerForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                return redirect('banner_view_page')
+        else:
+            form = BannerForm()
+        context = {
+            "form": form,
+        }
         return render(request, "pages/banner/banner_add_page.html", context)
     else:
-        return redirect("admin_login_page")
+        return redirect('admin_login_page')
+
+
+
+@never_cache
+@clear_old_messages
+def edit_banner_page(request, banner_id):
+    if request.user.is_superuser:
+        try:
+            banner = Banner.objects.get(id=banner_id)
+        except Banner.DoesNotExist:
+            return HttpResponse('Banner does not exist.')
+
+        if request.method == 'POST':
+            form = BannerForm(request.POST, request.FILES, instance=banner)
+            if form.is_valid():
+                form.save()
+                return redirect('banner_view_page')
+        else:
+            form = BannerForm(instance=banner)
+        
+        context = {
+            'form': form,
+            'banner_id': banner_id
+        }
+        return render(request, 'pages/banner/edit_banner_page.html', context)
+    else:
+        return redirect('admin_login_page')

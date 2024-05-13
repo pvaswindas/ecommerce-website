@@ -4,7 +4,7 @@ import random
 import textwrap
 from io import BytesIO
 import razorpay  # type: ignore
-from datetime import datetime
+from datetime import datetime, date
 from django.db.models import Q
 from datetime import timedelta
 from django.db.models import *
@@ -38,7 +38,7 @@ from django.contrib.auth.hashers import check_password
 from admin_app.models import Category, Brand, ProductColorImage, ProductSize
 from admin_app.models import ProductOffer, CategoryOffer, Coupon, Payment
 from admin_app.models import Orders, OrderItem, Wallet, WalletTransaction, Review
-from admin_app.models import Wishlist, WishlistItem, Cart, CartProducts
+from admin_app.models import Wishlist, WishlistItem, Cart, CartProducts, Banner
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from reportlab.lib import colors  # type: ignore
@@ -157,7 +157,7 @@ def get_cart_wishlist_address_order_data(request):
                         highest_offer_price = item.product.product_color_image.price
 
                     each_price = highest_offer_price * item.quantity
-                except Exception as e:
+                except Exception:
                     each_price = item.product.product_color_image.price * item.quantity
 
                 subtotal = subtotal + each_price
@@ -200,6 +200,11 @@ def sign_up(request):
 def index_page(request):
     if request.user.is_authenticated:
         context = {}
+        today = date.today() 
+        banners = Banner.objects.all()
+        valid_product_offer = ProductOffer.objects.filter(end_date__gte=today).values_list('product_color_image')
+        valid_banners = Banner.objects.filter(product_color_image__in=valid_product_offer)
+        valid_banners_count = len(valid_banners)
         all_products = ProductColorImage.objects.filter(
             is_listed=True, is_deleted=False
         )
@@ -243,6 +248,8 @@ def index_page(request):
         ).distinct()[:10]
         context.update(
             {
+                "valid_banners": valid_banners,
+                "valid_banners_count" : valid_banners_count,
                 "newest_five_products": newest_five_products,
                 "newest_women_products": newest_women_products,
                 "newest_men_products": newest_men_products,

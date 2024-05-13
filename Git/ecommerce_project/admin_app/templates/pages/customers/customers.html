@@ -62,6 +62,12 @@
                   </span>
                 </div>
                 {% if not user.is_superuser %}
+                  <form action="{% url 'promote_to_admin' user.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="col-auto">
+                      <button type="submit" class="btn btn-success rounded">Make Admin</button>
+                    </div>
+                  </form>
                   {% if user.is_active %}
                     <form action="{% url 'block_user' user.id %}" method="post">
                       {% csrf_token %}

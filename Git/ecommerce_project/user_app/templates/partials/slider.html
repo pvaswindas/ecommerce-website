@@ -2,65 +2,88 @@
 <div class="container mt-2">
     <div class="intro-slider-container slider-container-ratio mb-2">
         <div class="intro-slider owl-carousel owl-simple owl-light owl-nav-inside" data-toggle="owl" data-owl-options='{"nav": false}'>
-            <div class="intro-slide">
-                <figure class="slide-image">
-                    <picture>
-                        <source media="(max-width: 480px)" srcset="{% static 'user/images/carousel/3-sneakers-480w.jpg' %}">
-                        <img src="{% static 'user/images/carousel/3-sneakers.jpg' %}" alt="Image Desc">
-                    </picture>
-                </figure>
+            {% if valid_banners and valid_banners_count >= 3 %}
+                {% for banner in valid_banners %}
+                    <div class="intro-slide">
+                        <figure class="slide-image">
+                            <picture>
+                                <source media="(max-width: 480px)" srcset="{{ banner.banner_image.url }}">
+                                <img class="img-fluid d-block mx-auto" src="{{ banner.banner_image.url }}" alt="Image Desc">
+                            </picture>
+                        </figure>
 
-                <div class="intro-content">
-                    <h3 class="intro-subtitle">Deals and Promotions</h3>
-                    <h1 class="intro-title text-white">Sneakers & Athletic Shoes</h1>
+                        <div class="intro-content">
+                            <h3 class="intro-subtitle">{{ banner.subtitle }}</h3>
+                            <h1 class="intro-title text-white">{{ banner.title }}</h1>
 
-                    <div class="intro-price text-white">from ₹ 880</div>
+                            <div class="intro-price text-white">{{ banner.price_text }}</div>
 
-                    <a href="{% url 'sneakers_and_athletic_page' %}">
-                        <button class="btn btn-primary  btn-round" type="button">SHOP NOW<i class="icon-long-arrow-right"></i></button>
-                    </a>
+                            <a href="{% url 'product_single_view_page' banner.product_color_image.products.name banner.product_color_image.id %}">
+                                <button class="btn btn-primary btn-round" type="button">SHOP NOW<i class="icon-long-arrow-right"></i></button>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="intro-slide">
+                    <figure class="slide-image">
+                        <picture>
+                            <source media="(max-width: 480px)" srcset="{% static 'user/images/carousel/3-sneakers-480w.jpg' %}">
+                            <img src="{% static 'user/images/carousel/3-sneakers.jpg' %}" alt="Image Desc">
+                        </picture>
+                    </figure>
+
+                    <div class="intro-content">
+                        <h3 class="intro-subtitle">Deals and Promotions</h3>
+                        <h1 class="intro-title text-white">Sneakers & Athletic Shoes</h1>
+
+                        <div class="intro-price text-white">from ₹ 880</div>
+
+                        <a href="{% url 'sneakers_and_athletic_page' %}">
+                            <button class="btn btn-primary  btn-round" type="button">SHOP NOW<i class="icon-long-arrow-right"></i></button>
+                        </a>
+                    </div>
                 </div>
-            </div>
+                <div class="intro-slide">
+                    <form action="{% url 'sneakers_and_athletic_page' %}" method="get">
+                        <figure class="slide-image">
+                            <picture>
+                                <source media="(max-width: 480px)" srcset="{% static 'user/images/carousel/2-boots-480w.jpg' %}">
+                                <img src="{% static 'user/images/carousel/2-boots.jpg' %}" alt="Image Desc">
+                            </picture>
+                        </figure>
 
-            <div class="intro-slide">
-                <form action="{% url 'sneakers_and_athletic_page' %}" method="get">
-                    <figure class="slide-image">
-                        <picture>
-                            <source media="(max-width: 480px)" srcset="{% static 'user/images/carousel/2-boots-480w.jpg' %}">
-                            <img src="{% static 'user/images/carousel/2-boots.jpg' %}" alt="Image Desc">
-                        </picture>
-                    </figure>
+                        <div class="intro-content">
+                            <h3 class="intro-subtitle">Trending Now</h3>
+                            <h1 class="intro-title text-white">This Week's Most Wanted</h1>
 
-                    <div class="intro-content">
-                        <h3 class="intro-subtitle">Trending Now</h3>
-                        <h1 class="intro-title text-white">This Week's Most Wanted</h1>
+                            <div class="intro-price text-white">from ₹ 2, 199</div>
+                            <input type="hidden" name="boots" value="1">
+                            <button class="btn btn-primary  btn-round" type="submit">SHOP NOW<i class="icon-long-arrow-right"></i></button>
+                        </div>
+                    </form>
+                </div>
 
-                        <div class="intro-price text-white">from ₹ 2, 199</div>
-                        <input type="hidden" name="boots" value="1">
-                        <button class="btn btn-primary  btn-round" type="submit">SHOP NOW<i class="icon-long-arrow-right"></i></button>
-                    </div>
-                </form>
-            </div>
+                <div class="intro-slide">
+                    <form action="{% url 'sneakers_and_athletic_page' %}" method="get">
+                        <figure class="slide-image">
+                            <picture>
+                                <source media="(max-width: 480px)" srcset="{% static 'user/images/carousel/1-nw-480w.jpg' %}">
+                                <img src="{% static 'user/images/carousel/1-nw.jpg' %}" alt="Image Desc">
+                            </picture>
+                        </figure>
 
-            <div class="intro-slide">
-                <form action="{% url 'sneakers_and_athletic_page' %}" method="get">
-                    <figure class="slide-image">
-                        <picture>
-                            <source media="(max-width: 480px)" srcset="{% static 'user/images/carousel/1-nw-480w.jpg' %}">
-                            <img src="{% static 'user/images/carousel/1-nw.jpg' %}" alt="Image Desc">
-                        </picture>
-                    </figure>
+                        <div class="intro-content">
+                            <h3 class="intro-subtitle text-white">Deals and Promotions</h3>
+                            <h1 class="intro-title text-white">Running Shoes:</h1>
 
-                    <div class="intro-content">
-                        <h3 class="intro-subtitle text-white">Deals and Promotions</h3>
-                        <h1 class="intro-title text-white">Running Shoes:</h1>
-
-                        <div class="intro-price text-white"></div>
-                        <input type="hidden" name="running_shoes" value="1">
-                        <button class="btn btn-primary  btn-round" type="submit">SHOP NOW<i class="icon-long-arrow-right"></i></button>
-                    </div>
-                </form>
-            </div>
+                            <div class="intro-price text-white"></div>
+                            <input type="hidden" name="running_shoes" value="1">
+                            <button class="btn btn-primary  btn-round" type="submit">SHOP NOW<i class="icon-long-arrow-right"></i></button>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
         </div>
         <span class="slider-loader"></span>
     </div>
