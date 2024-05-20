@@ -51,10 +51,10 @@ class ProductColorImage(models.Model):
     )
     color = models.CharField(max_length=50)
     price = models.PositiveBigIntegerField()
-    main_image = models.FileField(upload_to=" product_all_images/")
-    side_image = models.FileField(upload_to=" product_all_images/")
-    top_image = models.FileField(upload_to=" product_all_images/")
-    back_image = models.FileField(upload_to=" product_all_images/")
+    main_image = models.FileField(upload_to="sneakheads-images/")
+    side_image = models.FileField(upload_to="sneakheads-images/")
+    top_image = models.FileField(upload_to="sneakheads-images/")
+    back_image = models.FileField(upload_to="sneakheads-images/")
     is_deleted = models.BooleanField(default=False)
     is_listed = models.BooleanField(default=True)
     in_stock = models.BooleanField(default=True)
@@ -419,7 +419,7 @@ class CartProducts(models.Model):
 
 class Banner(models.Model):
     banner_name = models.CharField(max_length=200)
-    banner_image = models.ImageField(upload_to="banner_images/", default='')
+    banner_image = models.ImageField(upload_to="sneakheads-banner/", default='')
     product_color_image = models.ForeignKey(ProductColorImage, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     subtitle = models.CharField(max_length=200)

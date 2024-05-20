@@ -767,7 +767,7 @@ def shop_page_view(request):
             | Q(products__category__name__icontains=search_query)
             | Q(products__brand__name__icontains=search_query)
         )
-
+    product_color_list = product_color_list.order_by('pk')
     if sortby == "a_z":
         product_color_list = product_color_list.order_by("products__name")
     elif sortby == "new_arrival":
@@ -777,7 +777,6 @@ def shop_page_view(request):
     elif sortby == "high_to_low":
         product_color_list = product_color_list.order_by("-price")
 
-    product_color_list = product_color_list.order_by('pk')
 
     paginator = Paginator(product_color_list, 12)
 
@@ -1248,7 +1247,7 @@ def update_address(request, address_id):
                     address = Address.objects.get(pk=address_id)
                 except Address.DoesNotExist:
                     messages.error(request, "Address not found.")
-                    return redirect("user_dashboard", user_id=user_id)
+                    return redirect("user_dashboard")
 
                 cleaned_name = clean_string(name)
                 cleaned_phone = clean_string(phone_number)
@@ -1364,13 +1363,13 @@ def update_address(request, address_id):
                     address.save()
                     messages.success(request, "Address Updated")
                     user_id = address.customer.user.id
-                    return redirect("user_dashboard", user_id=user_id)
+                    return redirect("user_dashboard")
                 else:
-                    return redirect("user_dashboard", user_id=user_id)
+                    return redirect("user_dashboard")
             else:
-                return redirect("user_dashboard", user_id=user_id)
+                return redirect("user_dashboard")
         else:
-            return redirect("user_dashboard", user_id=user_id)
+            return redirect("user_dashboard")
     else:
         return redirect("index_page")
 
@@ -1519,13 +1518,13 @@ def add_new_address(request, customer_id):
                     address.save()
                     messages.success(request, "New shipping address created")
                     user_id = customer.user.id
-                    return redirect("user_dashboard", user_id=user_id)
+                    return redirect("user_dashboard")
                 else:
-                    return redirect("user_dashboard", user_id=user_id)
+                    return redirect("user_dashboard")
             else:
                 messages.error(
                     request, "Please fill all the fields to add the address")
-                return redirect("user_dashboard", user_id=user_id)
+                return redirect("user_dashboard")
     else:
         return redirect(index_page)
 
@@ -1575,10 +1574,10 @@ def user_change_password(request, user_id):
                         auth.login(request, user)
 
                     messages.success(request, "Password Updated")
-                    return redirect("user_dashboard", user_id=user_id)
+                    return redirect("user_dashboard")
 
                 else:
-                    return redirect("user_dashboard", user_id=user_id)
+                    return redirect("user_dashboard")
             except Exception as e:
                 return redirect(index_page)
     else:

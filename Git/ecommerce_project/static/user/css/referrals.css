@@ -1,0 +1,83 @@
+  .col-md-3,
+  .col-md-4 {
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
+  .btn-primary {
+    padding: 10px 20px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  .referral_code_column {
+    min-height: 300px;
+    max-height: 350px;
+  }
+
+
+
+  .card {
+    background-color: #e6f5ff;
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .card-text {
+    color: #555555;
+  }
+
+  .card-text:first-child {
+    margin-top: 0;
+  }
+
+  .card-text:last-child {
+    margin-bottom: 0;
+  }
+
+
+  .alert-box {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px;
+    background-color: #353535;
+    color: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(78, 78, 78, 0.5);
+    z-index: 9999;
+    text-align: center;
+  }

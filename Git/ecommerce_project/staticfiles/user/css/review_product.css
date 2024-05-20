@@ -1,0 +1,11 @@
+.bi-star-fill.star {
+    color: #ffcc00;
+}
+
+.bi-star-fill.unstar {
+    color: #afafad;
+}
+
+.bi-star-fill.unstar:hover {
+    color: #ffcc00;
+}

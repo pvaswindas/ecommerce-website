@@ -502,7 +502,7 @@ def add_categories(request):
 
             if name_str and description_str:
                 cleaned_name = clean_string(name_str)
-                cleaned_description = clean_string(description)
+                cleaned_description = clean_string(description_str)
 
                 if not alphabets_pattern.match(name_str):
                     is_every_field_valid = False

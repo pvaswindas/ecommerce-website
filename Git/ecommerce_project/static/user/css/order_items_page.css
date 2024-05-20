@@ -1,0 +1,29 @@
+.main-container {
+    background-color: rgba(245, 245, 245, 0.9);
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 10px;
+    vertical-align: middle;
+}
+
+.custom-img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+tr {
+    transition: box-shadow 0.3s ease;
+}
+
+tr.table-row:hover {
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}

@@ -8,9 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-g#5oh!7wd0gkmzgiv#j_m%kzr5#t5063-ti4tbix&4ox&%j5h2"
 
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*', '127.0.0.1', 'localhost', '13.60.81.137', '0.0.0.0', 'www.sneakerheadsweb.shop', 'sneakerheadsweb.shop']
 
 
 SITE_ID = 1
@@ -76,10 +76,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "sneakerheads",
-        "USER": "postgres",
-        "PASSWORD": "error404",
+        "USER": "admin",
+        "PASSWORD": "admin123",
         "HOST": "localhost",
         "PORT": "5432",
     }
@@ -111,16 +111,13 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATIC_ROOT = BASE_DIR / "globalstatic"
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-STATIC_URL = "static/"
-
-STATIC_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+  os.path.join(BASE_DIR, 'static'),
 ]
-
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
